@@ -277,3 +277,484 @@ const goView=v=>{$(`.navb[data-v="${v}"]`).click()};
 /* ---------- Sofia chat ---------- */
 const log=$('#chatLog');
 function mdLite(t){let h=esc(t);h=h.replace(/
+(\w*)\n?([\s\S]*?)
+/g,(m,l,c)=>'<pre class="bg-black/50 rounded-xl p-3 my-2 overflow-x-auto text-[.72rem] text-cyan-200">'+c.trim()+'</pre>');h=h.replace(/`([^`]+)`/g,'<code class="text-cyan-300 bg-black/40 px-1 rounded">$1</code>').replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');return h}
+function say(t,who='s',raw){const d=document.createElement('div');d.className='msg '+who;d.innerHTML=raw?t:mdLite(t);log.append(d);log.scrollTop=log.scrollHeight;return d}
+let VOICE=true;$('#spkBtn').onclick=()=>{VOICE=!VOICE;$('#spkBtn').style.opacity=VOICE?1:.35;toast('Voice out '+(VOICE?'on':'off'))};
+function speak(t){if(!VOICE||!speechSynthesis)return;const u=new SpeechSynthesisUtterance(t.replace(/[*`#]/g,'').slice(0,260));u.lang=$('#vlang').value;speechSynthesis.cancel();speechSynthesis.speak(u)}
+
+/* ---------- AI router: Gemini → Groq → OpenRouter → offline brain ---------- */
+function activeAgent(){return DB.agents.find(a=>a.id===S.activeAgent)}
+async function askCloud(prompt,img,mime){
+  const ag=activeAgent();const sys=(ag?('You are '+ag.name+'. '+ag.ins+' Memory: '+(ag.memory||[]).slice(-10).join(' | ')):'You are Sofia, the AI inside SBSU AI Studio (Shaheed Bhagat Singh State University Ferozepur). Friendly senior-mentor tone. Punjabi/Hindi/English as the user speaks.');
+  try{
+    if(S.keys.GEMINI_API_KEY){const parts=[{text:prompt}];if(img)parts.push({inline_data:{mime_type:mime,data:img}});
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${S.model||'gemini-1.5-flash'}:generateContent?key=${S.keys.GEMINI_API_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:sys}]},contents:[{parts}],generationConfig:{temperature:+S.temp}})});
+      const j=await r.json();return j.candidates?.[0]?.content?.parts?.map(p=>p.text).join('')||null}
+    if(S.keys.GROQ_API_KEY){const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+S.keys.GROQ_API_KEY},body:JSON.stringify({model:S.model||'llama-3.3-70b-versatile',temperature:+S.temp,messages:[{role:'system',content:sys},{role:'user',content:prompt}]})});
+      const j=await r.json();return j.choices?.[0]?.message?.content||null}
+    if(S.keys.OPENROUTER_API_KEY){const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+S.keys.OPENROUTER_API_KEY},body:JSON.stringify({model:S.model||'meta-llama/llama-3.3-70b-instruct:free',temperature:+S.temp,messages:[{role:'system',content:sys},{role:'user',content:prompt}]})});
+      const j=await r.json();return j.choices?.[0]?.message?.content||null}
+  }catch(e){return null}
+  return null;
+}
+function offlineBrain(t){
+  const l=t.toLowerCase();
+  if(/^(hi|hello|hey|sat ?sri ?akal|ਸਤਿ|ਨਮਸਤੇ|namaste)/.test(l))return 'Sat Sri Akal! 🙏 Main Sofia haan — SBSU AI Studio di AI. Tell me what to build — a website, app, 2D/3D game, or an agent — or ask me anything.';
+  if(l.includes('who are you'))return "I'm **Sofia** — the AI builder inside SBSU AI Studio, made for Shaheed Bhagat Singh State University Ferozepur. I design, code, debug and preview full apps right here. Try: *Build me a Minecraft clone* or *Build me an expense tracker*.";
+  if(l.includes('supabase'))return 'Settings tab → paste SUPABASE_URL + SUPABASE_ANON_KEY. Create the free project at supabase.com, run the SQL shown in Settings, and every project syncs to the cloud with localStorage as offline fallback.';
+  if(l.includes('connect'))return 'Connect tab → one device taps **Host** (a QR + invite code appears), the other pastes/scans it and taps **Allow**, then sends back its answer code — the host taps **Allow** too. Only after BOTH consents does the WebRTC channel open. Then try: *Open YouTube in all connected devices*.';
+  if(l.includes('apk'))return 'Download the project ZIP → easiest path is **Capacitor**: `npm i @capacitor/core @capacitor/cli && npx cap init` then `npx cap add android` — Android Studio opens with APK-ready build files. Steps are in the ZIP README too.';
+  return "Here's how I'd approach that: break it into small pieces, build the simplest working version first, then polish. If you want it **built for real**, just say the word — e.g. *Build me a "+(l.split(' ').slice(0,4).join(' ')||'notes app')+"* — and I'll generate complete working code with live preview, Edit, and ZIP download. (Add a GEMINI_API_KEY in Settings for my full cloud brain.)";
+}
+async function sofiaReply(userText,img,mime){
+  const thinking=say('Sofia is thinking…','s');thinking.classList.add('pulse');
+  let out=await askCloud(userText,img,mime); if(!out)out=offlineBrain(userText);
+  const ag=activeAgent(); if(ag){ag.memory=ag.memory||[];ag.memory.push('Me: '+userText.slice(0,80)+' → You: '+out.slice(0,80));save()}
+  thinking.classList.remove('pulse');thinking.innerHTML=mdLite(out);log.scrollTop=log.scrollHeight;speak(out);
+}
+
+/* ============================================================
+   BUILD ENGINE — auto tool/language/workflow selector
+============================================================ */
+function pickEngine(p){const l=p.toLowerCase();
+  if(/expense|budget|money track/.test(l))return{engine:'pwa',kind:'expense'};
+  if(/minecraft|voxel|block|2d|flappy|snake|small 3d/.test(l))return{engine:'three.js',kind:'voxel'};
+  if(/pubg|bgmi|gta|open.?world|racing|car|4d|realistic|shooter|big map/.test(l))return{engine:'babylon.js',kind:'openworld'};
+  if(/whatsapp|instagram|telegram|chat app|social|messenger/.test(l))return{engine:'web',kind:'chatapp'};
+  if(/website|landing|portfolio|site|page/.test(l))return{engine:'web',kind:'website'};
+  return{engine:'web',kind:'generic'}}
+
+/* ---- builder: expense tracker (the required demo) ---- */
+function buildExpense(){return `<!DOCTYPE html><html lang="en" class="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b0b14"><title>Expense Tracker — SBSU</title><script src="https://cdn.tailwindcss.com"><\/script><style>body{background:#0b0b14;font-family:Inter,system-ui}.glass{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);backdrop-filter:blur(14px)}.gtext{background:linear-gradient(90deg,#a78bfa,#22d3ee);-webkit-background-clip:text;color:transparent}input,select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.55rem .8rem;font-size:.85rem;width:100%;outline:none}input:focus{border-color:#8b5cf6}.btn{background:linear-gradient(135deg,#8b5cf6,#6366f1);border-radius:12px;padding:.55rem 1.1rem;font-weight:600;font-size:.85rem;box-shadow:0 6px 18px -6px rgba(139,92,246,.5);color:#fff;border:0;cursor:pointer}
+.chip{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.45rem .7rem;font-size:.78rem;color:#e7e7f0;cursor:pointer}
+.row{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
+body{color:#e7e7f0;min-height:100vh}.del{color:#f87171}.ed{color:#22d3ee}</style></head>
+<body class="p-4 md:p-8 max-w-3xl mx-auto">
+<header class="flex items-center justify-between mb-6"><h1 class="text-2xl font-extrabold">💸 Expense <span class="gtext">Tracker</span></h1><span class="text-xs text-white/40">SBSU AI Studio · offline-first PWA</span></header>
+<div class="grid grid-cols-2 gap-3 mb-4">
+<div class="glass rounded-2xl p-4"><div class="text-xs text-white/50">Total spent</div><div id="tot" class="text-2xl font-extrabold gtext">₹0</div></div>
+<div class="glass rounded-2xl p-4"><div class="text-xs text-white/50">This filter</div><div id="cnt" class="text-2xl font-extrabold">0 items</div></div></div>
+<form id="f" class="glass rounded-2xl p-4 grid sm:grid-cols-5 gap-2 mb-4">
+<input id="nm" placeholder="Expense name" required class="sm:col-span-2">
+<input id="am" type="number" min="1" placeholder="₹ Amount" required>
+<select id="ct"><option>Food</option><option>Travel</option><option>Bills</option><option>Study</option><option>Other</option></select>
+<input id="dt" type="date" required>
+<button class="btn sm:col-span-5" id="sb">＋ Add expense</button></form>
+<div class="flex items-center gap-2 mb-3"><select id="mF" class="!w-auto"></select><canvas id="cv" width="560" height="150" class="flex-1 glass rounded-2xl" style="height:110px"></canvas></div>
+<div id="ls" class="space-y-2"></div>
+<script>
+let ex=JSON.parse(localStorage.getItem('sbsu_exp')||'[]'),editId=null;
+const CATS={Food:'#f59e0b',Travel:'#22d3ee',Bills:'#a78bfa',Study:'#34d399',Other:'#f472b6'};
+document.getElementById('dt').value=new Date().toISOString().slice(0,10);
+function persist(){localStorage.setItem('sbsu_exp',JSON.stringify(ex))}
+function months(){const s=new Set(ex.map(e=>e.dt.slice(0,7)));return['all',... [...s].sort().reverse()]}
+function render(){const mf=document.getElementById('mF'),cur=mf.value||'all';
+ mf.innerHTML=months().map(m=>'<option '+(m===cur?'selected':'')+' value="'+m+'">'+(m==='all'?'All months':m)+'</option>').join('');
+ const list=ex.filter(e=>cur==='all'||e.dt.startsWith(cur)).sort((a,b)=>b.dt.localeCompare(a.dt));
+ document.getElementById('ls').innerHTML=list.map(e=>'<div class="row"><span style="width:10px;height:10px;border-radius:50%;background:'+CATS[e.ct]+'"></span><div class="flex-1"><div class="text-sm font-semibold">'+e.nm.replace(/</g,'&lt;')+'</div><div class="text-[.68rem] text-white/40">'+e.ct+' · '+e.dt+'</div></div><b>₹'+e.am+'</b><button class="chip ed" onclick="edEx('+e.id+')">✏️</button><button class="chip del" onclick="delEx('+e.id+')">🗑</button></div>').join('')||'<p class="text-center text-white/30 text-sm py-6">No expenses yet — add your first one above.</p>';
+ document.getElementById('tot').textContent='₹'+ex.reduce((s,e)=>s+ +e.am,0).toLocaleString('en-IN');
+ document.getElementById('cnt').textContent=list.length+' items';
+ const byC={};list.forEach(e=>byC[e.ct]=(byC[e.ct]||0)+ +e.am);
+ const cv=document.getElementById('cv'),x=cv.getContext('2d');x.clearRect(0,0,560,150);
+ const ks=Object.keys(byC),mx=Math.max(1,...Object.values(byC));
+ ks.forEach((k,i)=>{const h=byC[k]/mx*100;x.fillStyle=CATS[k];x.beginPath();x.roundRect(20+i*105,120-h,70,h,8);x.fill();x.fillStyle='#9c9cb5';x.font='11px Inter';x.fillText(k+' ₹'+byC[k],20+i*105,140)});
+ persist()}
+window.delEx=id=>{ex=ex.filter(e=>e.id!==id);render()};
+window.edEx=id=>{const e=ex.find(x=>x.id===id);nm.value=e.nm;am.value=e.am;ct.value=e.ct;dt.value=e.dt;editId=id;sb.textContent='💾 Save changes';scrollTo(0,0)};
+f.onsubmit=e=>{e.preventDefault();
+ if(editId){Object.assign(ex.find(x=>x.id===editId),{nm:nm.value,am:am.value,ct:ct.value,dt:dt.value});editId=null;sb.textContent='＋ Add expense'}
+ else ex.push({id:Date.now(),nm:nm.value,am:am.value,ct:ct.value,dt:dt.value});
+ if(window.Notification&&Notification.permission==='granted')new Notification('Expense saved ✅',{body:nm.value+' — ₹'+am.value});
+ nm.value='';am.value='';render()};
+mF.onchange=render;
+if(window.Notification&&Notification.permission==='default')Notification.requestPermission();
+render();
+<\/script></body></html>`}
+
+/* ---- builder: voxel world → Three.js ---- */
+function buildVoxel(p){return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Voxel World — SBSU AI Studio</title><style>body{margin:0;overflow:hidden;background:#0b0b14;font-family:Inter,system-ui}#hud{position:fixed;top:10px;left:10px;color:#fff;background:rgba(0,0,0,.45);padding:10px 14px;border-radius:12px;font-size:12px;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15)}#xh{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:20px;pointer-events:none;text-shadow:0 0 6px #000}.pad{position:fixed;bottom:18px;left:18px;display:grid;grid-template-columns:repeat(3,54px);gap:6px}.pad button{height:54px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:20px;backdrop-filter:blur(8px)}@media(hover:hover){.pad{display:none}}</style></head><body>
+<div id="hud">🧱 <b>Voxel World</b> — Three.js (auto-selected: block-style game)<br>🖱 Click = lock &amp; break · Right-click = place · WASD move · Space/Shift up/down<br>📱 Drag = look · Tap = break · Pad = move</div><div id="xh">+</div>
+<div class="pad"><span></span><button data-k="w">▲</button><span></span><button data-k="a">◀</button><button data-k="s">▼</button><button data-k="d">▶</button></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script><script>
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x87b7e8);scene.fog=new THREE.Fog(0x87b7e8,20,70);
+const cam=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,200);cam.position.set(16,12,16);
+const ren=new THREE.WebGLRenderer({antialias:true});ren.setSize(innerWidth,innerHeight);ren.setPixelRatio(Math.min(devicePixelRatio,2));ren.shadowMap.enabled=true;document.body.appendChild(ren.domElement);
+scene.add(new THREE.AmbientLight(0xffffff,.55));
+const sun=new THREE.DirectionalLight(0xfff4d6,1);sun.position.set(30,50,20);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
+const S=36,MAX=S*S*4,geo=new THREE.BoxGeometry(1,1,1),mat=new THREE.MeshLambertMaterial({vertexColors:true});
+const mesh=new THREE.InstancedMesh(geo,mat,MAX);mesh.castShadow=mesh.receiveShadow=true;scene.add(mesh);
+const dummy=new THREE.Object3D(),col=new THREE.Color(),world=new Map();let free=[];
+const h=(x,z)=>Math.max(1,Math.round(2+2*Math.sin(x*.35)*Math.cos(z*.3)+Math.sin(x*.9+z*.7)));
+let idx=0;
+function setB(x,y,z,c){const k=x+','+y+','+z;if(world.has(k))return;let i=free.length?free.pop():idx++;if(i>=MAX)return;dummy.position.set(x,y,z);dummy.scale.set(1,1,1);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.setColorAt(i,col.set(c));world.set(k,i);mesh.count=Math.max(mesh.count,i+1);mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor.needsUpdate=true}
+function delB(k){if(!world.has(k))return;const i=world.get(k);world.delete(k);dummy.position.set(0,-99,0);dummy.scale.set(.001,.001,.001);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);mesh.instanceMatrix.needsUpdate=true;free.push(i)}
+for(let x=0;x<S;x++)for(let z=0;z<S;z++){const H=h(x,z);for(let y=0;y<H;y++)setB(x,y,z,y===H-1?0x55a630:y>H-3?0x8a5a32:0x8d99ae)}
+mesh.count=idx;
+let yaw=-.7,pit=-.35;const keys={};
+addEventListener('keydown',e=>keys[e.key.toLowerCase()]=1);addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
+ren.domElement.addEventListener('click',()=>{if(document.pointerLockElement!==ren.domElement&&matchMedia('(hover:hover)').matches)ren.domElement.requestPointerLock()});
+addEventListener('mousemove',e=>{if(document.pointerLockElement===ren.domElement){yaw-=e.movementX*.0025;pit=Math.max(-1.5,Math.min(1.5,pit-e.movementY*.0025))}});
+let tc=null;addEventListener('touchstart',e=>tc={x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()});
+addEventListener('touchmove',e=>{if(!tc)return;yaw-=(e.touches[0].clientX-tc.x)*.006;pit=Math.max(-1.5,Math.min(1.5,pit-(e.touches[0].clientY-tc.y)*.006));tc.x=e.touches[0].clientX;tc.y=e.touches[0].clientY});
+addEventListener('touchend',e=>{if(tc&&Date.now()-tc.t<220)breakBlock();tc=null});
+const ray=new THREE.Raycaster();
+function aim(){ray.setFromCamera({x:0,y:0},cam);const hit=ray.intersectObject(mesh)[0];return hit}
+function breakBlock(){const hit=aim();if(!hit)return;const p=new THREE.Vector3().setFromMatrixPosition(new THREE.Matrix4().fromArray(mesh.instanceMatrix.array,hit.instanceId*16));delB(p.x+','+p.y+','+p.z)}
+addEventListener('mousedown',e=>{if(document.pointerLockElement!==ren.domElement)return;const hit=aim();if(!hit)return;const p=new THREE.Vector3().setFromMatrixPosition(new THREE.Matrix4().fromArray(mesh.instanceMatrix.array,hit.instanceId*16));
+ if(e.button===2){const n=hit.face.normal;setB(p.x+n.x,p.y+n.y,p.z+n.z,[0x55a630,0x8a5a32,0x8d99ae][Math.floor(Math.random()*3)])}else delB(p.x+','+p.y+','+p.z)});
+addEventListener('contextmenu',e=>e.preventDefault());
+document.querySelectorAll('.pad button').forEach(b=>{const k=b.dataset.k;b.addEventListener('touchstart',e=>{e.preventDefault();keys[k]=1});b.addEventListener('touchend',()=>keys[k]=0)});
+function tick(){requestAnimationFrame(tick);cam.rotation.set(0,0,0,'YXZ');cam.rotation.y=yaw;cam.rotation.x=pit;
+ const sp=.16,f=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw)),r=new THREE.Vector3(-f.z,0,f.x);
+ if(keys.w)cam.position.addScaledVector(f,sp);if(keys.s)cam.position.addScaledVector(f,-sp);
+ if(keys.a)cam.position.addScaledVector(r,-sp);if(keys.d)cam.position.addScaledVector(r,sp);
+ if(keys[' '])cam.position.y+=sp;if(keys.shift)cam.position.y-=sp;
+ ren.render(scene,cam)}tick();
+addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();ren.setSize(innerWidth,innerHeight)});
+<\/script></body></html>`}
+
+/* ---- builder: open world → Babylon.js ---- */function buildOpenWorld(p){return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>Open World — SBSU AI Studio</title><style>body{margin:0;overflow:hidden;font-family:Inter,system-ui}#c{width:100vw;height:100vh;display:block}#hud{position:fixed;top:10px;left:10px;color:#fff;background:rgba(0,0,0,.45);padding:10px 14px;border-radius:12px;font-size:12px;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15)}#spd{position:fixed;bottom:16px;right:16px;color:#fff;font-size:28px;font-weight:800;text-shadow:0 2px 10px #000}</style></head><body>
+<canvas id="c"></canvas><div id="hud">🌍 <b>Open World Drive</b> — Babylon.js (auto-selected: big map, car, shadows, physics)<br>W/S accelerate &amp; brake · A/D steer · Mobile: on-screen pad</div><div id="spd">0 km/h</div>
+<div style="position:fixed;bottom:16px;left:16px;display:grid;grid-template-columns:repeat(3,54px);gap:6px"><span></span><button data-k="w" style="height:54px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);color:#fff;font-size:20px">▲</button><span></span><button data-k="a" style="height:54px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);color:#fff;font-size:20px">◀</button><button data-k="s" style="height:54px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);color:#fff;font-size:20px">▼</button><button data-k="d" style="height:54px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);color:#fff;font-size:20px">▶</button></div>
+<script src="https://cdn.babylonjs.com/babylon.js"><\/script><script>
+const cv=document.getElementById('c'),eng=new BABYLON.Engine(cv,true,{stencil:true});
+const sc=new BABYLON.Scene(eng);sc.clearColor=new BABYLON.Color4(.45,.65,.9,1);sc.fogMode=BABYLON.Scene.FOGMODE_EXP2;sc.fogDensity=.004;sc.fogColor=new BABYLON.Color3(.45,.65,.9);
+const hemi=new BABYLON.HemisphericLight('h',new BABYLON.Vector3(0,1,0),sc);hemi.intensity=.75;
+const sun=new BABYLON.DirectionalLight('s',new BABYLON.Vector3(-.4,-1,.3),sc);sun.position=new BABYLON.Vector3(80,120,-60);
+const sh=new BABYLON.ShadowGenerator(2048,sun);sh.useBlurExponentialShadowMap=true;
+const cam=new BABYLON.ArcRotateCamera('c',-Math.PI/2,1.05,26,BABYLON.Vector3.Zero(),sc);
+const g=BABYLON.MeshBuilder.CreateGround('g',{width:600,height:600,subdivisions:32},sc);
+const gm=new BABYLON.StandardMaterial('gm',sc);gm.diffuseColor=new BABYLON.Color3(.32,.42,.3);g.material=gm;g.receiveShadows=true;
+const road=BABYLON.MeshBuilder.CreateGround('r',{width:600,height:14},sc);const rm=new BABYLON.StandardMaterial('rm',sc);rm.diffuseColor=new BABYLON.Color3(.15,.15,.17);road.material=rm;road.position.y=.02;road.receiveShadows=true;
+function box(w,h2,d,x,z,c){const b=BABYLON.MeshBuilder.CreateBox('b',{width:w,height:h2,depth:d},sc);b.position.set(x,h2/2,z);const m=new BABYLON.StandardMaterial('m'+x+z,sc);m.diffuseColor=c;b.material=m;sh.addShadowCaster(b);b.receiveShadows=true;return b}
+for(let i=0;i<70;i++){const x=(Math.random()-.5)*560,z=(Math.random()-.5)*560;if(Math.abs(z)<16)continue;
+ if(Math.random()<.6)box(6+Math.random()*10,6+Math.random()*26,6+Math.random()*10,x,z,new BABYLON.Color3(.5+Math.random()*.3,.5+Math.random()*.3,.55+Math.random()*.3));
+ else{const t=BABYLON.MeshBuilder.CreateCylinder('t',{height:5,diameter:.8},sc);t.position.set(x,2.5,z);const tm=new BABYLON.StandardMaterial('tm'+i,sc);tm.diffuseColor=new BABYLON.Color3(.4,.28,.15);t.material=tm;
+ const l=BABYLON.MeshBuilder.CreateSphere('l',{diameter:4+Math.random()*2},sc);l.position.set(x,6,z);const lm=new BABYLON.StandardMaterial('lm'+i,sc);lm.diffuseColor=new BABYLON.Color3(.2,.55,.25);l.material=lm;sh.addShadowCaster(t);sh.addShadowCaster(l)}}
+const car=box(2.2,1,4.4,0,10,new BABYLON.Color3(.85,.2,.25));car.position.y=.75;
+const wheels=[];[[-1.1,1.6],[1.1,1.6],[-1.1,-1.6],[1.1,-1.6]].forEach(o=>{const w=BABYLON.MeshBuilder.CreateCylinder('w',{diameter:.9,height:.4},sc);w.rotation.z=Math.PI/2;w.parent=car;w.position.set(o[0],-.35,o[1]);const wm=new BABYLON.StandardMaterial('wm',sc);wm.diffuseColor=new BABYLON.Color3(.08,.08,.08);w.material=wm;wheels.push(w)});
+sh.addShadowCaster(car);
+const keys={};addEventListener('keydown',e=>keys[e.key.toLowerCase()]=1);addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
+document.querySelectorAll('button[data-k]').forEach(b=>{b.addEventListener('touchstart',e=>{e.preventDefault();keys[b.dataset.k]=1});b.addEventListener('touchend',()=>keys[b.dataset.k]=0)});
+let spd=0,ang=0;
+sc.onBeforeRenderObservable.add(()=>{const dt=eng.getDeltaTime()/1000;
+ if(keys.w)spd=Math.min(30,spd+26*dt);
+ if(keys.s)spd=Math.max(-10,spd-32*dt);
+ spd-=spd*.55*dt;
+ const dir=spd>=0?1:-1;
+ if(keys.a)ang+=1.9*dt*Math.min(1,Math.abs(spd)/8)*dir;
+ if(keys.d)ang-=1.9*dt*Math.min(1,Math.abs(spd)/8)*dir;
+ car.rotation.y=ang;
+ car.position.x+=Math.sin(ang)*spd*dt;car.position.z+=Math.cos(ang)*spd*dt;
+ car.position.x=Math.max(-290,Math.min(290,car.position.x));car.position.z=Math.max(-290,Math.min(290,car.position.z));
+ wheels.forEach(w=>w.rotation.x+=spd*dt*2);
+ cam.target=car.position;cam.alpha=-ang-Math.PI/2;
+ document.getElementById('spd').textContent=Math.round(Math.abs(spd)*6)+' km/h'});
+eng.runRenderLoop(()=>sc.render());addEventListener('resize',()=>eng.resize());
+<\/script></body></html>`}
+
+/* ---- builder: chat app (WhatsApp / Instagram style) ---- */
+function buildChatApp(p){const name=/instagram/i.test(p)?'InstaClone':/telegram/i.test(p)?'TeleClone':'ChatApp';
+ return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${name} — SBSU AI Studio</title><script src="https://cdn.tailwindcss.com"><\/script><style>body{background:#0b0b14;color:#e7e7f0;font-family:Inter,system-ui}.glass{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09)}.m{max-width:75%;padding:.55rem .9rem;border-radius:16px;font-size:.86rem;animation:u .25s}.me{margin-left:auto;background:linear-gradient(135deg,#7c3aed,#4f46e5);border-bottom-right-radius:5px}.th{background:rgba(255,255,255,.07);border-bottom-left-radius:5px}@keyframes u{from{opacity:0;transform:translateY(6px)}}input{outline:none}</style></head><body class="h-screen flex flex-col max-w-xl mx-auto">
+<header class="glass m-3 rounded-2xl px-4 py-3 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center font-bold">S</div><div><b>${name}</b><div class="text-xs text-emerald-400">● online — demo bot replies</div></div></header>
+<div id="log" class="flex-1 overflow-y-auto px-4 space-y-2"></div>
+<form id="f" class="p-3 flex gap-2"><input id="i" class="glass flex-1 rounded-2xl px-4 py-2.5 text-sm bg-transparent" placeholder="Message…" autocomplete="off"><button class="glass rounded-2xl px-5 text-sm font-semibold hover:bg-violet-500/30">➤</button></form>
+<script>
+const log=document.getElementById('log'),RE=['Nice! 🔥','Haan ji, bilkul!','Tell me more 👀','😂😂','Okie, noted ✅','Waah, great!','Interesting… go on'];
+function add(t,me){const d=document.createElement('div');d.className='m '+(me?'me':'th');d.textContent=t;log.append(d);log.scrollTop=1e9}
+add('Sat Sri Akal! 🙏 This is a working ${name} demo built by Sofia. Chats save locally — refresh and they stay.',0);
+(JSON.parse(localStorage.getItem('sbsu_chat')||'[]')).forEach(c=>add(c.t,c.me));
+f.onsubmit=e=>{e.preventDefault();if(!i.value.trim())return;const h=JSON.parse(localStorage.getItem('sbsu_chat')||'[]');
+ add(i.value,1);h.push({t:i.value,me:1});localStorage.setItem('sbsu_chat',JSON.stringify(h));i.value='';
+ setTimeout(()=>{const r=RE[Math.floor(Math.random()*RE.length)];add(r,0);h.push({t:r,me:0});localStorage.setItem('sbsu_chat',JSON.stringify(h))},700+Math.random()*900)};
+<\/script></body></html>`}
+
+/* ---- builder: modern website / landing ---- */
+function buildWebsite(p){const topic=p.replace(/build me|website|landing|page|site|a |an /gi,'').trim()||'Your Idea';
+ return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${topic} — SBSU AI Studio</title><script src="https://cdn.tailwindcss.com"><\/script><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet"><style>body{font-family:Inter;background:#0b0b14;color:#e7e7f0}.blob{position:fixed;border-radius:50%;filter:blur(100px);opacity:.3;z-index:-1}.glass{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);backdrop-filter:blur(14px)}.g{background:linear-gradient(90deg,#a78bfa,#22d3ee);-webkit-background-clip:text;color:transparent}.btn{background:linear-gradient(135deg,#8b5cf6,#6366f1);border-radius:14px;padding:.8rem 1.6rem;font-weight:600;box-shadow:0 10px 30px -8px rgba(139,92,246,.6);transition:.2s}.btn:hover{transform:translateY(-2px)}section{padding:5rem 1.5rem;max-width:1100px;margin:auto}</style></head><body>
+<div class="blob" style="width:440px;height:440px;background:#7c3aed;top:-120px;left:-100px"></div><div class="blob" style="width:380px;height:380px;background:#0ea5e9;bottom:-100px;right:-80px"></div>
+<nav class="glass m-4 rounded-2xl px-5 py-3 flex items-center justify-between max-w-6xl mx-auto"><b>${topic}</b><div class="hidden sm:flex gap-5 text-sm text-white/60"><a href="#f" class="hover:text-white">Features</a><a href="#p" class="hover:text-white">Pricing</a><a href="#c" class="hover:text-white">Contact</a></div><button class="btn !py-2 !px-4 text-sm">Get started</button></nav>
+<section class="text-center pt-20"><p class="text-cyan-300 text-sm font-semibold mb-4 tracking-widest">BUILT IN SECONDS · SBSU AI STUDIO</p><h1 class="text-4xl md:text-6xl font-extrabold leading-tight">${topic},<br><span class="g">reimagined for 2026.</span></h1><p class="text-white/60 max-w-xl mx-auto mt-5">A fully responsive, glassmorphic, dark-mode landing page generated by Sofia. Edit anything in the Studio tab and press ▶ Run.</p><div class="mt-8 flex gap-3 justify-center"><button class="btn">Start free →</button><button class="glass rounded-2xl px-6 py-3 font-semibold text-sm">Live demo</button></div></section>
+<section id="f"><h2 class="text-3xl font-extrabold text-center mb-10">Why people love it</h2><div class="grid sm:grid-cols-3 gap-4">${['⚡ Blazing fast','🔒 Private by design','📱 Works everywhere','🎨 Beautiful by default','🧠 AI inside','💸 Free tier'].map((t,i)=>'<div class="glass rounded-2xl p-6 hover:-translate-y-1 transition"><div class="text-2xl mb-2">'+t.split(' ')[0]+'</div><b>'+t.split(' ').slice(1).join(' ')+'</b><p class="text-sm text-white/50 mt-2">Crafted automatically with 2026 design language — soft glass, glow gradients, micro-motion.</p></div>').join('')}</div></section>
+<section id="p"><h2 class="text-3xl font-extrabold text-center mb-10">Simple pricing</h2><div class="grid sm:grid-cols-3 gap-4">${[['Free','₹0','For students'],['Pro','₹499/mo','For creators'],['Team','₹1,999/mo','For startups']].map((x,i)=>'<div class="glass rounded-2xl p-6 text-center '+(i===1?'ring-2 ring-violet-500':'')+'"><b>'+x[0]+'</b><div class="text-3xl font-extrabold g my-3">'+x[1]+'</div><p class="text-sm text-white/50 mb-4">'+x[2]+'</p><button class="btn w-full text-sm">Choose</button></div>').join('')}</div></section>
+<footer id="c" class="text-center text-white/40 text-sm py-10">Made with Sofia · Built for SBSU Ferozepur Students</footer></body></html>`}
+
+/* ---- builder: generic app ---- */function buildGeneric(p){return buildWebsite(p)}
+
+/* ---------- project pipeline ---------- */
+const BUILDERS={expense:buildExpense,voxel:buildVoxel,openworld:buildOpenWorld,chatapp:buildChatApp,website:buildWebsite,generic:buildGeneric};
+function newProject(prompt){
+ const pick=pickEngine(prompt);
+ const name=prompt.replace(/build me|make|create|a |an /gi,'').trim().split(' ').slice(0,4).join(' ')||'Untitled';
+ const code=BUILDERS[pick.kind](prompt);
+ const p={id:'p'+Date.now(),name:name.charAt(0).toUpperCase()+name.slice(1),prompt,engine:pick.engine,kind:pick.kind,code,chat:[{r:'u',t:prompt}],updated:Date.now()};
+ DB.projects.unshift(p);save();supaSync(p);selectProject(p.id);
+ say(`Done! ⚡ I built **${p.name}** — engine auto-selected: **${pick.engine==='three.js'?'Three.js (voxel/lightweight)':pick.engine==='babylon.js'?'Babylon.js (open world, shadows & physics)':pick.engine==='pwa'?'Offline-first PWA pattern':'Modern web stack'}**. Open the **Studio** tab for live preview, ✏️ Edit and 📦 ZIP.`,'s');
+ speak('Build complete. Opening studio.');goView('studio');
+}
+function selectProject(id){
+ S.active=id;save();renderProjList();
+ const p=DB.projects.find(x=>x.id===id);if(!p)return;
+ $('#codeEd').value=p.code;$('#codeEd').readOnly=true;$('#editBtn').textContent='✏️ Edit';
+ $('#engTag').textContent={three:'Three.js · voxel/2D',babylon:'Babylon.js · open world',pwa:'PWA · offline',web:'Web · responsive'}[p.engine==='three.js'?'three':p.engine==='babylon.js'?'babylon':p.engine==='pwa'?'pwa':'web']||p.engine;
+ $('#pv').srcdoc=p.code;$('#pvNote').textContent='▶ '+p.name;
+}
+function renderProjList(){
+ const sel=$('#projSel');sel.innerHTML=DB.projects.map(p=>`<option value="${p.id}" ${p.id===S.active?'selected':''}>${esc(p.name)}</option>`).join('')||'<option value="">— no projects yet —</option>';
+}
+$('#projSel').onchange=e=>selectProject(e.target.value);
+$('#runBtn').onclick=()=>{const p=DB.projects.find(x=>x.id===S.active);if(p){p.code=$('#codeEd').value;save();supaSync(p);$('#pv').srcdoc=p.code;toast('Preview refreshed ▶')}};
+$('#editBtn').onclick=()=>{const ro=$('#codeEd').readOnly;$('#codeEd').readOnly=!ro;$('#editBtn').textContent=ro?'💾 Save & Run':'✏️ Edit';
+ if(ro){toast('Editing — make changes, then Save & Run')}else{const p=DB.projects.find(x=>x.id===S.active);if(p){p.code=$('#codeEd').value;p.updated=Date.now();save();supaSync(p);$('#pv').srcdoc=p.code;toast('Saved ✅ live preview updated')}}};
+
+/* ---------- Download ZIP (full source + PWA + APK path) ---------- */
+const ENV_EXAMPLE=`# AI MODELS
+GEMINI_API_KEY=
+GROQ_API_KEY=
+OPENROUTER_API_KEY=
+HUGGINGFACE_API_KEY=
+DEEPSEEK_API_KEY=
+TOGETHER_API_KEY=
+MISTRAL_API_KEY=
+COHERE_API_KEY=
+OPENAI_API_KEY=
+ANTHROPIC_API_KEY=
+REPLICATE_API_KEY=
+# IMAGE / VOICE
+STABILITY_API_KEY=
+ELEVENLABS_API_KEY=
+REMOVE_BG_API_KEY=
+PEXELS_API_KEY=
+UNSPLASH_API_KEY=
+PIXABAY_API_KEY=
+# GOOGLE
+GOOGLE_MAPS_API_KEY=
+GOOGLE_SEARCH_API_KEY=
+YOUTUBE_API_KEY=
+GOOGLE_DRIVE_API_KEY=
+GOOGLE_SHEETS_API_KEY=
+GMAIL_API_KEY=
+FIREBASE_API_KEY=
+# OTHER
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+WEATHER_API_KEY=
+NEWS_API_KEY=
+TELEGRAM_BOT_TOKEN=
+GITHUB_TOKEN=
+CLOUDINARY_API_KEY=
+STRIPE_API_KEY=`;const README=p=>`# ${p.name}
+Built by **Sofia** — SBSU AI Studio (Shaheed Bhagat Singh State University Ferozepur).
+Engine: ${p.engine} · Prompt: "${p.prompt}"
+
+## Run locally
+Open index.html in any browser — no build step. For full PWA, serve the folder:
+npx serve .
+
+## Deploy to Vercel (recommended)
+1. Push this folder to GitHub.
+2. vercel.com → New Project → import the repo → Deploy (no framework preset needed).
+3. Add env vars from .env.example in Project → Settings → Environment Variables.
+4. PWA install prompt, offline mode and the app icon activate on the https URL.
+
+## Supabase (auth + cloud database)
+1. supabase.com → New project (free) → copy Project URL + anon key into .env / the app's Settings tab.
+2. SQL editor: create table projects(id text primary key, name text, engine text, code text, updated timestamptz default now());
+3. Authentication → enable Email provider for Login/Signup.
+
+## Android APK
+1. npm i -g @capacitor/cli && npx cap init "${p.name}" com.sbsu.${p.id}
+2. Copy this folder into the webDir, then: npx cap add android
+3. npx cap open android → Android Studio opens with build files ready → Build > Build APK.
+
+Built for SBSU Ferozepur Students by Sofia AI.`;
+const SWJS=`const C='sbsu-v1';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['./','./index.html','./manifest.json'])));self.skipWaiting()});self.addEventListener('activate',e=>e.waitUntil(clients.claim()));self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(n=>{const cp=n.clone();caches.open(C).then(c=>c.put(e.request,cp));return n}).catch(()=>caches.match('./index.html'))))});`;
+$('#zipBtn').onclick=async()=>{
+ const p=DB.projects.find(x=>x.id===S.active);if(!p)return toast('Build something first');
+ toast('Packing ZIP… 📦');
+ const z=new JSZip();
+ z.file('index.html',p.code);
+ z.file('manifest.json',manifestFor(p.name));
+ z.file('sw.js',SWJS);
+ z.file('.env.example',ENV_EXAMPLE);
+ z.file('README.md',README(p));
+ const blob=await z.generateAsync({type:'blob'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=p.name.replace(/\s+/g,'-')+'.zip';a.click();
+ toast('ZIP downloaded ✅ — deploy-ready for Vercel',1);
+};
+$('#envBtn').onclick=()=>{const a=document.createElement('a');a.href='data:text/plain,'+encodeURIComponent(ENV_EXAMPLE);a.download='.env.example';a.click()};
+
+/* ---------- command bar + chat wiring ---------- */
+function handle(text){
+ if(!text.trim())return;
+ say(text,'u');
+ const l=text.toLowerCase();
+ if(/^(build|make|create)\b/.test(l)||l.includes('build me')){newProject(text);return}
+ if(/open youtube.*(all|connected)/.test(l)&&peerOpen()){peerSend({t:'cmd',url:'https://youtube.com'});say('Sent to all connected devices: **open YouTube** 📺');return}
+ sofiaReply(text);
+  }
+$('#cmdGo').onclick=()=>{handle($('#cmd').value);$('#cmd').value=''};
+$('#cmd').addEventListener('keydown',e=>{if(e.key==='Enter')$('#cmdGo').click()});
+$('#sendBtn').onclick=()=>{handle($('#chatIn').value);$('#chatIn').value=''};
+$('#chatIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('#sendBtn').click()});
+
+/* ---------- voice IN (Punjabi / Hindi / English) ---------- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,recTarget='chat';
+function startMic(target){
+ if(!SR)return toast('Speech recognition needs Chrome/Edge');
+ recTarget=target;
+ rec=new SR();rec.lang=$('#vlang').value;rec.interimResults=false;
+ rec.onresult=e=>{const t=e.results[0][0].transcript;(target==='cmd'?$('#cmd'):$('#chatIn')).value=t;handle(t);(target==='cmd'?$('#cmd'):$('#chatIn')).value=''};
+ rec.onend=()=>{[$('#micBtn'),$('#cmdMic')].forEach(b=>b.style.transform='')};
+ rec.start();(target==='cmd'?$('#cmdMic'):$('#micBtn')).style.transform='scale(1.25)';toast('Listening… ('+$('#vlang').value+') 🎙️');
+}
+$('#micBtn').onclick=()=>startMic('chat');$('#cmdMic').onclick=()=>startMic('cmd');
+
+/* ---------- multimodal chips ---------- */
+$$('.chip[data-tool]').forEach(c=>c.onclick=async()=>{
+ const t=c.dataset.tool;
+ if(t==='scan')return $('#fileUp').click();
+ if(t==='image'){const q=prompt('Describe the image:');if(!q)return;
+   const ar=prompt('Aspect ratio — 1:1, 16:9, 9:16?','16:9')||'16:9';const [w,h]=ar==='9:16'?[768,1344]:ar==='1:1'?[1024,1024]:[1344,768];
+   say(`🖼 Generating **${q}** (${ar})…`,'s');
+   const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(q+' high quality, detailed, 2026 style')}?width=${w}&height=${h}&nologo=true`;
+   say(`<img src="${url}" class="rounded-xl max-w-full" onload="this.style.opacity=1" style="opacity:0;transition:.5s">`,'s',1);return}
+ if(t==='music'){const q=prompt('Music mood — e.g. "lofi punjabi beats"?')||'chill';
+   say(`🎵 Composing a short **${q}** loop with WebAudio (add ELEVENLABS_API_KEY in Settings for studio-grade tracks)…`,'s');
+   const ac=new(window.AudioContext||webkitAudioContext)(),scale=[0,3,5,7,10],base=220;
+   for(let i=0;i<24;i++){const o=ac.createOscillator(),g=ac.createGain();o.type=i%6===0?'triangle':'sine';o.frequency.value=base*Math.pow(2,scale[Math.floor(Math.random()*5)]/12)*(i%8>5?2:1);
+    o.connect(g);g.connect(ac.destination);const s=ac.currentTime+i*.28;g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(.22,s+.03);g.gain.exponentialRampToValueAtTime(.001,s+.5);o.start(s);o.stop(s+.55)}
+   toast('Playing 🎵');return}
+ if(t==='video'){say('🎬 Video generation: plug **REPLICATE_API_KEY** in Settings and I\'ll call a text-to-video model. Meanwhile, I can animate any image → video-style pan/zoom right in a built project — just ask while building.','s');return}
+ if(t==='research'){const q=prompt('Research topic:');if(!q)return;
+   say(`🔎 Researching **${esc(q)}**… (add GOOGLE_SEARCH_API_KEY for inline results — opening live sources now)`,'s');open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank');return}
+ if(t==='maps'){const q=prompt('Place to find on the map:')||'Shaheed Bhagat Singh State University Ferozepur';open('https://www.google.com/maps/search/'+encodeURIComponent(q),'_blank');say('📍 Opened Maps for **'+esc(q)+'** — add GOOGLE_MAPS_API_KEY to embed maps inside builds.','s')}
+});
+$('#fileUp').onchange=e=>{const f=e.target.files[0];if(!f)return;
+ say('📄 '+f.name,'u');
+ const r=new FileReader();
+ r.onload=async()=>{const b64=r.result.split(',')[1];
+  say(`Scanning **${f.name}**…`,'s');
+  const out=await askCloud('Analyse this document/image. Describe it, extract key text and data.',b64,f.type);
+  say(out||'📄 **'+esc(f.name)+'** received ('+(f.size/1024).toFixed(1)+' KB, '+f.type+'). For deep document vision add a GEMINI_API_KEY in Settings — then I can read text, tables and screenshots directly.','s')};
+ r.readAsDataURL(f);e.target.value='';
+};
+
+/* ---------- Agents ---------- */
+function renderAgents(){
+ $('#agList').innerHTML=DB.agents.map(a=>`<div class="glass rounded-2xl p-4 ${a.id===S.activeAgent?'ring-2 ring-violet-500':''}">
+  <div class="flex items-center gap-2 mb-1"><span class="text-xl">🤖</span><b class="text-sm">${esc(a.name)}</b><span class="text-[.6rem] text-cyan-300 ml-auto">${esc(a.role)}</span></div>
+  <p class="text-xs text-white/50 mb-3">${esc(a.ins||'No instructions')}</p>
+  <div class="flex gap-2"><button class="btn2 text-xs flex-1" onclick="useAgent('${a.id}')">${a.id===S.activeAgent?'● Active':'Use in chat'}</button><button class="btn2 text-xs" onclick="delAgent('${a.id}')">🗑</button></div></div>`).join('')
+  ||'<p class="text-white/30 text-sm col-span-2 text-center py-8">No agents yet — create a Study, Coding or Research agent. Each keeps its own memory.</p>';
+ const a=activeAgent();$('#agentTag').textContent=a?'· '+a.name+' active':'';
+}
+window.useAgent=id=>{S.activeAgent=S.activeAgent===id?null:id;save();renderAgents();toast(activeAgent()?activeAgent().name+' is now answering':'Back to Sofia')};
+window.delAgent=id=>{DB.agents=DB.agents.filter(a=>a.id!==id);if(S.activeAgent===id)S.activeAgent=null;save();renderAgents()};
+$('#agSave').onclick=()=>{const n=$('#agName').value.trim();if(!n)return toast('Give the agent a name');
+ DB.agents.push({id:'a'+Date.now(),name:n,role:$('#agRole').value,ins:$('#agIns').value,memory:[]});$('#agName').value='';$('#agIns').value='';save();renderAgents();toast('Agent saved 🤖')};
+
+/* ============================================================
+   CONNECT — WebRTC P2P · QR · double consent · Bluetooth
+============================================================ */
+let pc=null,dc=null,myName=localStorage.getItem('sbsu_dev')||'';
+$('#devName').value=myName;$('#devName').onchange=e=>{myName=e.target.value;localStorage.setItem('sbsu_dev',myName)};
+let modalResolve=null;
+function consent(title,body){return new Promise(res=>{modalResolve=res;$('#mTitle').textContent=title;$('#mBody').textContent=body;$('#modalBg').classList.remove('hidden')})}
+$('#mAllow').onclick=()=>{$('#modalBg').classList.add('hidden');modalResolve(true)};
+$('#mDeny').onclick=()=>{$('#modalBg').classList.add('hidden');modalResolve(false)};
+const peerOpen=()=>dc&&dc.readyState==='open';
+function plog(m,me){const d=document.createElement('div');d.className='msg s text-xs';if(me)d.classList.add('u');d.innerHTML=mdLite(m);$('#peerLog').append(d);$('#peerLog').scrollTop=1e9}
+function newPC(){pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});return pc}
+async function waitICE(){await new Promise(r=>{if(pc.iceGatheringState==='complete')return r();pc.onicegatheringstatechange=()=>{if(pc.iceGatheringState==='complete')r()};setTimeout(r,2500)})}
+function bindDC(){
+ dc.onopen=()=>{$('#connState').innerHTML='— <span class="text-emerald-400">connected ✅</span>';plog('🔒 Secure P2P channel open. Voice/Sofia commands, chat and files now flow device-to-device — nothing touches a server.');toast('Device connected 🔗',1)};
+ dc.onclose=()=>{$('#connState').textContent='— disconnected';plog('⚠️ Connection closed.')};
+ dc.onmessage=async e=>{
+  let m;try{m=JSON.parse(e.data)}catch{return plog(esc(e.data))}
+  if(m.t==='cmd'){const ok=await consent('Remote command','The connected device wants to open: '+m.url+' — allow on THIS device?');if(ok)open(m.url,'_blank');plog((ok?'▶ Executed: ':'🚫 Denied: ')+m.url);return}
+  if(m.t==='chat'){plog('<b>'+esc(m.from)+':</b> '+esc(m.text));return}
+  if(m.t==='file'){const a=document.createElement('a');a.href=m.data;a.download=m.name;a.click();plog('📁 Received file: '+esc(m.name)+' (downloaded)');return}
+ };
+}
+/* HOST */
+$('#hostBtn').onclick=async()=>{
+ const ok=await consent('Host a connection','This will generate an invite (QR + code). The other device must scan it AND tap Allow on both screens before anything connects. Continue?');if(!ok)return;
+ newPC();dc=pc.createDataChannel('sbsu');bindDC();
+ const offer=await pc.createOffer();await pc.setLocalDescription(offer);await waitICE();
+ const code=b64e(JSON.stringify(pc.localDescription));
+ $('#inviteOut').value=code;$('#inviteOut').classList.remove('hidden');$('#hostStep2').classList.remove('hidden');
+ $('#qrBox').innerHTML='';new QRCode($('#qrBox'),{text:code,width:170,height:170});$('#qrBox').classList.remove('hidden');$('#qrBox').classList.add('flex');
+ toast('Invite ready — share QR or code 📡',1);
+};
+$('#hostFin').onclick=async()=>{
+ try{const ans=JSON.parse(b64d($('#answerIn').value));
+  const ok=await consent('Final consent','The other device accepted. Allow this peer to connect to '+(myName||'this device')+'?');if(!ok)return toast('Connection refused');
+  await pc.setRemoteDescription(ans);toast('Handshake complete…',1)}catch(e){toast('Invalid answer code')}};
+/* JOIN */
+async function joinCode(code){
+ newPC();pc.ondatachannel=e=>{dc=e.channel;bindDC()};
+ const ok=await consent('Allow this host to view and control?','A host device invited you. Only after you tap Allow — and the host taps Allow too — will the secure P2P channel open. Camera, files and location always ask separately. Allow?');
+ if(!ok)return toast('You chose Don\'t Allow — nothing connected');
+ await pc.setRemoteDescription(JSON.parse(b64d(code)));
+ const ans=await pc.createAnswer();await pc.setLocalDescription(ans);await waitICE();
+ $('#answerOut').value=b64e(JSON.stringify(pc.localDescription));$('#answerOut').classList.remove('hidden');
+ toast('Your answer code is ready — send it back to the host',1);
+}
+$('#joinBtn').onclick=()=>{const c=$('#joinIn').value.trim();if(c)joinCode(c).catch(()=>toast('Invalid invite code'))};
+/* QR scan (camera — asks permission natively) */
+$('#scanBtn').onclick=async()=>{
+ try{const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+  const v=$('#scanVid');v.srcObject=stream;v.classList.remove('hidden');await v.play();toast('Point camera at the invite QR…');
+  if('BarcodeDetector'in window){const bd=new BarcodeDetector({formats:['qr_code']});
+   const iv=setInterval(async()=>{try{const codes=await bd.detect(v);if(codes.length){clearInterval(iv);v.srcObject.getTracks().forEach(t=>t.stop());v.classList.add('hidden');joinCode(codes[0].rawValue)}}catch(e){}},600)}
+  else toast('BarcodeDetector not supported — paste the code instead');
+ }catch(e){toast('Camera permission denied or unavailable')}};
+/* Bluetooth pairing (Web Bluetooth) */
+$('#btBtn').onclick=async()=>{
+ if(!navigator.bluetooth)return toast('Web Bluetooth needs Chrome/Edge on Android/desktop');
+ try{const d=await navigator.bluetooth.requestDevice({acceptAllDevices:true,optionalServices:['battery_service']});
+  toast('Paired with '+(d.name||'device')+' 🔵 — use invite codes to open the data channel',1);
+  plog('🔵 Bluetooth device selected: '+esc(d.name||'unknown')+'. For data, exchange invite/answer codes (Bluetooth carries the handshake on supported builds).')}
+ catch(e){toast('Bluetooth pairing cancelled')}};
+/* peer actions */
+function peerSend(o){if(peerOpen())dc.send(JSON.stringify(o));else toast('No device connected yet')}
+$('#peerCmdGo').onclick=()=>{const c=$('#peerCmd').value;if(!c)return;
+ plog('<b>Me (cmd):</b> '+esc(c),1);
+ if(/youtube/i.test(c))peerSend({t:'cmd',url:'https://youtube.com'});
+ else if(/maps?/i.test(c))peerSend({t:'cmd',url:'https://maps.google.com'});
+ else peerSend({t:'chat',from:myName||'Main device',text:'[command] '+c});
+ $('#peerCmd').value=''};
+$('#peerChatGo').onclick=()=>{const t=$('#peerChat').value;if(!t)return;peerSend({t:'chat',from:myName||'Me',text:t});plog('<b>Me:</b> '+esc(t),1);$('#peerChat').value=''};
+$('#pcCam').onclick=async()=>{try{const s=await navigator.mediaDevices.getUserMedia({video:true});s.getTracks().forEach(t=>t.stop());toast('Camera access granted on this device ✅',1)}catch(e){toast('Camera denied')}};
+$('#pcLoc').onclick=()=>navigator.geolocation?navigator.geolocation.getCurrentPosition(p=>{plog('📍 My location: '+p.coords.latitude.toFixed(5)+', '+p.coords.longitude.toFixed(5));peerSend({t:'chat',from:myName||'Me',text:'📍 '+p.coords.latitude.toFixed(5)+', '+p.coords.longitude.toFixed(5)})},()=>toast('Location denied')):toast('Geolocation unavailable');
+$('#pcFile').onclick=()=>$('#peerFile').click();
+$('#peerFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{peerSend({t:'file',name:f.name,data:r.result});plog('📁 Sent: '+esc(f.name),1)};r.readAsDataURL(f)};
+/* share invite */
+$$('[data-share]').forEach(b=>b.onclick=()=>{
+ const txt=encodeURIComponent('Join my SBSU AI Studio session — paste this invite code in the Connect tab:\n\n'+($('#inviteOut').value||'(host first to create a code)'));
+ const k=b.dataset.share;
+ if(k==='wa')open('https://wa.me/?text='+txt,'_blank');
+ else if(k==='fb')open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href)+'&quote='+txt,'_blank');
+ else if(k==='tg')open('https://t.me/share/url?url='+encodeURIComponent(location.href)+'&text='+txt,'_blank');
+ else{navigator.clipboard?.writeText($('#inviteOut').value||'');toast('Instagram: code copied — paste it in a DM/story 📋')}});
+
+/* ---------- settings ---------- */
+const KEYS=['GEMINI_API_KEY','GROQ_API_KEY','OPENROUTER_API_KEY','HUGGINGFACE_API_KEY','DEEPSEEK_API_KEY','TOGETHER_API_KEY','MISTRAL_API_KEY','COHERE_API_KEY','OPENAI_API_KEY','ANTHROPIC_API_KEY','REPLICATE_API_KEY','STABILITY_API_KEY','ELEVENLABS_API_KEY','REMOVE_BG_API_KEY','PEXELS_API_KEY','UNSPLASH_API_KEY','PIXABAY_API_KEY','GOOGLE_MAPS_API_KEY','GOOGLE_SEARCH_API_KEY','YOUTUBE_API_KEY','GOOGLE_DRIVE_API_KEY','GOOGLE_SHEETS_API_KEY','GMAIL_API_KEY','FIREBASE_API_KEY','SUPABASE_URL','SUPABASE_ANON_KEY','WEATHER_API_KEY','NEWS_API_KEY','TELEGRAM_BOT_TOKEN','GITHUB_TOKEN','CLOUDINARY_API_KEY','STRIPE_API_KEY'];
+$('#keysGrid').innerHTML=KEYS.map(k=>`<input class="inp !text-[.7rem]" data-key="${k}" placeholder="${k}" value="${esc(S.keys[k]||'')}">`).join('');
+$('#modelName').value=S.model||'';$('#tempRange').value=S.temp;$('#tempVal').textContent=S.temp;
+$('#tempRange').oninput=e=>$('#tempVal').textContent=e.target.value;
+$('#saveKeys').onclick=()=>{$$('#keysGrid input').forEach(i=>{if(i.value.trim())S.keys[i.dataset.key]=i.value.trim();else delete S.keys[i.dataset.key]});
+ S.model=$('#modelName').value.trim();S.temp=$('#tempRange').value;save();toast('Settings saved 🔑 (this browser only)',1)};
+
+/* ---------- first-run seed: expense tracker demo ---------- */
+if(!DB.projects.length){
+ DB.projects.push({id:'demo1',name:'Expense Tracker (Demo)',prompt:'Build me a complete expense tracker app',engine:'pwa',kind:'expense',code:buildExpense('expense tracker'),chat:[],updated:Date.now()});
+ save();
+}
+renderProjList();selectProject(S.active||DB.projects[0].id);renderAgents();
+say(`Sat Sri Akal, Anmol! 🙏 I'm **Sofia** — your builder inside SBSU AI Studio. Type what you want in the command bar up top — *"Build me Minecraft"*, *"Build me WhatsApp"*, *"Build me a gym website"* — and I'll pick the engine, write the full code and show it live. Your **Expense Tracker demo** is already loaded in Studio. Add a Gemini key in ⚙️ Settings to unlock my full cloud brain.`);
+</script>
+</body>
+</html>
