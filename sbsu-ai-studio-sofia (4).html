@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#0b0b14"/>
+<title>SBSU AI Studio — Sofia</title>
+<link rel="manifest" id="manifestLink" href="data:application/json,"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b14;--glass:rgba(255,255,255,.05);--line:rgba(255,255,255,.09);--acc:#8b5cf6;--acc2:#22d3ee}
+*{font-family:Inter,system-ui,sans-serif;box-sizing:border-box}
+body{background:var(--bg);color:#e7e7f0;min-height:100vh;overflow-x:hidden}
+.blob{position:fixed;border-radius:50%;filter:blur(110px);opacity:.35;pointer-events:none;z-index:0}
+.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.gtext{background:linear-gradient(90deg,#a78bfa,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{background:linear-gradient(135deg,#8b5cf6,#6366f1);border-radius:14px;padding:.65rem 1.1rem;font-weight:600;font-size:.85rem;transition:.2s;box-shadow:0 8px 24px -8px rgba(139,92,246,.6)}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.1)}
+.btn2{background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:12px;padding:.55rem .9rem;font-size:.8rem;font-weight:500;transition:.2s}
+.btn2:hover{background:rgba(255,255,255,.13)}
+.navb{display:flex;flex-direction:column;align-items:center;gap:4px;padding:.7rem 0;border-radius:16px;font-size:.62rem;color:#9c9cb5;transition:.2s;cursor:pointer;width:100%}
+.navb.on{background:rgba(139,92,246,.18);color:#fff}
+.navb span{font-size:1.15rem}
+.chip{border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:999px;padding:.35rem .8rem;font-size:.72rem;cursor:pointer;transition:.2s;white-space:nowrap}
+.chip:hover{border-color:var(--acc);color:#fff}
+.msg{max-width:82%;padding:.7rem 1rem;border-radius:18px;font-size:.88rem;line-height:1.55;animation:up .3s ease}
+.msg.u{margin-left:auto;background:linear-gradient(135deg,#7c3aed,#4f46e5);border-bottom-right-radius:6px}
+.msg.s{background:rgba(255,255,255,.06);border:1px solid var(--line);border-bottom-left-radius:6px}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.modalbg{position:fixed;inset:0;background:rgba(5,5,12,.7);backdrop-filter:blur(6px);z-index:60;display:flex;align-items:center;justify-content:center;padding:1rem}
+textarea.code{background:#08080f;color:#a5f3fc;font-family:ui-monospace,Menlo,monospace;font-size:.75rem;line-height:1.5}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(139,92,246,.35);border-radius:8px}
+.toast{background:#171727;border:1px solid var(--line);border-radius:12px;padding:.7rem 1rem;font-size:.8rem;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:up .25s}
+.dot{width:9px;height:9px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399}
+input,select,textarea{outline:none}input:focus,textarea:focus,select:focus{border-color:var(--acc)!important}
+.inp{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:.6rem .9rem;font-size:.85rem;width:100%}
+.view{display:none}.view.on{display:block;animation:up .3s}
+iframe.preview{width:100%;height:100%;border:0;border-radius:14px;background:#fff}
+.pulse{animation:p 1.4s infinite}@keyframes p{0%,100%{opacity:1}50%{opacity:.35}}
+</style>
+</head>
+<body>
+<div class="blob" style="width:480px;height:480px;background:#7c3aed;top:-140px;left:-120px"></div>
+<div class="blob" style="width:420px;height:420px;background:#0ea5e9;bottom:-140px;right:-100px"></div>
+
+<div class="relative z-10 flex h-screen">
+  <!-- SIDEBAR -->
+  <aside class="w-[74px] md:w-[86px] shrink-0 flex flex-col items-center py-4 gap-2 border-r border-white/10">
+    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center text-xl font-extrabold mb-3">S</div>
+    <button class="navb on" data-v="chat"><span>💬</span>Chat</button>
+    <button class="navb" data-v="studio"><span>🛠️</span>Studio</button>
+    <button class="navb" data-v="agents"><span>🤖</span>Agents</button>
+    <button class="navb" data-v="connect"><span>🔗</span>Connect</button>
+    <button class="navb" data-v="settings"><span>⚙️</span>Settings</button>
+    <div class="mt-auto text-[.55rem] text-white/30 text-center px-1">SBSU<br>Ferozepur</div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 flex flex-col min-w-0">
+    <!-- TOP BAR -->
+    <header class="p-3 md:p-4">
+      <div class="glass rounded-2xl px-4 py-3 flex items-center gap-3">
+        <div class="hidden sm:block">
+          <div class="font-bold text-sm leading-tight">SBSU <span class="gtext">AI Studio</span></div>
+          <div class="flex items-center gap-1.5 text-[.65rem] text-white/50"><span class="dot"></span>Sofia online</div>
+        </div>
+        <div class="flex-1 flex items-center gap-2 bg-black/30 border border-white/10 rounded-2xl px-3 py-1.5">
+          <span class="text-violet-300">✨</span>
+          <input id="cmd" class="bg-transparent flex-1 text-sm py-1.5" placeholder='Build me a… expense tracker / Minecraft / GTA 6 / WhatsApp' autocomplete="off"/>
+          <button id="cmdMic" class="text-lg hover:scale-110 transition" title="Voice in — Punjabi/Hindi/English">🎙️</button>
+          <button id="cmdGo" class="btn !py-1.5 !px-4 text-xs">Build ⚡</button>
+        </div>
+        <button id="installBtn" class="btn2 hidden text-xs">⬇ Install app</button>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto px-3 md:px-4 pb-4">
+
+      <!-- CHAT -->
+      <section id="v-chat" class="view on h-full">
+        <div class="glass rounded-2xl h-full flex flex-col">
+          <div class="px-4 py-3 border-b border-white/10 flex items-center gap-2 flex-wrap">
+            <span class="text-sm font-semibold">Sofia</span><span id="agentTag" class="text-[.65rem] text-cyan-300"></span>
+            <div class="flex gap-1.5 overflow-x-auto ml-auto">
+              <button class="chip" data-tool="image">🖼 Image</button>
+              <button class="chip" data-tool="scan">📄 Scan file</button>
+              <button class="chip" data-tool="music">🎵 Music</button>
+              <button class="chip" data-tool="video">🎬 Video</button>
+              <button class="chip" data-tool="research">🔎 Research</button>
+              <button class="chip" data-tool="maps">📍 Maps</button>
+            </div>
+          </div>
+          <div id="chatLog" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+          <div class="p-3 border-t border-white/10 flex items-center gap-2">
+            <select id="vlang" class="inp !w-auto text-xs !py-2"><option value="pa-IN">ਪੰਜਾਬੀ</option><option value="hi-IN">हिंदी</option><option value="en-IN" selected>English</option></select>
+            <button id="micBtn" class="btn2">🎙️</button>
+            <input id="chatIn" class="inp flex-1" placeholder="Ask Sofia anything, or say what to build…"/>
+            <button id="spkBtn" class="btn2" title="Voice out">🔊</button>
+            <button id="sendBtn" class="btn !py-2">Send</button>
+          </div>
+          <input type="file" id="fileUp" class="hidden" accept="image/*,application/pdf"/>
+        </div>
+      </section>
+
+      <!-- STUDIO -->
+      <section id="v-studio" class="view h-full">
+        <div class="grid lg:grid-cols-2 gap-3 h-full">
+          <div class="glass rounded-2xl flex flex-col min-h-[380px]">
+            <div class="px-4 py-2.5 border-b border-white/10 flex items-center gap-2 flex-wrap">
+              <select id="projSel" class="inp !w-auto text-xs !py-1.5 max-w-[180px]"></select>
+              <span id="engTag" class="text-[.62rem] px-2 py-1 rounded-full bg-cyan-400/10 text-cyan-300 border border-cyan-400/20"></span>
+              <div class="ml-auto flex gap-1.5">
+                <button id="editBtn" class="btn2 text-xs">✏️ Edit</button>
+                <button id="runBtn" class="btn2 text-xs">▶ Run</button>
+                <button id="zipBtn" class="btn2 text-xs">📦 ZIP</button>
+              </div>
+            </div>
+            <textarea id="codeEd" class="code flex-1 w-full p-3 resize-none" readonly spellcheck="false"></textarea>
+          </div>
+          <div class="glass rounded-2xl flex flex-col min-h-[380px]">
+            <div class="px-4 py-2.5 border-b border-white/10 text-xs text-white/50 flex items-center gap-2">Live preview <span class="dot"></span><span id="pvNote" class="ml-auto"></span></div>
+            <div class="flex-1 p-2"><iframe id="pv" class="preview" sandbox="allow-scripts allow-same-origin allow-modals allow-forms"></iframe></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AGENTS -->
+      <section id="v-agents" class="view">
+        <div class="grid md:grid-cols-3 gap-3">
+          <div class="glass rounded-2xl p-4">
+            <h3 class="font-bold text-sm mb-3">Create agent</h3>
+            <input id="agName" class="inp mb-2" placeholder="Name — e.g. Study Agent"/>
+            <select id="agRole" class="inp mb-2"><option>Study Agent</option><option>Coding Agent</option><option>Research Agent</option><option>Personal Assistant</option></select>
+            <textarea id="agIns" class="inp mb-3" rows="3" placeholder="Instructions — how should it behave?"></textarea>
+            <button id="agSave" class="btn w-full">Save agent</button>
+          </div>
+          <div id="agList" class="md:col-span-2 grid sm:grid-cols-2 gap-3 content-start"></div>
+        </div>
+      </section>
+
+      <!-- CONNECT -->
+      <section id="v-connect" class="view">
+        <div class="grid lg:grid-cols-2 gap-3">
+          <div class="glass rounded-2xl p-4 space-y-3">
+            <h3 class="font-bold text-sm">🔗 Connect devices <span class="text-[.65rem] text-white/40 font-normal">WebRTC P2P — hotspot / Wi-Fi / same network or any network</span></h3>
+            <input id="devName" class="inp" placeholder="This device's name — e.g. Anmol's Phone"/>
+            <div class="grid grid-cols-2 gap-2">
+              <button id="hostBtn" class="btn">📡 Host — create invite</button>
+              <button id="btBtn" class="btn2">🔵 Bluetooth pair</button>
+            </div>
+            <div id="qrBox" class="hidden items-center justify-center bg-white rounded-xl p-3 w-fit mx-auto"></div>
+            <textarea id="inviteOut" class="inp hidden" rows="3" readonly placeholder="Invite code appears here"></textarea>
+            <div id="hostStep2" class="hidden space-y-2">
+              <p class="text-xs text-white/60">Paste the <b>answer code</b> from the other device:</p>
+              <textarea id="answerIn" class="inp" rows="3"></textarea>
+              <button id="hostFin" class="btn w-full">✅ Finish connection</button>
+            </div>
+            <div class="border-t border-white/10 pt-3 space-y-2">
+              <p class="text-xs text-white/60">Joining instead? Paste an invite code or scan its QR:</p>
+              <textarea id="joinIn" class="inp" rows="3" placeholder="Paste invite code…"></textarea>
+              <div class="grid grid-cols-2 gap-2">
+                <button id="joinBtn" class="btn">🤝 Join</button>
+                <button id="scanBtn" class="btn2">📷 Scan QR</button>
+              </div>
+              <textarea id="answerOut" class="inp hidden" rows="3" readonly placeholder="Your answer code — send back to host"></textarea>
+              <video id="scanVid" class="hidden w-full rounded-xl" playsinline></video>
+            </div>
+            <div class="flex gap-2 flex-wrap pt-1">
+              <span class="text-xs text-white/40 self-center">Share invite:</span>
+              <button class="chip" data-share="wa">WhatsApp</button>
+              <button class="chip" data-share="fb">Facebook</button>
+              <button class="chip" data-share="ig">Instagram</button>
+              <button class="chip" data-share="tg">Telegram</button>
+            </div>
+          </div>
+          <div class="glass rounded-2xl p-4 flex flex-col gap-3">
+            <h3 class="font-bold text-sm">📱 Connected devices <span id="connState" class="text-[.65rem] text-white/40">— none</span></h3>
+            <div class="flex gap-2">
+              <input id="peerCmd" class="inp flex-1" placeholder='Try: "Open YouTube in all connected devices"'/>
+              <button id="peerCmdGo" class="btn !py-2">Run</button>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <button id="pcCam" class="btn2 text-xs">📷 Camera</button>
+              <button id="pcLoc" class="btn2 text-xs">📍 Location</button>
+              <button id="pcFile" class="btn2 text-xs">📁 Send file</button>
+            </div>
+            <input type="file" id="peerFile" class="hidden"/>
+            <div id="peerLog" class="flex-1 min-h-[140px] max-h-[220px] overflow-y-auto space-y-2 bg-black/25 rounded-xl p-3 text-xs"></div>
+            <div class="flex gap-2">
+              <input id="peerChat" class="inp flex-1" placeholder="Message the other device…"/>
+              <button id="peerChatGo" class="btn2">Send</button>
+           </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="v-settings" class="view">
+        <div class="grid lg:grid-cols-2 gap-3">
+          <div class="glass rounded-2xl p-4 space-y-3">
+            <h3 class="font-bold text-sm">🧠 Model settings</h3>
+            <input id="modelName" class="inp" placeholder="Model — e.g. gemini-1.5-flash, llama-3.3-70b (Groq)"/>
+            <label class="text-xs text-white/60 flex justify-between">Temperature <span id="tempVal">0.7</span></label>
+            <input id="tempRange" type="range" min="0" max="2" step="0.1" value="0.7" class="w-full accent-violet-500"/>
+            <p class="text-[.68rem] text-white/40">Sofia auto-routes: Gemini key → Gemini, Groq key → Groq, OpenRouter key → OpenRouter. No key → Sofia runs her built-in offline brain (she never fakes a cloud answer).</p>
+            <h3 class="font-bold text-sm pt-2">🔑 API keys <span class="text-white/40 font-normal">stored only in this browser (localStorage)</span></h3>
+            <div id="keysGrid" class="grid sm:grid-cols-2 gap-2"></div>
+            <div class="flex gap-2">
+              <button id="saveKeys" class="btn flex-1">💾 Save settings</button>
+              <button id="envBtn" class="btn2">⬇ .env.example</button>
+            </div>
+          </div>
+          <div class="glass rounded-2xl p-4 space-y-3 text-sm">
+            <h3 class="font-bold text-sm">🗄 Supabase setup (free tier)</h3>
+            <ol class="list-decimal ml-5 text-xs text-white/70 space-y-1.5">
+              <li>Create a project at <b>supabase.com</b> → copy <b>Project URL</b> and <b>anon key</b>.</li>
+              <li>Paste them below as <code class="text-cyan-300">SUPABASE_URL</code> / <code class="text-cyan-300">SUPABASE_ANON_KEY</code> (also in Vercel env when deploying).</li>
+              <li>SQL editor → run: <code class="text-cyan-300">create table projects(id text primary key, name text, engine text, code text, updated timestamptz default now());</code></li>
+              <li>Authentication → enable Email for Login/Signup. Projects sync automatically once keys are set; localStorage remains the offline fallback.</li>
+            </ol>
+            <h3 class="font-bold text-sm pt-2">📲 PWA test cases</h3>
+            <ul class="text-xs text-white/70 space-y-1.5 list-disc ml-5">
+              <li>Add expense → refresh → data still there ✅ (localStorage + Supabase)</li>
+              <li>Deploy the ZIP to Vercel → turn off internet → app still opens ✅ (sw.js)</li>
+              <li>Install on phone → Wi-Fi off → opens full-screen with its own icon ✅</li>
+            </ul>
+            <p class="text-[.65rem] text-white/30 pt-4 text-center">Built for SBSU Ferozepur Students by Sofia AI.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- CONSENT MODAL (security gate — both devices must tap Allow) -->
+<div id="modalBg" class="modalbg hidden">
+  <div class="glass rounded-2xl p-5 max-w-sm w-full space-y-3" style="background:#14141f">
+    <h3 id="mTitle" class="font-bold"></h3>
+    <p id="mBody" class="text-sm text-white/70"></p>
+    <div class="grid grid-cols-2 gap-2 pt-1">
+      <button id="mDeny" class="btn2">Don't Allow</button>
+      <button id="mAllow" class="btn">Allow</button>
+    </div>
+  </div>
+</div>
+<div id="toasts" class="fixed bottom-4 right-4 z-[70] space-y-2"></div>
+
+<script>
+/* ================= SBSU AI STUDIO — SOFIA CORE ================= */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const toast=(m,ok)=>{const t=document.createElement('div');t.className='toast';t.style.borderColor=ok?'#34d39966':'var(--line)';t.textContent=m;$('#toasts').append(t);setTimeout(()=>t.remove(),3400)};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const b64e=s=>btoa(unescape(encodeURIComponent(s))), b64d=s=>decodeURIComponent(escape(atob(s.trim())));
+
+/* ---------- persistent memory (Supabase when keyed, localStorage always) ---------- */
+const DB=JSON.parse(localStorage.getItem('sbsu_db')||'{"projects":[],"agents":[],"settings":{}}');
+const save=()=>localStorage.setItem('sbsu_db',JSON.stringify(DB));
+const S=DB.settings; S.keys=S.keys||{}; S.temp=S.temp??0.7;
+async function supaSync(p){ if(!S.keys.SUPABASE_URL||!S.keys.SUPABASE_ANON_KEY)return;
+  try{await fetch(S.keys.SUPABASE_URL+'/rest/v1/projects',{method:'POST',headers:{apikey:S.keys.SUPABASE_ANON_KEY,Authorization:'Bearer '+S.keys.SUPABASE_ANON_KEY,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates'},body:JSON.stringify([{id:p.id,name:p.name,engine:p.engine,code:p.code}])});}catch(e){} }
+
+/* ---------- PWA ---------- */
+const ICON='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="24" fill="#7c3aed"/><text x="50" y="68" font-size="52" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold">S</text></svg>');
+function manifestFor(name){return JSON.stringify({name,short_name:name.slice(0,12),start_url:'.',display:'standalone',background_color:'#0b0b14',theme_color:'#7c3cf6',icons:[{src:ICON,sizes:'any',type:'image/svg+xml',purpose:'any'}]})}
+$('#manifestLink').href='data:application/json,'+encodeURIComponent(manifestFor('SBSU AI Studio'));
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{/* single-file mode: sw.js ships in the ZIP for deploys */});
+let deferredPrompt=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('#installBtn').classList.remove('hidden')});
+$('#installBtn').onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;$('#installBtn').classList.add('hidden')}};
+
+/* ---------- navigation ---------- */
+$$('.navb').forEach(b=>b.onclick=()=>{$$('.navb').forEach(x=>x.classList.remove('on'));b.classList.add('on');$$('.view').forEach(v=>v.classList.remove('on'));$('#v-'+b.dataset.v).classList.add('on')});
+const goView=v=>{$(`.navb[data-v="${v}"]`).click()};
+
+/* ---------- Sofia chat ---------- */
+const log=$('#chatLog');
+function mdLite(t){let h=esc(t);h=h.replace(/
