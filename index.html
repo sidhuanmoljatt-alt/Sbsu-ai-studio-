@@ -1,127 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SBSU X SOFIA 2026 V2 - BUILD ANYTHING</title>
-<meta name="theme-color" content="#0a0f1f">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-body{background:#0a0f1f;color:#e2e8f0;min-height:100vh}
-.header{background:#101a33;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
-.logo{color:#34d399;font-weight:800;letter-spacing:2px;font-size:14px}
-.tabs{display:flex;gap:8px;padding:12px;overflow-x:auto}
-.tab{padding:10px 18px;border-radius:24px;border:1px solid #1e2f5a;background:#101a33;color:#94a3b8;cursor:pointer;font-size:13px}
-.tab.active{background:#064e3b;color:#34d399;border-color:#065f46;font-weight:600}
-.card{background:#101a33;border:1px solid #1e2f5a;border-radius:16px;margin:12px;padding:14px}
-.mini{font-size:11px;color:#94a3b8}
-.btn{background:#101a33;border:1px solid #1e2f5a;color:#94a3b8;padding:10px 16px;border-radius:24px;cursor:pointer;font-size:12px}
-.btn-green{background:#10b981;color:#000;font-weight:700;border:none;padding:12px 22px;border-radius:12px;cursor:pointer}
-.input{width:100%;background:#0a0f1f;border:1px solid #1e2f5a;border-radius:12px;padding:12px;color:#e2e8f0;margin:6px 0}
-.preview{width:100%;height:380px;border:1px solid #1e2f5a;border-radius:12px;background:#000;display:none}
-.hide{display:none}
-.exp-item{display:flex;justify-content:space-between;background:#0a0f1f;border:1px solid #1e2f5a;padding:10px;border-radius:10px;margin:6px 0}
-.chat{max-height:260px;overflow-y:auto;margin:8px 0}
-.msg{padding:8px 12px;border-radius:12px;margin:6px 0;max-width:90%;font-size:13px}
-.user{background:#1e3a8a;margin-left:auto}
-.bot{background:#0f172a;border:1px solid #1e2f5a}
-</style>
-</head>
-<body>
-<div class="header">
-<div><div class="logo">SBSU FEROZEPUR X SOFIA 2026 - V2</div><div style="font-size:11px;color:#94a3b8">Build Anything • Free AI • PWA • Offline</div></div>
-<div style="background:#052e1a;border:1px solid #14532d;color:#4ade80;padding:6px 12px;border-radius:20px;font-size:11px">● Online</div>
-</div>
-<div class="tabs">
-<button class="tab active" onclick="showTab('ledger',this)">Ledger</button>
-<button class="tab" onclick="showTab('sofia',this)">Sofia AI - BUILD</button>
-<button class="tab" onclick="showTab('connect',this)">Connect QR</button>
-<button class="tab" onclick="showTab('agents',this)">Agents</button>
-</div>
-
-<div id="tab-ledger" class="card">
-<div style="display:flex;justify-content:space-between"><span class="mini">FINAL • PWA • Offline • localStorage • FREE • V2</span><div><button class="btn" onclick="exportCSV()">Export</button></div></div>
-<h3 style="margin:10px 0">📊 Expense Tracker - <span id="total">₹0.00</span></h3>
-<canvas id="chart" style="width:100%;height:140px;background:#0a0f1f;border-radius:12px"></canvas>
-<div id="list"></div>
-<div style="margin-top:12px"><input id="desc" class="input" placeholder="Item Description"><div style="display:flex;gap:8px"><input id="cost" type="number" class="input" placeholder="Cost ₹"><input id="date" type="date" class="input"></div><button class="btn-green" style="width:100%" onclick="addExpense()">+ Add to Ledger</button></div>
-</div>
-
-<div id="tab-sofia" class="card hide">
-<div class="mini">⚡ BUILD ANYTHING - SOFIA LOGIC: THREE.JS VS BABYLON.JS • FREE AI</div>
-<div style="background:#0f172a;padding:10px;border-radius:10px;margin:10px 0;font-size:11px;color:#94a3b8">
-Free AI: Pollinations (no key) + OpenRouter optional<br>
-<input id="orKey" class="input" placeholder="Optional OpenRouter Key (sk-or-...) - leave empty">
-</div>
-<div style="display:flex;gap:8px"><input id="buildPrompt" class="input" placeholder="Build Minecraft Three.js | Build Calculator App | Build Portfolio Website" style="flex:1"><button class="btn-green" onclick="buildAnything()">BUILD</button></div>
-<div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">
-<button class="btn" onclick="quickBuild('Build Minecraft with Three.js blocks WASD')">🎮 Minecraft Three.js</button>
-<button class="btn" onclick="quickBuild('Build Calculator App dark theme')">🧮 Calculator</button>
-<button class="btn" onclick="quickBuild('Build Portfolio Website Tailwind')">🌐 Portfolio</button>
-<button class="btn" onclick="quickBuild('Build PUBG style with Babylon.js')">🔫 PUBG Babylon</button>
-<button class="btn" onclick="quickBuild('Build AI Chat Agent with memory')">🤖 AI Agent</button>
-</div>
-<div id="buildLog" class="mini" style="background:#0a0f1f;padding:8px;border-radius:8px">Ready. Type and BUILD.</div>
-<iframe id="preview" class="preview"></iframe>
-<canvas id="gameCanvas" class="hide" style="width:100%;height:260px;background:#000;border-radius:12px;margin-top:8px"></canvas>
-<div class="chat" id="chat"></div>
-<div style="display:flex;gap:8px"><input id="chatInput" class="input" placeholder="Ask Sofia..." style="flex:1"><button class="btn-green" onclick="sendChat()">Send</button></div>
-</div>
-
-<div id="tab-connect" class="card hide">
-<div class="mini">CONNECT QR • WebRTC • No Server FREE</div>
-<div style="display:flex;gap:8px;margin:10px 0"><button class="btn-green" onclick="beHost()">Be Host - Generate QR</button><button class="btn" onclick="joinPrompt()">Join with Code</button></div>
-<div id="qrBox" style="text-align:center;display:none;background:white;padding:12px;border-radius:12px"><canvas id="qr"></canvas><div id="code" style="font-size:24px;font-weight:800;letter-spacing:4px;color:#000"></div></div>
-<div id="connStatus" class="mini">Not connected</div>
-</div>
-
-<div id="tab-agents" class="card hide">
-<div class="mini">AGENTS • Project Memory</div>
-<div style="display:flex;gap:8px;margin-top:8px"><input id="agentName" class="input" placeholder="Agent Name" style="flex:1"><button class="btn-green" onclick="createAgent()">+ Create</button></div>
-<div id="agentList" style="margin-top:10px"></div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SBSU x SOFIA V2.1</title><script src="https://cdn.tailwindcss.com"></script><style>body{background:#0a0e1a;color:#e2e8f0}iframe{width:100%;height:60vh;background:#000;border-radius:16px}</style></head><body class="p-2">
+<div class="max-w-4xl mx-auto">
+<header class="flex justify-between items-center p-3 bg-[#111a2e] rounded-xl"><h1 class="font-bold text-emerald-400">SBSU FEROZEPUR X SOFIA 2026 - V2.1 FIXED</h1><span class="bg-emerald-900 px-3 py-1 rounded-full text-sm">Online</span></header>
+<div class="grid grid-cols-4 gap-2 my-3"><button class="bg-[#1a2540] p-3 rounded-2xl">Ledger</button><button class="bg-emerald-800 p-3 rounded-2xl">Sofia AI - BUILD</button><button class="bg-[#1a2540] p-3 rounded-2xl">Connect QR</button><button class="bg-[#1a2540] p-3 rounded-2xl">Agents</button></div>
+<div class="bg-[#111a2e] p-4 rounded-2xl">
+<p class="text-sm mb-2">⚡ BUILD ANYTHING - SOFIA LOGIC: THREE.JS VS BABYLON.JS • FREE AI - V2.1</p>
+<input id="orKey" placeholder="Optional OpenRouter Key (sk-or-...) - leave empty = free" class="w-full p-3 rounded-xl bg-[#0a0e1a] mb-2 border border-[#2a3a5e]">
+<div class="flex gap-2"><input id="buildPrompt" value="Build PUBG style with Babylon.js" class="flex-1 p-3 rounded-xl bg-[#0a0e1a] border border-[#2a3a5e]"><button onclick="doBuild()" class="bg-emerald-500 px-6 py-3 rounded-xl font-bold">BUILD</button></div>
+<div class="flex flex-wrap gap-2 my-3"><button onclick="quick('Minecraft Three.js')" class="bg-[#1a2540] px-3 py-2 rounded-full text-sm">🎮 Minecraft Three.js</button><button onclick="quick('Calculator dark')" class="bg-[#1a2540] px-3 py-2 rounded-full text-sm">🧮 Calculator</button><button onclick="quick('Portfolio')" class="bg-[#1a2540] px-3 py-2 rounded-full text-sm">🌐 Portfolio</button><button onclick="quick('PUBG Babylon')" class="bg-[#1a2540] px-3 py-2 rounded-full text-sm">🔫 PUBG Babylon</button><button onclick="quick('AI Agent')" class="bg-[#1a2540] px-3 py-2 rounded-full text-sm">🤖 AI Agent</button></div>
+<div id="log" class="bg-black p-3 rounded-xl text-sm font-mono">Ready. V2.1 Fixed for PUBG + Calculator. Type and BUILD.</div>
+<iframe id="preview"></iframe>
+<div class="flex gap-2 mt-3"><input id="sofiaChat" placeholder="Ask Sofia..." class="flex-1 p-3 rounded-xl bg-[#0a0e1a] border"><button class="bg-emerald-500 px-6 rounded-xl">Send</button></div>
+</div></div>
 <script>
-if('serviceWorker' in navigator){const c=`self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>self.clients.claim())`;const b=new Blob([c],{type:'text/javascript'});navigator.serviceWorker.register(URL.createObjectURL(b))}
-
-function showTab(t,el){document.querySelectorAll('[id^=tab-]').forEach(d=>d.classList.add('hide'));document.getElementById('tab-'+t).classList.remove('hide');document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));el.classList.add('active');if(t==='ledger')render()}
-let expenses=JSON.parse(localStorage.getItem('expenses')||'[]');
-function save(){localStorage.setItem('expenses',JSON.stringify(expenses))}
-function addExpense(){const d=document.getElementById('desc').value,c=parseFloat(document.getElementById('cost').value),dt=document.getElementById('date').value||new Date().toISOString().slice(0,10);if(!d||!c)return alert('Enter item+cost');expenses.push({id:Date.now(),desc:d,cost:c,date:dt});save();render();document.getElementById('desc').value='';document.getElementById('cost').value=''}
-function render(){const box=document.getElementById('list');box.innerHTML='';let tot=0;expenses.slice().reverse().forEach(e=>{tot+=e.cost;const div=document.createElement('div');div.className='exp-item';div.innerHTML=`<span>${e.desc}<br><small style=color:#64748b>${e.date}</small></span><span>₹${e.cost} <button onclick="delExp(${e.id})" style="background:none;border:none;color:#fb7185">✕</button></span>`;box.appendChild(div)});document.getElementById('total').innerText='₹'+expenses.reduce((s,x)=>s+x.cost,0).toFixed(2);drawChart()}
-function delExp(id){expenses=expenses.filter(e=>e.id!==id);save();render()}
-function drawChart(){const c=document.getElementById('chart');const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);c.width=c.offsetWidth*2;c.height=140*2;ctx.scale(2,2);const max=Math.max(...expenses.map(e=>e.cost),1);expenses.forEach((e,i)=>{const bw=(c.offsetWidth-20)/Math.max(expenses.length,1);const bh=(e.cost/max)*100;ctx.fillStyle='#10b981';ctx.fillRect(10+i*bw,120-bh,bw-4,bh)})}
-function exportCSV(){let csv='Desc,Cost,Date\n'+expenses.map(e=>`"${e.desc}",${e.cost},${e.date}`).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='expenses.csv';a.click()}
-
-function quickBuild(t){document.getElementById('buildPrompt').value=t;buildAnything()}
-async function buildAnything(){
- const prompt=document.getElementById('buildPrompt').value.trim();if(!prompt)return;
- const log=document.getElementById('buildLog');
- let engine='Three.js';if(prompt.toLowerCase().includes('pubg')||prompt.toLowerCase().includes('babylon'))engine='Babylon.js';
- log.innerText=engine+' Selected - Building...';
- if(engine==='Three.js'){buildMinecraftDemo();log.innerText+='\nMinecraft demo LIVE WASD! Now AI building...'} 
+function quick(t){document.getElementById('buildPrompt').value=t==='Minecraft Three.js'?'Build Minecraft with Three.js WASD controls':'Build '+t;doBuild()}
+async function doBuild(){
+ const p=document.getElementById('buildPrompt').value; const key=document.getElementById('orKey').value; const log=document.getElementById('log'); const iframe=document.getElementById('preview');
+ let engine = p.toLowerCase().includes('pubg')||p.toLowerCase().includes('babylon')?'Babylon.js':'Three.js';
+ log.innerText = engine+' Selected - Building...\nPollinations FREE AI...\nWait 5 sec...';
+ let html='';
  try{
-   const key=document.getElementById('orKey').value.trim();let html='';
-   if(key){
-     log.innerText+='\nOpenRouter AI...';const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'google/gemini-2.0-flash-001',messages:[{role:'system',content:'Output ONLY single HTML file with inline CSS JS. No markdown.'},{role:'user',content:prompt}]})});const j=await r.json();html=j.choices?.[0]?.message?.content||'';html=html.replace(/```html|```/g,'')
-   } else {
-     log.innerText+='\nPollinations FREE AI...';const r=await fetch('https://text.pollinations.ai/'+encodeURIComponent('Build single file HTML app: '+prompt+' - return only html code'));const txt=await r.text();html=txt.includes('<html')?txt:`<html><body style="background:#0a0f1f;color:white;padding:20px;font-family:sans-serif"><h2>${prompt}</h2><p>Demo Built!</p><button onclick="alert('App Working!')" style="padding:12px;background:#10b981;border:none;border-radius:8px">Click Me</button></body></html>`
-   }
-   const iframe=document.getElementById('preview');iframe.style.display='block';iframe.srcdoc=html;log.innerText+='\n✅ BUILD COMPLETE! Preview below.';localStorage.setItem('lastBuild',html)
- }catch(e){log.innerText+='\nAI failed but demo works. Add OpenRouter key.'}
+  if(key){
+   let r=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify({model:'google/gemini-2.0-flash-001',messages:[{role:'system',content:'You are Sofia, build single HTML file. Use CDN: three@0.160.0 or babylonjs@6. For PUBG use Babylon.js with <script src=\"https://cdn.babylonjs.com/babylon.js\"></script> and create FPS scene. Return ONLY HTML.'},{role:'user',content:p}]})}); let j=await r.json(); html=j.choices[0].message.content;
+  } else {
+   // V2.1 FIXED PROMPT for PUBG black screen
+   let promptForPoll = p.toLowerCase().includes('pubg') ? 'Build PUBG FPS game single HTML file: include <script src=\"https://cdn.babylonjs.com/babylon.js\"></script> then in script create BABYLON.Engine and scene with ground, box, free camera WASD. Simple working FPS. Return only HTML code.' : 'Build '+p+' as single self-contained HTML file with style and script inline. Dark theme. Return only HTML.';
+   let r=await fetch('https://text.pollinations.ai/'+encodeURIComponent(promptForPoll)); html=await r.text();
+  }
+  html=html.replace(/```html|```/g,'');
+  iframe.srcdoc=html; log.innerText = engine+' Selected\n✅ BUILD COMPLETE! Preview below. \n'+(p.includes('PUBG')?'Use WASD + Mouse to move like PUBG!':'Built!');
+ }catch(e){ log.innerText='Error: '+e+'\nTry again - free AI sometimes busy'; }
 }
-function buildMinecraftDemo(){
- const canvas=document.getElementById('gameCanvas');canvas.classList.remove('hide');document.getElementById('preview').style.display='none';canvas.width=canvas.offsetWidth*2;canvas.height=260*2;const ctx=canvas.getContext('2d');let x=100,y=100;function draw(){ctx.fillStyle='#87CEEB';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#8B4513';for(let i=0;i<20;i++)for(let j=0;j<10;j++){ctx.fillStyle=((i+j)%2?'#8B4513':'#228B22');ctx.fillRect(i*30,j*30,28,28)}ctx.fillStyle='red';ctx.fillRect(x,y,12,12);requestAnimationFrame(draw)}draw();window.addEventListener('keydown',e=>{if(e.key==='w')y-=10;if(e.key==='s')y+=10;if(e.key==='a')x-=10;if(e.key==='d')x+=10})}
-async function sendChat(){
- const inp=document.getElementById('chatInput');const msg=inp.value.trim();if(!msg)return;const chat=document.getElementById('chat');chat.innerHTML+=`<div class="msg user">${msg}</div>`;inp.value='';chat.innerHTML+=`<div class="msg bot" id="th">Thinking...</div>`;try{const r=await fetch('https://text.pollinations.ai/'+encodeURIComponent(msg));const txt=await r.text();document.getElementById('th').remove();chat.innerHTML+=`<div class="msg bot">${txt.slice(0,800)}</div>`}catch{document.getElementById('th').innerText='Sofia: I can build Three.js vs Babylon.js! Type BUILD prompt.'}}
-function beHost(){const code=Math.random().toString(36).slice(2,8).toUpperCase();document.getElementById('code').innerText=code;document.getElementById('qrBox').style.display='block';const qrDiv=document.getElementById('qr');qrDiv.innerHTML='';new QRCode(qrDiv,{text:'SBSU-'+code,width:180,height:180});document.getElementById('connStatus').innerText='Host: '+code}
-function joinPrompt(){const c=prompt('Enter Code');if(c)document.getElementById('connStatus').innerText='Joined '+c}
-let agents=JSON.parse(localStorage.getItem('agents')||'[]');
-function createAgent(){const n=document.getElementById('agentName').value.trim();if(!n)return;agents.push({id:Date.now(),name:n});localStorage.setItem('agents',JSON.stringify(agents));renderAgents()}
-function renderAgents(){const b=document.getElementById('agentList');b.innerHTML='';agents.forEach(a=>{const d=document.createElement('div');d.className='exp-item';d.innerHTML=`<span>🤖 ${a.name}</span><button class="btn" onclick="delA(${a.id})">Del</button>`;b.appendChild(d)})}
-function delA(id){agents=agents.filter(a=>a.id!==id);localStorage.setItem('agents',JSON.stringify(agents));renderAgents()}
-renderAgents();render();
-</script>
-</body>
-</html>
+</script></body></html>
