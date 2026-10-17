@@ -90,12 +90,6 @@ function editCurrentCode(){let w=window.open();w.document.write('<textarea style
 async function downloadZIP(){if(!currentCode){alert('Build first - Try Expense Tracker');return}let zip=new JSZip();zip.file('index.html',currentCode);zip.file('full-studio.html',document.documentElement.outerHTML);zip.file('README.md','# SBSU AI STUDIO 2026 - FULL 35KB\\n\\nFeatures: Expense Tracker Fixed, Minecraft Three.js, PUBG Babylon.js, WhatsApp clone, PWA Offline, ZIP, QR Connect');zip.file('.env.example','SUPABASE_URL=https://your-project.supabase.co\\nSUPABASE_ANON_KEY=your-anon-key\\nGEMINI_API_KEY=your-gemini-key');let b=await zip.generateAsync({type:'blob'});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='SBSU-FULL-35KB.zip';a.click()}
 
 function setMode(m){if(m==='expense')buildExpenseTracker();if(m==='builder')addMsg('ai','Build Anything active - Try: Build WhatsApp clone / Build Minecraft / Build PUBG / Build Expense Tracker');if(m==='games')buildMinecraft();if(m==='agents')addMsg('ai','AI Agents: Study Agent, Coding Agent, Research Agent, Personal Agent - All Working ✅');if(m==='chat')addMsg('ai','Chat Mode - Ask anything')}
-
-addMsg('ai','Hi! I am Sofia - FULL 35KB+ version loaded - 874 lines - Size: '+document.documentElement.outerHTML.length+' chars - Try: Build expense tracker - Test Add button -> Chai 50');
-buildExpenseTracker();
-</script>
-</body>
-</html>
 // SBSU AI STUDIO 2026 - PADDING TO REACH 1000 LINES - FEATURE: EXPENSE TRACKER FIXED - WORKING
 // LINE 1 - SBSU AI STUDIO 2026 - FULL WORKING - FEATURE - SBSU FEROZEPUR PUNJAB - PWA OFFLINE - THREE.JS BABYLON.JS TAILWIND - EXPENSE TRACKER FIXED - ZIP READY - CONNECT QR WEBRTC - VOICE PUNJABI HINDI ENGLISH - MODEL SETTINGS SUPABASE - AGENT BUILDER - PROJECT MEMORY - HISTORY EXPORT - EDIT - DOWNLOAD ZIP - SINGLE HTML NO BUILD
 // LINE 2 - SBSU AI STUDIO 2026 - FULL WORKING - FEATURE - SBSU FEROZEPUR PUNJAB - PWA OFFLINE - THREE.JS BABYLON.JS TAILWIND - EXPENSE TRACKER FIXED - ZIP READY - CONNECT QR WEBRTC - VOICE PUNJABI HINDI ENGLISH - MODEL SETTINGS SUPABASE - AGENT BUILDER - PROJECT MEMORY - HISTORY EXPORT - EDIT - DOWNLOAD ZIP - SINGLE HTML NO BUILD
