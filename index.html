@@ -89,12 +89,11 @@ function editCurrentCode(){let w=window.open();w.document.write('<textarea style
 
 async function downloadZIP(){if(!currentCode){alert('Build first - Try Expense Tracker');return}let zip=new JSZip();zip.file('index.html',currentCode);zip.file('full-studio.html',document.documentElement.outerHTML);zip.file('README.md','# SBSU AI STUDIO 2026 - FULL 35KB\\n\\nFeatures: Expense Tracker Fixed, Minecraft Three.js, PUBG Babylon.js, WhatsApp clone, PWA Offline, ZIP, QR Connect');zip.file('.env.example','SUPABASE_URL=https://your-project.supabase.co\\nSUPABASE_ANON_KEY=your-anon-key\\nGEMINI_API_KEY=your-gemini-key');let b=await zip.generateAsync({type:'blob'});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='SBSU-FULL-35KB.zip';a.click()}
 
-function setMode(m){if(m==='expense')buildExpenseTracker();if(m==='builder')addMsg('ai','Build Anything active - Try: Build WhatsApp clone / Build Minecraft / Build PUBG / Build Expense Tracker');if(m==='games')buildMinecraft();if(m==='agents')addMsg('ai','AI Agents: Study Agent, Coding Agent, Research Agent, Personal Agent - All Working ✅');if(m==='chat')addMsg('ai','Chat Mode - Ask anything')}
 function setMode(m){if(m==='expense')buildExpenseTracker();if(m==='builder')buildGeneric('Builder');if(m==='games')buildMinecraft();if(m==='agent')showPanel('settings');}
-</script>
-</body>
-</html>
-<script>
+// SBSU BONUS FIX - ENSURE 100% WORKING
+window.addEventListener('load',()=>{
+if(!currentCode){console.log('SBSU: Auto loading Expense');setTimeout(()=>{buildExpenseTracker()},500)}
+});
 // SBSU BONUS FIX - ENSURE 100% WORKING ON VERCEL - NO BLANK SCREEN
 // Fix 1: Prevent iframe blank on first load
 window.addEventListener('load', () => {
