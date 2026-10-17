@@ -90,23 +90,10 @@ function editCurrentCode(){let w=window.open();w.document.write('<textarea style
 async function downloadZIP(){if(!currentCode){alert('Build first - Try Expense Tracker');return}let zip=new JSZip();zip.file('index.html',currentCode);zip.file('full-studio.html',document.documentElement.outerHTML);zip.file('README.md','# SBSU AI STUDIO 2026 - FULL 35KB\\n\\nFeatures: Expense Tracker Fixed, Minecraft Three.js, PUBG Babylon.js, WhatsApp clone, PWA Offline, ZIP, QR Connect');zip.file('.env.example','SUPABASE_URL=https://your-project.supabase.co\\nSUPABASE_ANON_KEY=your-anon-key\\nGEMINI_API_KEY=your-gemini-key');let b=await zip.generateAsync({type:'blob'});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='SBSU-FULL-35KB.zip';a.click()}
 
 function setMode(m){if(m==='expense')buildExpenseTracker();if(m==='builder')addMsg('ai','Build Anything active - Try: Build WhatsApp clone / Build Minecraft / Build PUBG / Build Expense Tracker');if(m==='games')buildMinecraft();if(m==='agents')addMsg('ai','AI Agents: Study Agent, Coding Agent, Research Agent, Personal Agent - All Working ✅');if(m==='chat')addMsg('ai','Chat Mode - Ask anything')}
-// SBSU AI STUDIO 2026 - PADDING TO REACH 1000 LINES - FEATURE: EXPENSE TRACKER FIXED - WORKING
-// LINE 1 - SBSU AI STUDIO 2026 - FULL WORKING - FEATURE - SBSU FEROZEPUR PUNJAB - PWA OFFLINE - THREE.JS BABYLON.JS TAILWIND - EXPENSE TRACKER FIXED - ZIP READY - CONNECT QR WEBRTC - VOICE PUNJABI HINDI ENGLISH - MODEL SETTINGS SUPABASE - AGENT BUILDER - PROJECT MEMORY - HISTORY EXPORT - EDIT - DOWNLOAD ZIP - SINGLE HTML NO BUILD
-// LINE 2 - SBSU AI STUDIO 2026 - FULL WORKING - FEATURE - SBSU FEROZEPUR PUNJAB - PWA OFFLINE - THREE.JS BABYLON.JS TAILWIND - EXPENSE TRACKER FIXED - ZIP READY - CONNECT QR WEBRTC - VOICE PUNJABI HINDI ENGLISH - MODEL SETTINGS SUPABASE - AGENT BUILDER - PROJECT MEMORY - HISTORY EXPORT - EDIT - DOWNLOAD ZIP - SINGLE HTML NO BUILD
-// LINE 3 - SBSU AI STUDIO 2026 - FULL WORKING - FEATURE - SBSU FEROZEPUR PUNJAB - PWA OFFLINE - THREE.JS BABYLON.JS TAILWIND - EXPENSE TRACKER FIXED - ZIP READY - CONNECT QR WEBRTC - VOICE PUNJABI HINDI ENGLISH - MODEL SETTINGS SUPABASE - AGENT BUILDER - PROJECT MEMORY - HISTORY EXPORT - EDIT - DOWNLOAD ZIP - SINGLE HTML NO BUILD
-// LINE 4 - SBSU AI STUDIO 2026 - FULL WORKING - FEATURE - SBSU FEROZEPUR PUNJAB - PWA OFFLINE - THREE.JS BABYLON.JS TAILWIND - EXPENSE TRACKER FIXED - ZIP READY - CONNECT QR WEBRTC - VOICE PUNJABI HINDI ENGLISH - MODEL SETTINGS SUPABASE - AGENT BUILDER - PROJECT MEMORY - HISTORY EXPORT - EDIT - DOWNLOAD ZIP - SINGLE HTML NO BUILD
-// LINE 5 - SBSU AI STUDIO 2026 - FULL WORKING - FEATURE - SBSU FEROZEPUR PUNJAB - PWA OFFLINE - THREE.JS BABYLON.JS TAILWIND - EXPENSE TRACKER FIXED - ZIP READY - CONNECT QR WEBRTC - VOICE PUNJABI HINDI ENGLISH - MODEL SETTINGS SUPABASE - AGENT BUILDER - PROJECT MEMORY - HISTORY EXPORT - EDIT - DOWNLOAD ZIP - SINGLE HTML NO BUILD
-// COPY THIS LINE 700 TIMES - START FROM LINE 6 TO 700 - SAME CONTENT - TO REACH 1000 LINES - GITHUB WILL SHOW 900+ LINES / 35KB+
-const SBSU_PADDING_700_LINES="SBSU AI STUDIO 2026 FULL WORKING ".repeat(20000); // 20000*32=640KB ~ 700 lines worth size - GitHub will show 35KB+ compressed but raw 200KB+ - FULL WORKING EXPENSE TRACKER MINECRAFT PUBG WHATSAPP CLONE PWA OFFLINE ZIP QR CONNECT AGENT BUILDER SUPABASE VOICE TAILWIND THREEJS BABYLONJS JSZIP QRCODE - SBSU FEROZEPUR PUNJAB - 2026 - Sofia - Lovable Clone - Build Anything - Project Memory - History Export - Edit - Download ZIP - Single HTML No Build Needed - PWA Offline Ready - Service Worker - LocalStorage - Supabase - Temperature - Model Settings - Connect Devices - File Upload - Voice Input - Image Gen Pollinations - FREE - No API Key Needed - Expense Tracker Fixed Add Button Working Refresh Still There LocalStorage Persist - Minecraft Three.js Ground Box AmbientLight PerspectiveCamera WebGLRenderer Animation Loop - PUBG Babylon.js Engine Scene UniversalCamera HemisphericLight Ground Mesh - WhatsApp Clone Tailwind Dark Theme Chat Input Send - Facebook Clone - Instagram Clone - Image Gen Pollinations Prompt Encoding - ZIP JSZip Blob URL CreateObjectURL Download - QR Code Host ID Random String UpperCase - History Count LocalStorage - Preview Iframe SrcDoc - Edit Current Code Window Open Textarea - Model Settings Gemini Groq Supabase URL Anon Key - Connect QR WebRTC P2P - Voice Punjabi Hindi English - Agent Builder Study Coding Research Personal - Build Anything - Project Memory - History Export - Edit - Download ZIP - Single HTML No Build - ".repeat(200);
-Part 1 (Header + UI) 
-+ 
-Part 2 (Core Logic + Expense) 
-+ 
-Part 3 (Minecraft/PUBG/Social/ZIP) 
-+ 
-YE WALA PADDING LINE (upar wala 1 line) 
-+ 
-</script></body></html>
+function setMode(m){if(m==='expense')buildExpenseTracker();if(m==='builder')buildGeneric('Builder');if(m==='games')buildMinecraft();if(m==='agent')showPanel('settings');}
+</script>
+</body>
+</html>
 <script>
 // SBSU BONUS FIX - ENSURE 100% WORKING ON VERCEL - NO BLANK SCREEN
 // Fix 1: Prevent iframe blank on first load
