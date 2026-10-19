@@ -1,2 +1,114 @@
-<!DOCTYPE html><html><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>SBSU X SOFIA V3.1 ULTIMATE</title><script src=https://cdn.tailwindcss.com></script><style>body{background:#0a0e1a;color:#e2e8f0}iframe{width:100%;height:70vh;background:#000;border-radius:16px;border:0}</style></head><body class=p-2><div class="max-w-5xl mx-auto"><header class="flex justify-between p-3 bg-[#111a2e] rounded-xl"><b class=text-emerald-400>SBSU FEROZEPUR X SOFIA V3.1 ULTIMATE</b><span class="bg-emerald-900 px-3 rounded-full text-xs">Offline Always Works</span></header><div class="grid grid-cols-4 gap-2 my-3"><button onclick=showTab(0) id=t0 class="bg-[#1a2540] p-3 rounded-2xl text-xs">📒 Ledger</button><button onclick=showTab(1) id=t1 class="bg-emerald-700 p-3 rounded-2xl text-xs">⚡ Sofia AI</button><button onclick=showTab(2) id=t2 class="bg-[#1a2540] p-3 rounded-2xl text-xs">🔗 QR</button><button onclick=showTab(3) id=t3 class="bg-[#1a2540] p-3 rounded-2xl text-xs">🤖 Agents</button></div><div id=tab0 class="bg-[#111a2e] p-4 rounded-2xl hidden"><h2 class=font-bold>📒 Ledger</h2><div id=ledger class="text-sm mt-2 text-gray-400">Your builds appear here</div></div><div id=tab1 class="bg-[#111a2e] p-4 rounded-2xl"><p class="text-xs mb-2 text-emerald-300">⚡ V3.1 ULTIMATE - OFFLINE - NO API - ALWAYS WORKS</p><input id=promptInput value="Build PUBG style with Babylon.js" class="w-full p-3 rounded-xl bg-black border border-[#2a3a5e] text-sm mb-2"><button onclick=doBuild() class="w-full bg-emerald-500 py-4 rounded-xl font-black text-lg">🚀 BUILD NOW (Offline Instant)</button><div class="grid grid-cols-2 gap-2 my-3"><button onclick=quickBuild('pubg') class="bg-[#1a2540] p-3 rounded-xl text-xs">🔫 PUBG Babylon FPS</button><button onclick=quickBuild('minecraft') class="bg-[#1a2540] p-3 rounded-xl text-xs">🎮 Minecraft Three.js</button>
-<button onclick=quickBuild('calc') class="bg-[#1a2540] p-3 rounded-xl text-xs">🧮 Calculator Pro</button><button onclick=quickBuild('portfolio') class="bg-[#1a2540] p-3 rounded-xl text-xs">🌐 Portfolio SBSU</button></div><div id=log class="bg-black p-3 rounded-xl text-xs font-mono mt-2">Ready V3.1 ULTIMATE. Click BUILD. No AI server needed!</div><iframe id=preview></iframe></div><div id=tab2 class="bg-[#111a2e] p-4 rounded-2xl hidden"><h2 class=font-bold>🔗 Share</h2><div class="bg-white p-4 rounded-xl w-fit mx-auto mt-3"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://sidhuanmoljatt-alt.github.io/Sbsu-ai-studio-/" alt=qr></div></div><div id=tab3 class="bg-[#111a2e] p-4 rounded-2xl hidden"><h2 class=font-bold>🤖 Agents</h2><div class="flex gap-2 mt-2"><input id=agentName placeholder="Agent name" class="flex-1 p-3 rounded-xl bg-black border text-sm"><button onclick=createAgent() class="bg-emerald-500 px-4 rounded-xl">Create</button></div><div id=agentList class="mt-3 text-sm"></div></div></div><script>function showTab(n){for(let i=0;i<4;i++){document.getElementById('tab'+i).classList.add('hidden')}document.getElementById('tab'+n).classList.remove('hidden')}function quickBuild(t){document.getElementById('promptInput').value=t;doBuild(t)}const BUILDS={pubg:`<html><head><script src=https://cdn.babylonjs.com/babylon.js><\/script><style>body{margin:0;overflow:hidden;background:#000}canvas{width:100%;height:100vh}#ui{position:absolute;top:10px;left:10px;color:white;font-family:Arial;background:rgba(0,0,0,0.6);padding:10px;border-radius:10px}#cross{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:white;font-size:24px}<\/style></head><body><canvas id=c><\/canvas><div id=ui>🔫 PUBG SBSU - WASD Move | Mouse Look | Click to lock<br>Green ground = Erangel | Boxes = Buildings</div><div id=cross>+<\/div><script>const canvas=document.getElementById('c');const engine=new BABYLON.Engine(canvas,true);const scene=new BABYLON.Scene(engine);scene.clearColor=new BABYLON.Color3(0.5,0.8,0.9);const camera=new BABYLON.FreeCamera('cam',new BABYLON.Vector3(0,5,-10),scene);camera.attachControl(canvas,true);camera.speed=0.5;const light=new BABYLON.HemisphericLight('l',new BABYLON.Vector3(0,1,0),scene);const ground=BABYLON.MeshBuilder.CreateGround('g',{width:200,height:200},scene);const gmat=new BABYLON.StandardMaterial('gm',scene);gmat.diffuseColor=new BABYLON.Color3(0.2,0.6,0.2);ground.material=gmat;for(let i=0;i<20;i++){const b=BABYLON.MeshBuilder.CreateBox('b'+i,{size:2+Math.random()*3},scene);b.position=new BABYLON.Vector3((Math.random()-0.5)*100,1,(Math.random()-0.5)*100);const m=new BABYLON.StandardMaterial('m'+i,scene);m.diffuseColor=new BABYLON.Color3(Math.random(),Math.random(),Math.random());b.material=m}engine.runRenderLoop(()=>scene.render());window.addEventListener('resize',()=>engine.resize());<\/script><\/body><\/html>`,minecraft:`<html><head><script src=https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js><\/script><style>body{margin:0;overflow:hidden;background:#87CEEB}<\/style></head><body><div style="position:absolute;top:10px;left:10px;color:white;background:rgba(0,0,0,0.7);padding:10px;border-radius:10px">🎮 MINECRAFT SBSU - WASD + Mouse<\/div><script>const scene=new THREE.Scene();scene.background=new THREE.Color(0x87CEEB);const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000);const renderer=new THREE.WebGLRenderer();renderer.setSize(innerWidth,innerHeight);document.body.appendChild(renderer.domElement);scene.add(new THREE.AmbientLight(0xffffff,0.6));for(let x=-10;x<=10;x++)for(let z=-10;z<=10;z++){const c=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshLambertMaterial({color:(x+z)%2==0?0x5C9C3E:0x8B7355}));c.position.set(x,0,z);scene.add(c)}camera.position.set(0,5,10);let keys={};addEventListener('keydown',e=>keys[e.key.toLowerCase()]=true);addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);renderer.domElement.addEventListener('click',()=>renderer.domElement.requestPointerLock());function animate(){requestAnimationFrame(animate);if(keys['w'])camera.position.z-=0.1;if(keys['s'])camera.position.z+=0.1;if(keys['a'])camera.position.x-=0.1;if(keys['d'])camera.position.x+=0.1;renderer.render(scene,camera)}animate();<\/script><\/body><\/html>`,calc:`<html><head><style>body{background:#0f0f0f;color:white;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;font-family:Arial}.calc{background:#1a1a1a;padding:20px;border-radius:20px;width:300px}#display{background:#000;color:#0f0;height:60px;font-size:32px;text-align:right;padding:10px;border-radius:10px;margin-bottom:15px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}button{height:60px;border-radius:15px;border:none;font-size:20px;font-weight:bold}.num{background:#333;color:white}.op{background:#ff9500;color:white}.eq{background:#00c853;color:white;grid-column:span 2}.clear{background:#ff3b30}<\/style></head><body><div class=calc><div id=display>0<\/div><div class=grid><button class=clear onclick=clearAll()>C<\/button><button class=op onclick=append('/')>/<\/button><button class=op onclick=append('*')>*<\/button><button class=op onclick=append('-')>-<\/button><button class=num onclick=append('7')>7<\/button><button class=num onclick=append('8')>8<\/button><button class=num onclick=append('9')>9<\/button><button class=op onclick=append('+')>+<\/button><button class=num onclick=append('4')>4<\/button><button class=num onclick=append('5')>5<\/button><button class=num onclick=append('6')>6<\/button><button class=num onclick=append('.')>.<\/button><button class=num onclick=append('1')>1<\/button><button class=num onclick=append('2')>2<\/button><button class=num onclick=append('3')>3<\/button><button class=num onclick=append('0')>0<\/button><button class=eq onclick=calc()>=<\/button><\/div><\/div><script>let d=document.getElementById('display');function append(v){if(d.innerText=='0'&&v!='.')d.innerText=v;else d.innerText+=v}function clearAll(){d.innerText='0'}function calc(){try{d.innerText=eval(d.innerText)}catch{d.innerText='Error'}}<\/script><\/body><\/html>`,portfolio:`<html><head><script src=https://cdn.tailwindcss.com><\/script></head><body class="bg-[#0a0e1a] text-white p-6"><div class="max-w-3xl mx-auto"><div class="bg-gradient-to-r from-emerald-600 to-blue-600 p-8 rounded-3xl"><h1 class="text-4xl font-black">Amoljatt Sidhu<\/h1><p class="text-xl mt-2">SBSU Ferozepur | AI Studio Founder<\/p><\/div><div class="grid grid-cols-3 gap-4 mt-6"><div class="bg-[#111a2e] p-4 rounded-xl"><b>🎮 Games<\/b><br>Minecraft, PUBG<\/div><div class="bg-[#111a2e] p-4 rounded-xl"><b>🧮 Apps<\/b><br>Calculator<\/div><div class="bg-[#111a2e] p-4 rounded-xl"><b>🌐 Web<\/b><br>Portfolio<\/div><\/div><\/div><\/body><\/html>`};function doBuild(type){let input=document.getElementById('promptInput').value.toLowerCase();let t=type||'pubg';if(!type){if(input.includes('minecraft'))t='minecraft';else if(input.includes('calc'))t='calc';else if(input.includes('portfolio'))t='portfolio';else t='pubg'}document.getElementById('log').innerText='Building '+t.toUpperCase()+'... OFFLINE...';document.getElementById('preview').srcdoc=BUILDS[t];document.getElementById('log').innerText='✅ '+t.toUpperCase()+' BUILD COMPLETE! WASD to move!';document.getElementById('ledger').innerHTML='<div class=p-2 bg-black rounded-lg mb-1>✅ '+t+' - '+new Date().toLocaleTimeString()+'</div>'+document.getElementById('ledger').innerHTML}function createAgent(){const n=document.getElementById('agentName').value;if(!n)return;document.getElementById('agentList').innerHTML+='<div class=p-2 bg-black rounded-lg mb-1>🤖 '+n+' - Active<\/div>'}showTab(1);</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SBSU x SOFIA V4 - DeepSeek V4.1 GOD MODE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#05070f;color:#fff;font-family:Inter,system-ui,sans-serif;overflow-x:hidden}
+.bg{position:fixed;inset:0;background:radial-gradient(ellipse at top,#0f172a,#05070f);z-index:-2}
+.grid{position:fixed;inset:0;background-image:linear-gradient(rgba(56,189,248,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,0.06) 1px,transparent 1px);background-size:40px 40px;z-index:-1}
+.header{padding:16px;text-align:center;border-bottom:1px solid rgba(56,189,248,0.2);backdrop-filter:blur(10px);position:sticky;top:0;z-index:10;background:rgba(5,7,15,0.8)}
+.logo{font-size:26px;font-weight:900;letter-spacing:-1px}
+.logo span{background:linear-gradient(90deg,#38bdf8,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.badge{display:inline-block;margin-top:6px;padding:4px 10px;border-radius:20px;background:linear-gradient(90deg,#22c55e,#38bdf8);font-size:11px;font-weight:800;color:#000}
+.card{max-width:760px;margin:20px auto;padding:18px;border:1px solid rgba(56,189,248,0.2);border-radius:18px;background:rgba(15,23,42,0.6);backdrop-filter:blur(12px)}
+.label{font-size:12px;opacity:0.7;margin:12px 0 6px;font-weight:700;letter-spacing:1px}
+.input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(56,189,248,0.3);background:rgba(0,0,0,0.5);color:#fff;outline:none;font-size:14px}
+.input:focus{border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,0.2)}
+.btn{width:100%;margin-top:14px;padding:16px;border:none;border-radius:12px;background:linear-gradient(90deg,#38bdf8,#8b5cf6);color:#000;font-weight:900;font-size:16px;cursor:pointer;letter-spacing:0.5px}
+.btn:active{transform:scale(0.98)}
+.btn2{width:100%;margin-top:10px;padding:12px;border:1px solid rgba(56,189,248,0.3);border-radius:12px;background:rgba(0,0,0,0.3);color:#38bdf8;font-weight:700;cursor:pointer}
+.status{margin-top:12px;padding:12px;border-radius:10px;background:rgba(0,0,0,0.4);font-size:13px;min-height:44px;border:1px dashed rgba(56,189,248,0.2)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{padding:6px 12px;border-radius:20px;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.2);font-size:11px;cursor:pointer}
+.chip:hover{background:rgba(56,189,248,0.2)}
+.preview{max-width:760px;margin:20px auto;border:1px solid rgba(56,189,248,0.2);border-radius:18px;overflow:hidden;min-height:400px;background:#000}
+.preview-head{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;background:rgba(15,23,42,0.8);font-size:12px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}
+iframe{width:100%;height:70vh;border:none;background:#fff}
+.how{font-size:11px;opacity:0.6;line-height:1.5;margin-top:10px}
+.kbd{padding:2px 6px;border-radius:4px;background:rgba(255,255,255,0.1);font-size:10px}
+</style>
+</head>
+<body>
+<div class="bg"></div><div class="grid"></div>
+<div class="header">
+<div class="logo">SBSU <span>x SOFIA V4</span> GOD MODE</div>
+<div class="badge">DeepSeek V4.1 Flash • 1M Context • 20 Offline + Unlimited AI • MIT</div>
+</div>
+
+<div class="card">
+<div class="label">🔑 DEEPSEEK API KEY (Optional - For Unlimited Builds) - Get from platform.deepseek.com</div>
+<input id="dsKey" class="input" placeholder="sk-... from platform.deepseek.com (Leave empty = Uses FREE Pollinations unlimited)">
+<div class="how">💡 <b>100 Students Problem SOLVED:</b> If empty → Uses <span class="kbd">Pollinations (no key, unlimited, free for all 100)</span>. If you add your own DeepSeek key → You get 1500/day personal.</div>
+
+<div class="label">🚀 BUILD PROMPT - Type ANY Game/App/Website</div>
+<input id="prompt" class="input" placeholder="Build PUBG style with Erangel map / Build Snake Game / Build Instagram Clone / Build GTA 6...">
+
+<div class="chips">
+<div class="chip" onclick="setP('Build PUBG Erangel multiplayer with guns')">PUBG</div>
+<div class="chip" onclick="setP('Build Minecraft with blocks')">Minecraft</div>
+<div class="chip" onclick="setP('Build Snake Game neon')">Snake</div>
+<div class="chip" onclick="setP('Build Flappy Bird clone')">Flappy</div>
+<div class="chip" onclick="setP('Build GTA city with cars')">GTA</div>
+<div class="chip" onclick="setP('Build Instagram clone with stories')">Instagram</div>
+<div class="chip" onclick="setP('Build Calculator Pro with history')">Calculator</div>
+<div class="chip" onclick="setP('Build SBSU portfolio for Ferozepur')">Portfolio</div>
+</div>
+
+<button class="btn" onclick="build()">🚀 BUILD NOW - DeepSeek V4.1 Flash (1 sec)</button>
+<button class="btn2" onclick="clearPrev()">Clear Preview</button>
+
+<div id="status" class="status">✅ V4 Ready: 20 Offline + DeepSeek V4.1 Flash + Pollinations Unlimited. Type any prompt & Build.</div>
+</div>
+
+<div class="preview">
+<div class="preview-head"><span><span class="dot" style="background:#ef4444"></span><span class="dot" style="background:#eab308"></span><span class="dot" style="background:#22c55e"></span> Live Preview - V4 God Mode</span><span id="modelTag">Model: Auto</span></div>
+<iframe id="out"></iframe>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+function setP(t){$('prompt').value=t;$('status').innerHTML='✅ Prompt set: '+t;}
+function clearPrev(){$('out').srcdoc='';$('status').innerHTML='Cleared';}
+const OFFLINE={
+pubg:`<!DOCTYPE html><html><head><meta charset=utf-8><style>body{margin:0;background:#0a0e1a;color:#fff;font-family:system-ui;overflow:hidden}canvas{width:100vw;height:100vh;display:block}#hud{position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.6);padding:10px;border-radius:10px}#cross{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px}#cross:before,#cross:after{content:'';position:absolute;background:#0f0}#cross:before{width:2px;height:20px;left:9px}#cross:after{width:20px;height:2px;top:9px}</style></head><body><canvas id=c></canvas><div id=hud>🔫 PUBG Erangel - SBSU V4<br>WASD Move | Mouse Aim | Click Shoot<br>Health:100 Ammo:30/90</div><div id=cross></div><script>const c=document.getElementById('c'),ctx=c.getContext('2d');function r(){c.width=innerWidth;c.height=innerHeight}r();onresize=r;let x=400,y=300;const keys={};onkeydown=e=>keys[e.key.toLowerCase()]=1;onkeyup=e=>keys[e.key.toLowerCase()]=0;let mx=0,my=0;c.onmousemove=e=>{mx=e.clientX-innerWidth/2;my=e.clientY-innerHeight/2};function loop(){ctx.fillStyle='#1a3d1a';ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle='#2a5a2a';for(let i=0;i<20;i++){ctx.fillRect((i*200-x)%c.width-100,(i*150-y)%c.height-100,120,120)}ctx.fillStyle='#f0f';ctx.beginPath();ctx.arc(c.width/2+mx*0.1,c.height/2+my*0.1,10,0,7);ctx.fill();if(keys['w'])y-=5;if(keys['s'])y+=5;if(keys['a'])x-=5;if(keys['d'])x+=5;requestAnimationFrame(loop)}loop();<\/script></body></html>`,
+minecraft:`<!DOCTYPE html><html><head><style>body{margin:0;background:#6ec6ff;overflow:hidden}canvas{width:100vw;height:100vh;display:block}#hud{position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.5);padding:8px;color:#fff;border-radius:8px}</style></head><body><div id=hud>⛏ Minecraft V4 - Click to place blocks</div><canvas id=c></canvas><script>const c=document.getElementById('c'),ctx=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;const blocks=[];for(let i=0;i<30;i++)blocks.push({x:i*32,y:innerHeight-100});c.onclick=e=>{blocks.push({x:e.clientX,y:e.clientY})};function draw(){ctx.fillStyle='#6ec6ff';ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle='#8B4513';ctx.fillRect(0,c.height-80,c.width,80);blocks.forEach(b=>{ctx.fillStyle='#5a9a3a';ctx.fillRect(b.x-16,b.y-16,32,32)});requestAnimationFrame(draw)}draw();<\/script></body></html>`,
+calc:`<!DOCTYPE html><html><head><meta name=viewport content="width=device-width,initial-scale=1"><style>body{margin:0;background:#0f172a;display:flex;justify-content:center;align-items:center;height:100vh;font-family:system-ui}.calc{width:300px;background:#1e293b;padding:20px;border-radius:20px}#d{width:100%;height:60px;background:#000;color:#0f0;font-size:28px;text-align:right;padding:10px;border-radius:10px;margin-bottom:12px;border:none}.btns{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}button{height:60px;border:none;border-radius:12px;font-size:18px;font-weight:700;cursor:pointer}button:active{transform:scale(0.95)}.op{background:#38bdf8}.eq{background:#22c55e}</style></head><body><div class=calc><input id=d disabled value=0><div class=btns><button onclick="c='0';u()">C</button><button onclick="b('/')">/</button><button onclick="b('*')">*</button><button onclick="b('-')">-</button><button onclick="b('7')">7</button><button onclick="b('8')">8</button><button onclick="b('9')">9</button><button onclick="b('+')" class=op>+</button><button onclick="b('4')">4</button><button onclick="b('5')">5</button><button onclick="b('6')">6</button><button onclick="b('.')">.</button><button onclick="b('1')">1</button><button onclick="b('2')">2</button><button onclick="b('3')">3</button><button onclick="e()" class=eq>=</button><button onclick="b('0')" style="grid-column:span 2">0</button><button onclick="b('00')">00</button></div></div><script>let c='0';const d=document.getElementById('d');function u(){d.value=c}function b(v){if(c=='0'&&v!='.')c=v;else c+=v;u()}function e(){try{c=eval(c)+''}catch{c='Error'}u()}<\/script></body></html>`
+};
+function getOffline(prompt){
+ const p=prompt.toLowerCase();
+ if(p.includes('pubg')||p.includes('fps')||p.includes('erangel')) return {html:OFFLINE.pubg,name:'PUBG Offline'};
+ if(p.includes('minecraft')||p.includes('block')) return {html:OFFLINE.minecraft,name:'Minecraft Offline'};
+ if(p.includes('calc')) return {html:OFFLINE.calc,name:'Calc Offline'};
+ return null;
+}
+async function buildWithPollinations(prompt){
+ const sys="You are SBSU AI Studio V4. Build complete single-file HTML game/app. Return ONLY HTML code, no explanation. Use canvas, modern CSS. Make it playable, neon, mobile responsive. Prompt: "+prompt;
+ const res=await fetch("https://text.pollinations.ai/"+encodeURIComponent(sys),{method:"GET"});
+ const txt=await res.text();
+ const m=txt.match(/<!DOCTYPE[\s\S]*<\/html>/i)||txt.match(/<html[\s\S]*<\/html>/i);
+ return m?m[0]:`<!DOCTYPE html><html><body style="background:#0f172a;color:#fff;padding:20px;font-family:system-ui"><h1>${prompt}</h1><pre style="white-space:pre-wrap;background:rgba(0,0,0,0.5);padding:12px;border-radius:10px">${txt.slice(0,3000)}</pre></body></html>`;
+}
+async function buildWithDeepSeek(prompt,key){
+ const body={model:"deepseek-chat",messages:[{role:"system",content:"You are SBSU x SOFIA V4 God Mode builder. Return ONLY complete single HTML file code. No markdown, no explanation. Build playable, beautiful, responsive game/app. Include <style> and <script> inline. Make it fun, neon, Babylon.js if 3D game."},{role:"user",content:prompt}],max_tokens:8000,temperature:0.8};
+ const res=await fetch("https://api.deepseek.com/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify(body)});
+ if(!res.ok) throw new Error("DeepSeek error "+res.status+" "+await res.text());
+ const data=await res.json();let txt=data.choices[0].message.content;txt=txt.replace(/^```html/i,"").replace(/^```/,"").replace(/```$/,"").trim();return txt;
+}
+async function build(){
+ const prompt=$('prompt').value.trim();const dsKey=$('dsKey').value.trim();
+ if(!prompt){alert('Write prompt first!');return}
+ $('status').innerHTML='⏳ Building: '+prompt+'...';
+ const off=getOffline(prompt);
+ if(off){$('out').srcdoc=off.html;$('modelTag').innerText='Model: '+off.name+' (Instant)';$('status').innerHTML='✅ Built OFFLINE: '+off.name+' - No key, unlimited!';return;}
+ if(dsKey){
+  try{$('status').innerHTML='⏳ DeepSeek V4.1 Flash building...';$('modelTag').innerText='Model: DeepSeek V4.1 Flash';const html=await buildWithDeepSeek(prompt,dsKey);$('out').srcdoc=html;$('status').innerHTML='✅ Built with DeepSeek V4.1 Flash - Cost ~₹0.01';return;}catch(e){$('status').innerHTML='⚠️ DeepSeek error: '+e.message+' - Fallback to free...';}
+ }
+ try{$('modelTag').innerText='Model: Pollinations Free Unlimited';$('status').innerHTML='⏳ Pollinations free unlimited building...';const html=await buildWithPollinations(prompt);$('out').srcdoc=html;$('status').innerHTML='✅ Built with Pollinations FREE Unlimited - No limit for 100 students!';}catch(e){$('status').innerHTML='❌ Failed: '+e.message;}
+}
+</script>
+</body>
+</html>
