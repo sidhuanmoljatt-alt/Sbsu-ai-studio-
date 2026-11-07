@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App Builder - Build Apps FREE - Unbeatable App</title>
+<script src="https://js.puter.com/v2/"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#0f172a] text-white min-h-screen font-[Inter]">
+
+<!-- ===== TOP BAR ===== -->
+<header class="sticky top-0 z-40 bg-[#0f172a]/95 backdrop-blur border-b border-white/10">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <a href="index.html" class="flex items-center gap-2">
+      <span class="w-9 h-9 bg-yellow-400 rounded-xl flex items-center justify-center text-xl">🚀</span>
+      <span class="font-bold text-lg leading-none">Unbeatable<br><span class="text-yellow-400 text-sm">App Builder</span></span>
+    </a>
+    <nav class="hidden md:flex gap-1 text-sm">
+      <a href="index.html" class="px-3 py-2 rounded-full hover:bg-white/10">🏠 Home</a>
+      <a href="app-builder.html" class="bg-white/10 px-3 py-2 rounded-full">📱 App</a>
+      <a href="website-builder.html" class="px-3 py-2 rounded-full hover:bg-white/10">🌐 Website</a>
+      <a href="ai-agent-builder.html" class="px-3 py-2 rounded-full hover:bg-white/10">🤖 AI Agent</a>
+      <a href="game-builder.html" class="px-3 py-2 rounded-full hover:bg-white/10">🎮 Game</a>
+      <a href="my-apps.html" class="px-3 py-2 rounded-full hover:bg-white/10">📁 My Apps</a>
+      <a href="keys-host-share.html" class="px-3 py-2 rounded-full hover:bg-white/10">🔑 Keys + Host</a>
+      <a href="settings.html" class="px-3 py-2 rounded-full hover:bg-white/10">⚙️ Settings</a>
+    </nav>
+    <button id="loginBtn" onclick="handleLogin()" class="bg-yellow-400 text-black font-bold px-4 py-2 rounded-full text-sm">Sign In FREE</button>
+  </div>
+  <div class="md:hidden flex gap-2 overflow-x-auto px-4 pb-3 text-xs whitespace-nowrap">
+    <a href="index.html" class="bg-white/10 px-3 py-2 rounded-full">🏠 Home</a>
+    <a href="website-builder.html" class="bg-white/10 px-3 py-2 rounded-full">🌐 Website</a>
+    <a href="ai-agent-builder.html" class="bg-white/10 px-3 py-2 rounded-full">🤖 AI Agent</a>
+    <a href="game-builder.html" class="bg-white/10 px-3 py-2 rounded-full">🎮 Game</a>
+    <a href="my-apps.html" class="bg-white/10 px-3 py-2 rounded-full">📁 My Apps</a>
+    <a href="keys-host-share.html" class="bg-white/10 px-3 py-2 rounded-full">🔑 Keys</a>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 pb-20">
+
+<!-- ===== HERO ===== -->
+<section class="py-6 text-center">
+  <span class="bg-yellow-400/20 text-yellow-300 text-xs px-3 py-1 rounded-full">📱 APP BUILDER - 100% FREE - YOU $0</span>
+  <h1 class="text-3xl md:text-5xl font-black mt-3">Build Any App.<br><span class="text-yellow-400">Type. Build. Share.</span></h1>
+  <p class="text-white/60 text-sm mt-2">To-Do, Calculator, Notes, Timer, Expense, Quiz, Weather - Anything. No coding.</p>
+</section>
+
+<!-- ===== BUILDER BOX ===== -->
+<div class="bg-white/5 border border-white/10 rounded-3xl p-4 md:p-5">
+  <label class="font-bold text-sm">What app do you want? - Type in simple words:</label>
+  <textarea id="appPrompt" rows="3" placeholder="Example: Make a beautiful To-Do App with Save, Delete, Dark Mode...&#10;Example: Make a Calculator App with History...&#10;Example: Make a Notes App..." class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 mt-2 text-sm outline-none"></textarea>
+
+  <!-- Options -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3 text-sm">
+    <select id="appStyle" class="bg-black/40 border border-white/10 rounded-xl p-3">
+      <option value="Modern Dark + Yellow">🎨 Modern Dark + Yellow</option>
+      <option value="Clean White + Blue">🎨 Clean White + Blue</option>
+      <option value="Colorful Gradient">🎨 Colorful Gradient</option>
+      <option value="Minimal Black White">🎨 Minimal Black White</option>
+    </select>
+    <select id="appLang" class="bg-black/40 border border-white/10 rounded-xl p-3">
+      <option value="English">🌐 English</option>
+      <option value="Hindi + English">🌐 Hindi + English</option>
+      <option value="Hindi">🌐 Hindi</option>
+    </select>
+    <select id="appModel" class="bg-black/40 border border-white/10 rounded-xl p-3">
+      <option value="auto">🤖 Auto - Best FREE Model</option>
+      <option value="puter">🤖 Puter FREE First</option>
+      <option value="pollinations">🤖 Pollinations FREE First</option>
+    </select>
+    <label class="bg-black/40 border border-white/10 rounded-xl p-3 flex items-center gap-2 text-xs"><input type="checkbox" id="useMyKeys" checked> Use My Keys if FREE over</label>
+  </div>
+
+  <!-- Quick Templates -->
+  <div class="flex flex-wrap gap-2 mt-3 text-xs">
+    <button onclick="setTemplate('Make a beautiful To-Do App with Add, Delete, Complete, Save in localStorage, Dark Mode')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">✅ To-Do App</button>
+    <button onclick="setTemplate('Make a Calculator App with History, Dark Mode, Beautiful Buttons')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">🧮 Calculator</button>
+    <button onclick="setTemplate('Make a Notes App with Add, Edit, Delete, Search, Save')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">📝 Notes App</button>
+    <button onclick="setTemplate('Make a Stopwatch + Timer App with Lap, Beautiful Design')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">⏱️ Timer</button>
+    <button onclick="setTemplate('Make an Expense Tracker App with Add Income, Add Expense, Total Balance, Chart')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">💰 Expense</button>
+    <button onclick="setTemplate('Make a Quiz App with 10 Questions, Score, Timer')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">❓ Quiz App</button>
+  </div>
+
+  <button onclick="buildApp()" id="buildBtn" class="w-full md:w-auto bg-yellow-400 text-black font-bold px-8 py-4 rounded-full mt-4 text-sm">🚀 Build My App FREE →</button>
+  <p class="text-[11px] text-white/40 mt-2">Auto-Shifter: Puter FREE → Pollinations FREE → Your Keys (Unlimited) → Popup. Developer $0. Your keys stay on YOUR device only.</p>
+  <div id="buildStatus" class="text-sm mt-3 text-yellow-300"></div>
+</div>
+
+<!-- ===== ADSENSE AD ===== -->
+<div class="bg-white/5 border border-dashed border-white/10 rounded-2xl p-4 text-center text-xs text-white/40 mt-4">
+  📢 Ad Space - Your AdSense Ad Will Show Here After Approval
+  <!-- Paste AdSense code here after approval -->
+</div>
+
+<!-- ===== PREVIEW + ACTIONS ===== -->
+<div id="resultBox" class="hidden mt-5">
+  <div class="flex flex-wrap gap-2 justify-between items-center">
+    <h2 class="font-bold text-lg">✨ Your App is Ready!</h2>
+    <div class="flex flex-wrap gap-2">
+      <button onclick="saveApp()" class="bg-white/10 px-4 py-2 rounded-full text-sm">💾 Save</button>
+      <button onclick="hostApp()" class="bg-green-500 text-black font-bold px-4 py-2 rounded-full text-sm">🚀 Host FREE</button>
+      <button onclick="copyAppLink()" class="bg-white/10 px-4 py-2 rounded-full text-sm">🔗 Copy Link</button>
+      <button onclick="shareAppWhatsApp()" class="bg-[#25D366] text-black font-bold px-4 py-2 rounded-full text-sm">💬 Share WhatsApp</button>
+      <button onclick="downloadApp()" class="bg-white/10 px-4 py-2 rounded-full text-sm">⬇️ Download .html</button>
+      <button onclick="editAppPrompt()" class="bg-yellow-400 text-black font-bold px-4 py-2 rounded-full text-sm">✏️ Edit / Rebuild</button>
+    </div>
+  </div>
+  <div id="hostResult" class="text-sm mt-2"></div>
+  <iframe id="appPreview" sandbox="allow-scripts allow-same-origin" class="w-full h-[520px] bg-white rounded-3xl mt-3 border border-white/10"></iframe>
+  <details class="mt-3"><summary class="text-xs text-white/50 cursor-pointer">Show Code (Copy / Edit)</summary><textarea id="appCodeView" rows="8" class="w-full bg-black/60 rounded-2xl p-3 mt-2 text-[11px] font-mono"></textarea></details>
+</div>
+
+<!-- ===== MY RECENT APPS ===== -->
+<div class="mt-6">
+  <div class="flex justify-between"><h2 class="font-bold">Your Recent Apps</h2><a href="my-apps.html" class="text-yellow-400 text-sm">View All →</a></div>
+  <div id="recentApps" class="grid md:grid-cols-3 gap-3 mt-3 text-sm"><p class="text-white/50">No apps yet. Build your first app above!</p></div>
+</div>
+
+</main>
+
+<!-- ===== POPUP ===== -->
+<div id="limitPopup" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
+  <div class="bg-[#1e293b] rounded-3xl p-6 max-w-md w-full text-center">
+    <h2 class="text-xl font-bold">⚠️ All FREE Limits Over</h2>
+    <p class="text-sm text-white/70 mt-2">Puter + Pollinations + All your keys over. Choose:</p>
+    <div class="space-y-2 mt-4">
+      <button onclick="closePopup()" class="w-full bg-white/10 py-3 rounded-full text-sm">🆓 Wait Tomorrow - FREE - $0</button>
+      <a href="https://puter.com" target="_blank" class="block w-full bg-yellow-400 text-black font-bold py-3 rounded-full text-sm">💳 Buy Puter - YOU pay Puter</a>
+      <a href="keys-host-share.html" class="block w-full bg-white/10 py-3 rounded-full text-sm">🔑 Attach Another API Key</a>
+      <button onclick="closePopup(); buildApp();" class="w-full bg-green-500 text-black font-bold py-3 rounded-full text-sm">🔄 Try FREE Again</button>
+    </div>
+    <button onclick="closePopup()" class="mt-3 text-xs text-white/50">Close</button>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="script.js"></script>
+<script>
+// Load last prompt from Home
+const lastPrompt = localStorage.getItem('unbeatable_last_prompt');
+if(lastPrompt){ document.getElementById('appPrompt').value = lastPrompt; localStorage.removeItem('unbeatable_last_prompt'); }
+function setTemplate(t){ document.getElementById('appPrompt').value = t; window.scrollTo({top:0, behavior:'smooth'}); }
+async function handleLogin(){ try{ const u = await puter.auth.getUser(); if(u && u.username){ document.getElementById('loginBtn').textContent='👤 '+u.username; return; } }catch(e){} try{ await puter.auth.signIn(); location.reload(); }catch(e){ alert('Sign In FREE with Puter'); } }
+(async()=>{ try{ const u=await puter.auth.getUser(); if(u && u.username) document.getElementById('loginBtn').textContent='👤 '+u.username; }catch(e){} })();
+
+let currentHtml = '';
+let currentTitle = '';
+
+async function buildApp(){
+  const prompt = document.getElementById('appPrompt').value.trim();
+  if(!prompt) return alert('Type what app you want first! Example: Make a To-Do App');
+  const style = document.getElementById('appStyle').value;
+  const lang = document.getElementById('appLang').value;
+  const modelPref = document.getElementById('appModel').value;
+  const useKeys = document.getElementById('useMyKeys').checked;
+  const status = document.getElementById('buildStatus');
+  const btn = document.getElementById('buildBtn');
+  btn.disabled = true; btn.textContent = '⏳ Building... Please wait 10-20 sec...';
+  const fullPrompt = `Make a complete single-file HTML app: ${prompt}. Style: ${style}. Language: ${lang}. Requirements: 1) Single HTML file, 2) Use Tailwind CDN, 3) Beautiful modern design, 4) Fully working buttons, 5) Use localStorage to save data, 6) Mobile responsive, 7) No external images needed, use emoji. Return ONLY HTML code, no explanation, no markdown.`;
+  currentTitle = prompt.slice(0,60);
+
+  // Order based on preference
+  const order = modelPref==='pollinations' ? ['pollinations','puter'] : ['puter','pollinations'];
+
+  for(const step of order){
+    try{
+      status.textContent = step==='puter' ? 'Step 1/4: Trying Puter FREE...' : 'Step 2/4: Trying Pollinations FREE (No login, No pay)...';
+      let html = '';
+      if(step==='puter'){
+        const resp = await puter.ai.chat(fullPrompt, {model:'openai/gpt-6-astra'});
+        html = (resp.message?.content || resp.toString()).replace(/```html|```/g,'').trim();
+      } else {
+        const res = await fetch('https://text.pollinations.ai/'+encodeURIComponent(fullPrompt));
+        html = (await res.text()).replace(/```html|```/g,'').trim();
+      }
+      if(html && html.length>300 && html.includes('<')){
+        showResult(html, step==='puter' ? '✅ Built via Puter FREE' : '✅ Built via Pollinations FREE');
+        btn.disabled=false; btn.textContent='🚀 Build My App FREE →'; return;
+      }
+    }catch(e){ console.log(step+' failed', e); }
+  }
+
+  // Step 3: User Keys
+  if(useKeys){
+    const keys = JSON.parse(localStorage.getItem('unbeatable_api_keys')||'[]');
+    for(let i=0;i<keys.length;i++){
+      status.textContent = `Step 3/4: Trying Your Key ${i+1}/${keys.length} - ${keys[i].provider} (YOU pay provider, Developer $0)...`;
+      try{
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+keys[i].value}, body: JSON.stringify({model:'gpt-4o-mini', messages:[{role:'user', content: fullPrompt}]})});
+        if(res.ok){
+          const data = await res.json();
+          let html = data.choices[0].message.content.replace(/```html|```/g,'').trim();
+          showResult(html, `✅ Built via YOUR Key ${i+1} - ${keys[i].provider}`); btn.disabled=false; btn.textContent='🚀 Build My App FREE →'; return;
+        }
+      }catch(e){ continue; }
+    }
+  }
+
+  // Step 4: Popup
+  status.textContent = '❌ All limits over - Showing options...';
+  btn.disabled=false; btn.textContent='🚀 Build My App FREE →';
+  showPopup();
+}
+
+function showResult(html, msg){
+  currentHtml = html;
+  document.getElementById('buildStatus').textContent = msg;
+  const box = document.getElementById('resultBox'); box.classList.remove('hidden');
+  document.getElementById('appPreview').srcdoc = html;
+  document.getElementById('appCodeView').value = html;
+  box.scrollIntoView({behavior:'smooth'});
+}
+function editAppPrompt(){ document.getElementById('appPrompt').value += ' - Make it even better, add more features'; window.scrollTo({top:0, behavior:'smooth'}); }
+function saveApp(){
+  if(!currentHtml) return alert('Build app first!');
+  let saved = JSON.parse(localStorage.getItem('unbeatable_saved_apps')||'[]');
+  saved.unshift({name: currentTitle, html: currentHtml, time: new Date().toLocaleString(), type:'App'});
+  localStorage.setItem('unbeatable_saved_apps', JSON.stringify(saved));
+  try{ puter.kv.set('unbeatable_saved_apps', JSON.stringify(saved)); }catch(e){}
+  alert('✅ App Saved! See in My Apps.'); renderRecent();
+}
+async function hostApp(){
+  if(!currentHtml) return alert('Build app first!');
+  const name = prompt('Enter app name for hosting (no space, e.g. my-todo):', currentTitle.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30) || 'my-app');
+  if(!name) return;
+  document.getElementById('hostResult').textContent = '⏳ Hosting FREE on YOUR Puter Cloud...';
+  try{
+    const fileName = name + '.html';
+    await puter.fs.write(fileName, currentHtml);
+    const user = await puter.auth.getUser().catch(()=>null);
+    const link = user ? `https://${user.username}.puter.site/${fileName}` : fileName;
+    window._hostLink = link;
+    document.getElementById('hostResult').innerHTML = `✅ <b>Hosted FREE!</b> 🔗 <a href="${link}" target="_blank" class="text-yellow-400 underline">${link}</a> - Share this link!`;
+    let hosted = JSON.parse(localStorage.getItem('hosted_apps')||'[]');
+    hosted.unshift({name: fileName, link, time: new Date().toLocaleString()});
+    localStorage.setItem('hosted_apps', JSON.stringify(hosted));
+    renderRecent();
+  }catch(e){ document.getElementById('hostResult').innerHTML = '⚠️ Please Sign In FREE first (top right), then Host again. Your app is still saved locally.'; }
+}
+function copyAppLink(){ if(window._hostLink) navigator.clipboard.writeText(window._hostLink).then(()=>alert('✅ Host Link Copied!')); else alert('Host app first, then copy link. Or use Download.'); }
+function shareAppWhatsApp(){
+  const link = window._hostLink || ((typeof CONFIG!=='undefined') ? CONFIG.baseUrl : window.location.href);
+  const text = encodeURIComponent(`🚀 I built this App FREE on Unbeatable App! Try it: ${link} - Build yours FREE too!`);
+  window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+function downloadApp(){
+  if(!currentHtml) return alert('Build app first!');
+  const blob = new Blob([currentHtml], {type:'text/html'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = (currentTitle||'my-app').replace(/[^a-z0-9]+/gi,'-')+'.html'; a.click();
+}
+function showPopup(){ const p=document.getElementById('limitPopup'); p.classList.remove('hidden'); p.classList.add('flex'); }
+function closePopup(){ const p=document.getElementById('limitPopup'); p.classList.add('hidden'); p.classList.remove('flex'); }
+function renderRecent(){
+  try{
+    const saved = JSON.parse(localStorage.getItem('unbeatable_saved_apps')||'[]').slice(0,3);
+    const hosted = JSON.parse(localStorage.getItem('hosted_apps')||'[]').slice(0,3);
+    const all = [...saved, ...hosted];
+    if(all.length) document.getElementById('recentApps').innerHTML = all.map(a=>`<div class="bg-white/5 border border-white/10 p-4 rounded-2xl"><b>🚀 ${a.name}</b><p class="text-white/50 text-xs">${a.time||''}</p><a href="my-apps.html" class="text-yellow-400 text-xs">Open in My Apps →</a></div>`).join('');
+  }catch(e){}
+}
+renderRecent();
+</script>
+</body>
+</html>
