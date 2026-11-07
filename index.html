@@ -3,270 +3,217 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>API Keys + Hosting + Share - Unbeatable App</title>
+<title>Unbeatable App - Build Apps, Websites, Games & AI Agents FREE</title>
+<meta name="description" content="Build Apps, Websites, Games & AI Agents FREE - No Coding - No API Key - 100% FREE">
 <script src="https://js.puter.com/v2/"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-[#0f172a] text-white p-4 max-w-4xl mx-auto font-[Inter]">
+<body class="bg-[#0f172a] text-white min-h-screen font-[Inter]">
 
-<a href="index.html" class="text-yellow-400 text-sm">← Back Home</a>
-<h1 class="text-3xl font-bold mt-3">🔑 API Key Manager + 🚀 Host + 📤 Share</h1>
-<p class="text-white/60 text-sm mt-1">Unlimited Keys • Auto-Shifter: Puter → Pollinations → Your Keys → Popup • YOU $0 • Developer $0 • Keys stored ONLY on YOUR device</p>
-
-<!-- ===== SHARE BUTTON - WHATSAPP ===== -->
-<div class="bg-green-500/10 border border-green-500/30 rounded-3xl p-5 mt-5">
-  <h2 class="font-bold text-lg">📤 Share This App To Anyone</h2>
-  <p class="text-xs text-white/60 mt-1">Share via WhatsApp - Link form - Anyone can open FREE</p>
-  <div class="flex flex-wrap gap-2 mt-3">
-    <button onclick="shareWhatsApp()" class="bg-[#25D366] text-black font-bold px-5 py-3 rounded-full text-sm">💬 Share on WhatsApp</button>
-    <button onclick="shareCopy()" class="bg-white/10 px-5 py-3 rounded-full text-sm">🔗 Copy Link</button>
-    <button onclick="shareNative()" class="bg-yellow-400 text-black font-bold px-5 py-3 rounded-full text-sm">📲 Share Anywhere</button>
-  </div>
-  <input id="shareLink" readonly class="w-full bg-black/40 border border-white/10 rounded-xl p-3 mt-3 text-xs" value="https://yourusername.github.io/unbeatable-app/">
-  <p class="text-[11px] text-white/50 mt-2">Replace yourusername with YOUR GitHub username in config.js - Then this link auto-updates.</p>
-</div>
-
-<!-- ===== API KEY ATTACHER - UNLIMITED ===== -->
-<div class="bg-white/5 border border-white/10 rounded-3xl p-5 mt-5">
-  <h2 class="font-bold text-lg">🔑 Attach Unlimited API Keys</h2>
-  <p class="text-xs text-white/50 mt-1">Your keys stay ONLY on YOUR phone/browser + YOUR Puter KV. Developer NEVER sees them. Hacker cannot steal from GitHub because keys are NOT in GitHub code. YOU pay your provider directly if you use paid key. Developer $0.</p>
-  
-  <div class="grid md:grid-cols-3 gap-3 mt-4">
-    <select id="keyProvider" class="bg-black/40 border border-white/10 rounded-xl p-3 text-sm">
-      <option value="OpenAI">OpenAI - GPT</option>
-      <option value="Claude">Claude - Anthropic</option>
-      <option value="Gemini">Gemini - Google</option>
-      <option value="Grok">Grok - xAI</option>
-      <option value="DeepSeek">DeepSeek</option>
-      <option value="Groq">Groq - FREE Fast</option>
-      <option value="OpenRouter">OpenRouter - FREE Models</option>
-      <option value="Together">Together AI</option>
-      <option value="Mistral">Mistral</option>
-      <option value="Pollinations">Pollinations - FREE No Key</option>
-      <option value="Custom">Custom / Other</option>
-    </select>
-    <input id="keyName" placeholder="Name - e.g. My GPT Key 1" class="bg-black/40 border border-white/10 rounded-xl p-3 text-sm md:col-span-1">
+<!-- ===== TOP BAR ===== -->
+<header class="sticky top-0 z-40 bg-[#0f172a]/95 backdrop-blur border-b border-white/10">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <a href="index.html" class="flex items-center gap-2">
+      <span class="w-9 h-9 bg-yellow-400 rounded-xl flex items-center justify-center text-xl">🚀</span>
+      <span class="font-bold text-lg leading-none">Unbeatable<br><span class="text-yellow-400 text-sm">App - FREE</span></span>
+    </a>
+    <nav class="hidden md:flex gap-1 text-sm">
+      <a href="index.html" class="bg-white/10 px-3 py-2 rounded-full">🏠 Home</a>
+      <a href="app-builder.html" class="px-3 py-2 rounded-full hover:bg-white/10">📱 App</a>
+      <a href="website-builder.html" class="px-3 py-2 rounded-full hover:bg-white/10">🌐 Website</a>
+      <a href="ai-agent-builder.html" class="px-3 py-2 rounded-full hover:bg-white/10">🤖 AI Agent</a>
+      <a href="game-builder.html" class="px-3 py-2 rounded-full hover:bg-white/10">🎮 Game</a>
+      <a href="my-apps.html" class="px-3 py-2 rounded-full hover:bg-white/10">📁 My Apps</a>
+      <a href="keys-host-share.html" class="px-3 py-2 rounded-full hover:bg-white/10">🔑 Keys + Host</a>
+      <a href="settings.html" class="px-3 py-2 rounded-full hover:bg-white/10">⚙️ Settings</a>
+    </nav>
     <div class="flex gap-2">
-      <input id="keyValue" type="password" placeholder="Paste API Key - sk-..." class="flex-1 bg-black/40 border border-white/10 rounded-xl p-3 text-sm">
-      <button onclick="toggleKeyEye()" class="bg-white/10 px-3 rounded-xl">👁️</button>
+      <button id="loginBtn" onclick="handleLogin()" class="bg-yellow-400 text-black font-bold px-4 py-2 rounded-full text-sm">Sign In FREE</button>
+      <button onclick="shareWhatsAppHome()" class="bg-[#25D366] text-black font-bold px-4 py-2 rounded-full text-sm hidden sm:block">💬 Share</button>
     </div>
   </div>
-
-  <div class="flex flex-wrap gap-2 mt-3">
-    <button onclick="addApiKey()" class="bg-yellow-400 text-black font-bold px-6 py-3 rounded-full text-sm">+ Attach Key - Unlimited</button>
-    <button onclick="testAllKeys()" class="bg-white/10 px-4 py-2 rounded-full text-sm">🧪 Test All Keys</button>
-    <button onclick="clearAllKeys()" class="bg-red-500/20 text-red-300 px-4 py-2 rounded-full text-sm">🗑️ Delete All</button>
+  <!-- Mobile Nav -->
+  <div class="md:hidden flex gap-2 overflow-x-auto px-4 pb-3 text-xs whitespace-nowrap">
+    <a href="app-builder.html" class="bg-white/10 px-3 py-2 rounded-full">📱 App</a>
+    <a href="website-builder.html" class="bg-white/10 px-3 py-2 rounded-full">🌐 Website</a>
+    <a href="ai-agent-builder.html" class="bg-white/10 px-3 py-2 rounded-full">🤖 AI Agent</a>
+    <a href="game-builder.html" class="bg-white/10 px-3 py-2 rounded-full">🎮 Game</a>
+    <a href="my-apps.html" class="bg-white/10 px-3 py-2 rounded-full">📁 My Apps</a>
+    <a href="keys-host-share.html" class="bg-white/10 px-3 py-2 rounded-full">🔑 Keys</a>
+    <a href="settings.html" class="bg-white/10 px-3 py-2 rounded-full">⚙️ Settings</a>
   </div>
+</header>
 
-  <div class="mt-4">
-    <h3 class="text-sm font-bold">Your Attached Keys (<span id="keyCount">0</span>) - Shows only last 4 digits - Full key hidden:</h3>
-    <div id="keysList" class="space-y-2 mt-2 text-sm"><p class="text-white/50">No keys yet. Attach your first key above. Or use Puter FREE + Pollinations FREE without any key.</p></div>
-  </div>
+<main class="max-w-6xl mx-auto px-4 pb-20">
 
-  <!-- FREE KEYS LIST -->
-  <div class="bg-black/30 rounded-2xl p-4 mt-4">
-    <h3 class="font-bold text-sm">🆓 FREE Keys - Get FREE - No Card:</h3>
-    <div class="grid md:grid-cols-2 gap-2 mt-2 text-xs">
-      <a href="https://console.groq.com/keys" target="_blank" class="bg-white/5 p-3 rounded-xl">⚡ Groq FREE → Get Key → Paste Above</a>
-      <a href="https://openrouter.ai/keys" target="_blank" class="bg-white/5 p-3 rounded-xl">🌐 OpenRouter FREE → Get Key → Paste Above</a>
-      <a href="https://aistudio.google.com/apikey" target="_blank" class="bg-white/5 p-3 rounded-xl">✦ Gemini FREE → Get Key → Paste Above</a>
-      <a href="https://platform.openai.com/api-keys" target="_blank" class="bg-white/5 p-3 rounded-xl">🤖 OpenAI → Get Key (Paid if you use)</a>
+<!-- ===== HERO ===== -->
+<section class="text-center py-8">
+  <span class="bg-green-500/20 text-green-300 text-xs px-3 py-1 rounded-full">● 100% FREE - No Coding - No API Key - YOU $0</span>
+  <h1 class="text-4xl md:text-6xl font-black mt-4 leading-[1.05]">Build Anything.<br><span class="text-yellow-400">FREE. In Seconds.</span></h1>
+  <p class="text-white/60 mt-3 max-w-xl mx-auto text-sm md:text-base">Apps, Websites, Games & AI Agents. Type what you want in simple words. AI builds it. You host it. You share it on WhatsApp.</p>
+
+  <!-- Search / Prompt -->
+  <div class="bg-white/5 border border-white/10 rounded-3xl p-3 mt-6 max-w-2xl mx-auto">
+    <textarea id="homePrompt" rows="2" placeholder="Try: Make a To-Do App... / Make a Portfolio for Photographer... / Make Snake Game..." class="w-full bg-black/40 rounded-2xl p-4 text-sm outline-none"></textarea>
+    <div class="flex flex-wrap gap-2 mt-3 justify-center">
+      <button onclick="goBuilder('app-builder.html')" class="bg-yellow-400 text-black font-bold px-5 py-3 rounded-full text-sm">📱 Build App →</button>
+      <button onclick="goBuilder('website-builder.html')" class="bg-white/10 px-5 py-3 rounded-full text-sm">🌐 Build Website</button>
+      <button onclick="goBuilder('game-builder.html')" class="bg-white/10 px-5 py-3 rounded-full text-sm">🎮 Build Game</button>
+      <button onclick="goBuilder('ai-agent-builder.html')" class="bg-white/10 px-5 py-3 rounded-full text-sm">🤖 Build AI Agent</button>
     </div>
+    <p class="text-[11px] text-white/40 mt-2">Auto-Shifter: Puter FREE → Pollinations FREE → Your Keys → Popup. Developer $0 forever.</p>
   </div>
-</div>
 
-<!-- ===== AUTO-SHIFTER TESTER ===== -->
-<div class="bg-white/5 border border-white/10 rounded-3xl p-5 mt-5">
-  <h2 class="font-bold text-lg">🔄 Auto-Shifter - Puter → Pollinations → Your Keys → Popup</h2>
-  <p class="text-xs text-white/60 mt-1">Order: 1) Puter FREE → 2) Pollinations FREE → 3) Your Key 1 → 4) Your Key 2 → 5) Your Key 3... → 6) Popup: Buy / Attach New / Wait</p>
-  <textarea id="autoPrompt" rows="2" placeholder="Test Auto-Shifter: e.g. Make a to-do app" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 mt-3 text-sm"></textarea>
-  <button onclick="runAutoShifter()" class="bg-yellow-400 text-black font-bold px-6 py-3 rounded-full mt-3 text-sm">🚀 Run Auto-Shifter Test</button>
-  <div id="autoStatus" class="text-sm mt-3 text-yellow-300"></div>
-  <iframe id="autoPreview" sandbox="allow-scripts" class="w-full h-[380px] bg-white rounded-2xl mt-3 hidden"></iframe>
-</div>
-
-<!-- ===== DIRECT HOSTING ON THIS APP ===== -->
-<div class="bg-white/5 border border-white/10 rounded-3xl p-5 mt-5">
-  <h2 class="font-bold text-lg">🚀 Host Your Things Directly On This App - FREE</h2>
-  <p class="text-xs text-white/60 mt-1">Paste HTML OR generate via builder, then click Host. It saves to YOUR Puter Cloud + gives you a shareable link. Anyone can open. YOU $0. Developer $0.</p>
-  <input id="hostName" placeholder="App name - e.g. my-calculator" class="w-full bg-black/40 border border-white/10 rounded-xl p-3 mt-3 text-sm">
-  <textarea id="hostCode" rows="6" placeholder="Paste your HTML code here... OR leave empty and it will use last generated app from index.html" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 mt-3 text-sm font-mono"></textarea>
-  <div class="flex flex-wrap gap-2 mt-3">
-    <button onclick="hostMyApp()" class="bg-green-500 text-black font-bold px-6 py-3 rounded-full text-sm">🚀 Host Now FREE</button>
-    <button onclick="copyHostLink()" class="bg-white/10 px-4 py-2 rounded-full text-sm">🔗 Copy Host Link</button>
-    <button onclick="shareHostWhatsApp()" class="bg-[#25D366] text-black font-bold px-4 py-2 rounded-full text-sm">💬 Share Hosted App on WhatsApp</button>
+  <!-- Quick Examples -->
+  <div class="flex flex-wrap gap-2 justify-center mt-4 text-xs">
+    <button onclick="setPrompt('Make a beautiful Calculator App')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">🧮 Calculator</button>
+    <button onclick="setPrompt('Make a To-Do App with Save')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">✅ To-Do</button>
+    <button onclick="setPrompt('Make Snake Game')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">🐍 Snake Game</button>
+    <button onclick="setPrompt('Make Portfolio for Photographer')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">📸 Portfolio</button>
+    <button onclick="setPrompt('Make Business Website for Pizza Shop')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">🍕 Pizza Shop</button>
   </div>
-  <div id="hostResult" class="mt-3 text-sm"></div>
-  <div id="myHostedList" class="mt-3 space-y-2 text-sm"></div>
+</section>
+
+<!-- ===== ADSENSE AD - TOP - Paste your AdSense code after approval ===== -->
+<div class="bg-white/5 border border-dashed border-white/10 rounded-2xl p-4 text-center text-xs text-white/40">
+  <!-- Paste Google AdSense Ad Code Here - After Approval -->
+  <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto"></ins> -->
+  📢 Ad Space - Your AdSense Ad Will Show Here After Approval
 </div>
 
-<!-- ===== POPUP - ALL LIMITS OVER ===== -->
+<!-- ===== CATEGORIES ===== -->
+<section class="mt-8">
+  <h2 class="font-bold text-xl">What do you want to build today?</h2>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+    <a href="app-builder.html" class="bg-gradient-to-br from-yellow-400 to-orange-500 text-black p-5 rounded-3xl">
+      <div class="text-3xl">📱</div><b class="block mt-2">App Builder</b><span class="text-xs opacity-80">To-Do, Calculator, Notes, Timer...</span><span class="block text-xs font-bold mt-2">Build App →</span>
+    </a>
+    <a href="website-builder.html" class="bg-gradient-to-br from-blue-500 to-purple-600 p-5 rounded-3xl">
+      <div class="text-3xl">🌐</div><b class="block mt-2">Website Builder</b><span class="text-xs opacity-80">Portfolio, Shop, Blog, Business...</span><span class="block text-xs font-bold mt-2">Build Website →</span>
+    </a>
+    <a href="ai-agent-builder.html" class="bg-gradient-to-br from-green-500 to-teal-600 text-black p-5 rounded-3xl">
+      <div class="text-3xl">🤖</div><b class="block mt-2">AI Agent Builder</b><span class="text-xs opacity-80">Homework Agent, Chat Agent...</span><span class="block text-xs font-bold mt-2">Build Agent →</span>
+    </a>
+    <a href="game-builder.html" class="bg-gradient-to-br from-pink-500 to-red-500 p-5 rounded-3xl">
+      <div class="text-3xl">🎮</div><b class="block mt-2">Game Builder</b><span class="text-xs opacity-80">Snake, Memory, Quiz, Racing...</span><span class="block text-xs font-bold mt-2">Build Game →</span>
+    </a>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="bg-white/5 border border-white/10 rounded-3xl p-5 mt-6">
+  <h2 class="font-bold text-lg">How it works? - 3 Steps - FREE</h2>
+  <div class="grid md:grid-cols-3 gap-3 mt-3 text-sm">
+    <div class="bg-black/30 p-4 rounded-2xl"><b>1. Type in simple words</b><p class="text-white/60 text-xs mt-1">No coding. Type like "Make a calculator". In English or Hindi.</p></div>
+    <div class="bg-black/30 p-4 rounded-2xl"><b>2. AI Builds + You Preview</b><p class="text-white/60 text-xs mt-1">Auto-Shifter: Puter → Pollinations → Your Keys. Preview instantly.</p></div>
+    <div class="bg-black/30 p-4 rounded-2xl"><b>3. Host + Share on WhatsApp</b><p class="text-white/60 text-xs mt-1">Click Host FREE on Puter. Click Share - Send link to anyone.</p></div>
+  </div>
+  <div class="flex flex-wrap gap-2 mt-4">
+    <a href="keys-host-share.html" class="bg-yellow-400 text-black font-bold px-4 py-2 rounded-full text-sm">🔑 Attach Unlimited API Keys</a>
+    <a href="my-apps.html" class="bg-white/10 px-4 py-2 rounded-full text-sm">📁 See My Saved Apps</a>
+  </div>
+</section>
+
+<!-- ===== WHY FREE ===== -->
+<section class="grid md:grid-cols-2 gap-3 mt-6">
+  <div class="bg-white/5 border border-white/10 rounded-3xl p-5">
+    <h3 class="font-bold">Why 100% FREE for YOU?</h3>
+    <ul class="text-sm text-white/70 space-y-2 mt-3">
+      <li>✅ <b class="text-white">Puter FREE</b> - AI + Login + Storage + Database</li>
+      <li>✅ <b class="text-white">Pollinations FREE</b> - Backup AI, No login, No key</li>
+      <li>✅ <b class="text-white">GitHub Pages FREE</b> - Hosting + AdSense</li>
+      <li>✅ <b class="text-white">Your Keys</b> - You pay your provider only if you use paid key</li>
+      <li>✅ <b class="text-white">Developer $0</b> - Developer never pays for your usage</li>
+    </ul>
+  </div>
+  <div class="bg-white/5 border border-white/10 rounded-3xl p-5">
+    <h3 class="font-bold">Trending Now - Try These</h3>
+    <div id="trendingList" class="space-y-2 mt-3 text-sm"></div>
+  </div>
+</section>
+
+<!-- ===== MY RECENT APPS PREVIEW ===== -->
+<section class="mt-6">
+  <div class="flex justify-between items-center"><h2 class="font-bold text-xl">Your Recent Apps</h2><a href="my-apps.html" class="text-yellow-400 text-sm">View All →</a></div>
+  <div id="recentApps" class="grid md:grid-cols-3 gap-3 mt-3 text-sm"><p class="text-white/50">No apps yet. Build your first app above - It's FREE!</p></div>
+</section>
+
+<!-- ===== ADSENSE AD - BOTTOM ===== -->
+<div class="bg-white/5 border border-dashed border-white/10 rounded-2xl p-4 text-center text-xs text-white/40 mt-6">
+  📢 Ad Space - Your AdSense Ad Will Show Here After Approval
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="text-center text-xs text-white/40 mt-8">
+  <p>Unbeatable App - Build FREE - Puter + Pollinations + GitHub Pages - YOU $0 - Developer $0</p>
+  <p class="mt-2"><a href="settings.html" class="underline">Settings</a> • <a href="keys-host-share.html" class="underline">API Keys</a> • <span id="appVersion"></span></p>
+</footer>
+
+</main>
+
+<!-- ===== LIMIT POPUP ===== -->
 <div id="limitPopup" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
   <div class="bg-[#1e293b] rounded-3xl p-6 max-w-md w-full text-center">
     <h2 class="text-xl font-bold">⚠️ All FREE Limits Over</h2>
-    <p class="text-sm text-white/70 mt-2">Puter FREE over + Pollinations busy + All your keys over. Choose what YOU want. Developer pays $0 in all options.</p>
+    <p class="text-sm text-white/70 mt-2">Puter FREE over + Pollinations busy + All your keys over. Choose what YOU want. Developer pays $0.</p>
     <div class="space-y-2 mt-4">
-      <button onclick="closePopup(); alert('Wait till tomorrow - Free resets at 12 AM')" class="w-full bg-white/10 py-3 rounded-full text-sm">🆓 Wait Tomorrow - FREE - $0</button>
-      <a href="https://puter.com" target="_blank" class="block w-full bg-yellow-400 text-black font-bold py-3 rounded-full text-sm">💳 Buy Puter Subscription - YOU pay Puter directly</a>
-      <button onclick="closePopup(); document.getElementById('keyValue').focus(); window.scrollTo(0,200)" class="w-full bg-white/10 py-3 rounded-full text-sm">🔑 Attach Another API Key - YOU pay your provider</button>
-      <button onclick="closePopup(); runAutoShifter()" class="w-full bg-green-500 text-black font-bold py-3 rounded-full text-sm">🔄 Try FREE Key List Again</button>
+      <button onclick="closePopup()" class="w-full bg-white/10 py-3 rounded-full text-sm">🆓 Wait Tomorrow - FREE - $0</button>
+      <a href="https://puter.com" target="_blank" class="block w-full bg-yellow-400 text-black font-bold py-3 rounded-full text-sm">💳 Buy Puter - YOU pay Puter</a>
+      <a href="keys-host-share.html" class="block w-full bg-white/10 py-3 rounded-full text-sm">🔑 Attach Another API Key</a>
     </div>
     <button onclick="closePopup()" class="mt-3 text-xs text-white/50">Close</button>
   </div>
 </div>
 
 <script src="config.js"></script>
+<script src="script.js"></script>
 <script>
-// ===== KEYS - UNLIMITED - LOCAL + PUTER KV =====
-let apiKeys = JSON.parse(localStorage.getItem('unbeatable_api_keys') || '[]');
-function saveKeys(){ localStorage.setItem('unbeatable_api_keys', JSON.stringify(apiKeys)); try{ puter.kv.set('unbeatable_api_keys', JSON.stringify(apiKeys)); }catch(e){} renderKeys(); }
-function renderKeys(){
-  document.getElementById('keyCount').textContent = apiKeys.length;
-  const list = document.getElementById('keysList');
-  if(!apiKeys.length){ list.innerHTML = '<p class="text-white/50">No keys yet. Use Puter FREE + Pollinations FREE without key.</p>'; return; }
-  list.innerHTML = apiKeys.map((k,i)=>`
-    <div class="bg-black/30 p-3 rounded-xl flex justify-between items-center">
-      <div><b>${escapeHtml(k.provider)}</b> - ${escapeHtml(k.name)} - <span class="text-white/50">....${k.value.slice(-4)}</span> <span class="text-green-400 text-xs">● ${k.status||'Ready'}</span></div>
-      <div class="flex gap-1">
-        <button onclick="useKey(${i})" class="bg-yellow-400 text-black px-3 py-1 rounded-full text-xs font-bold">Use</button>
-        <button onclick="deleteKey(${i})" class="bg-red-500/20 text-red-300 px-3 py-1 rounded-full text-xs">Delete</button>
-      </div>
-    </div>`).join('');
+// ===== HOME PAGE LOGIC =====
+function setPrompt(t){ document.getElementById('homePrompt').value = t; window.scrollTo({top:0, behavior:'smooth'}); }
+function goBuilder(page){
+  const prompt = document.getElementById('homePrompt').value.trim();
+  if(prompt) localStorage.setItem('unbeatable_last_prompt', prompt);
+  window.location.href = page;
 }
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function toggleKeyEye(){ const el=document.getElementById('keyValue'); el.type = el.type==='password'?'text':'password'; }
-function addApiKey(){
-  const provider=document.getElementById('keyProvider').value;
-  const name=document.getElementById('keyName').value.trim() || (provider+' Key '+(apiKeys.length+1));
-  const value=document.getElementById('keyValue').value.trim();
-  if(!value) return alert('Paste your API key first!');
-  if(value.length < 10) return alert('Key looks too short - Check again');
-  apiKeys.push({provider, name, value, status:'Ready', created:Date.now()});
-  document.getElementById('keyValue').value=''; document.getElementById('keyName').value='';
-  saveKeys(); alert('✅ Key Attached! Total keys: '+apiKeys.length+' - Unlimited. This key is ONLY on YOUR device.');
+function shareWhatsAppHome(){
+  const link = (typeof CONFIG!=='undefined' && CONFIG.baseUrl) ? CONFIG.baseUrl : window.location.href;
+  const text = encodeURIComponent(`🚀 Try Unbeatable App - FREE! Build Apps, Websites, Games & AI Agents - No Coding - No API Key - 👉 ${link}`);
+  window.open(`https://wa.me/?text=${text}`, '_blank');
 }
-function deleteKey(i){ if(confirm('Delete this key?')){ apiKeys.splice(i,1); saveKeys(); } }
-function clearAllKeys(){ if(confirm('Delete ALL keys?')){ apiKeys=[]; saveKeys(); } }
-function useKey(i){ alert('Using key: '+apiKeys[i].provider+' - '+apiKeys[i].name+' - Now run Auto-Shifter, it will auto-use this key if Puter/Pollinations fail.'); }
-function testAllKeys(){ if(!apiKeys.length) return alert('No keys to test. Attach a key first.'); alert('Testing '+apiKeys.length+' keys... All keys format OK. Real test happens when Auto-Shifter uses them.'); }
-renderKeys();
-// Load keys from Puter KV if local empty
-try{ puter.kv.get('unbeatable_api_keys').then(v=>{ if(v && !apiKeys.length){ apiKeys=JSON.parse(v); saveKeys(); } }).catch(()=>{}); }catch(e){}
-
-// ===== AUTO-SHIFTER - PUTER -> POLLINATIONS -> USER KEYS -> POPUP =====
-async function runAutoShifter(){
-  const prompt = document.getElementById('autoPrompt').value.trim() || 'Make a beautiful to-do app';
-  const status = document.getElementById('autoStatus');
-  // Step 1: PUTER
-  status.textContent = 'Step 1/4: Trying Puter FREE (Your allowance)...';
+async function handleLogin(){
   try{
-    const resp = await puter.ai.chat(`Make single-file HTML app: ${prompt}. Return ONLY HTML.`, {model:'openai/gpt-6-astra'});
-    let html = (resp.message?.content||resp.toString()).replace(/```html|```/g,'').trim();
-    if(html.length>200){ showAutoResult(html, '✅ Done via Puter FREE'); return; }
-  }catch(e){ console.log('Puter failed, shifting...', e); }
-  // Step 2: POLLINATIONS
-  status.textContent = 'Step 2/4: Puter limit over - Trying Pollinations FREE (No login, No pay)...';
-  try{
-    const res = await fetch('https://text.pollinations.ai/'+encodeURIComponent(`Make single-file HTML app: ${prompt}. Return ONLY HTML.`));
-    let html = (await res.text()).replace(/```html|```/g,'').trim();
-    if(html.length>200){ showAutoResult(html, '✅ Done via Pollinations FREE - No login, No pay'); return; }
-  }catch(e){ console.log('Pollinations failed', e); }
-  // Step 3: USER KEYS - Loop unlimited keys
-  if(apiKeys.length){
-    for(let i=0;i<apiKeys.length;i++){
-      status.textContent = `Step 3/4: Trying Your Key ${i+1}/${apiKeys.length} - ${apiKeys[i].provider} - ${apiKeys[i].name} (YOU pay your provider, Developer $0)...`;
-      try{
-        // Generic OpenAI-compatible call - Works for OpenAI, Groq, OpenRouter, Together, DeepSeek, Mistral
-        const res = await fetch('https://api.openai.com/v1/chat/completions', {
-          method:'POST',
-          headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKeys[i].value},
-          body: JSON.stringify({model:'gpt-4o-mini', messages:[{role:'user', content:`Make single-file HTML app: ${prompt}. Return ONLY HTML.`}]})
-        });
-        if(res.ok){
-          const data = await res.json();
-          let html = data.choices[0].message.content.replace(/```html|```/g,'').trim();
-          showAutoResult(html, `✅ Done via YOUR Key ${i+1} - ${apiKeys[i].provider} - YOU pay your provider, Developer $0`);
-          return;
-        } else {
-          apiKeys[i].status='Limit/Error - Skipped'; saveKeys();
-          continue; // Auto-shift to next key
-        }
-      }catch(e){ continue; }
+    const user = await puter.auth.getUser();
+    if(user && user.username){
+      document.getElementById('loginBtn').textContent = '👤 ' + user.username;
+      return;
     }
-  } else {
-    status.textContent = 'Step 3/4: No user keys attached - Skipping to popup...';
+  }catch(e){}
+  try{ await puter.auth.signIn(); location.reload(); }catch(e){ alert('Sign In FREE with Puter - 1 click - No card'); }
+}
+// Check login on load
+(async()=>{ try{ const u = await puter.auth.getUser(); if(u && u.username) document.getElementById('loginBtn').textContent = '👤 ' + u.username; }catch(e){} })();
+// Trending
+const trending = [
+  {t:'Make a To-Do App with Save', p:'app-builder.html'},
+  {t:'Make a Calculator App', p:'app-builder.html'},
+  {t:'Make Portfolio for Photographer', p:'website-builder.html'},
+  {t:'Make Snake Game', p:'game-builder.html'},
+  {t:'Make AI Agent for Homework', p:'ai-agent-builder.html'},
+  {t:'Make Pizza Shop Website', p:'website-builder.html'},
+];
+document.getElementById('trendingList').innerHTML = trending.map(x=>`<button onclick="localStorage.setItem('unbeatable_last_prompt','${x.t}'); window.location.href='${x.p}'" class="w-full text-left bg-black/30 p-3 rounded-xl hover:bg-black/50">🔥 ${x.t} <span class="text-yellow-400 float-right">→</span></button>`).join('');
+// Recent Apps
+try{
+  const hosted = JSON.parse(localStorage.getItem('hosted_apps')||'[]').slice(0,3);
+  const saved = JSON.parse(localStorage.getItem('unbeatable_saved_apps')||'[]').slice(0,3);
+  const all = [...hosted, ...saved];
+  if(all.length){
+    document.getElementById('recentApps').innerHTML = all.map(a=>`<div class="bg-white/5 border border-white/10 p-4 rounded-2xl"><b>🚀 ${a.name||a.title||'My App'}</b><p class="text-white/50 text-xs mt-1">${a.time||''}</p><a href="${a.link||'my-apps.html'}" target="_blank" class="text-yellow-400 text-xs">Open →</a></div>`).join('');
   }
-  // Step 4: POPUP
-  status.textContent = '❌ All limits over - Showing options...';
-  showPopup();
-}
-function showAutoResult(html, msg){
-  document.getElementById('autoStatus').textContent = msg;
-  const f = document.getElementById('autoPreview'); f.classList.remove('hidden'); f.srcdoc = html;
-  window._lastAutoHtml = html; // For hosting
-}
-function showPopup(){ const p=document.getElementById('limitPopup'); p.classList.remove('hidden'); p.classList.add('flex'); }
+}catch(e){}
+if(typeof CONFIG!=='undefined') document.getElementById('appVersion').textContent = 'v' + CONFIG.version;
 function closePopup(){ const p=document.getElementById('limitPopup'); p.classList.add('hidden'); p.classList.remove('flex'); }
-
-// ===== WHATSAPP SHARE - LINK FORM =====
-function getAppLink(){ try{ return window.location.origin + window.location.pathname.replace('keys-host-share.html','index.html'); }catch(e){ return 'https://yourusername.github.io/unbeatable-app/'; } }
-function shareWhatsApp(){
-  const link = getAppLink();
-  const text = encodeURIComponent(`🚀 Try Unbeatable App - FREE! Build Apps, Websites, Games & AI Agents - 100% FREE - No Coding - No API Key - 👉 ${link}`);
-  window.open(`https://wa.me/?text=${text}`, '_blank');
-}
-function shareCopy(){ navigator.clipboard.writeText(getAppLink()).then(()=>alert('✅ Link Copied! Paste in WhatsApp to anyone.')); }
-function shareNative(){
-  if(navigator.share){ navigator.share({title:'Unbeatable App - FREE', text:'Build Apps, Websites, Games FREE', url:getAppLink()}); }
-  else shareWhatsApp();
-}
-// Set share link input
-document.getElementById('shareLink').value = getAppLink();
-
-// ===== DIRECT HOSTING ON THIS APP =====
-async function hostMyApp(){
-  const name = document.getElementById('hostName').value.trim().replace(/[^a-zA-Z0-9-]/g,'-') || ('app-'+Date.now());
-  let code = document.getElementById('hostCode').value.trim() || window._lastAutoHtml || '';
-  if(!code) return alert('Paste HTML code first OR run Auto-Shifter first - Then Host.');
-  const result = document.getElementById('hostResult');
-  result.textContent = '⏳ Hosting FREE on YOUR Puter Cloud...';
-  try{
-    // Save to YOUR Puter FS - YOU $0
-    const fileName = name + '.html';
-    await puter.fs.write(fileName, code);
-    // Create shareable hosted link - Puter hosting format
-    const user = await puter.auth.getUser().catch(()=>null);
-    const hostLink = user ? `https://${user.username}.puter.site/${fileName}` : `https://puter.com/app/${fileName}`;
-    const localLink = `${getAppLink()}?hosted=${encodeURIComponent(fileName)}`;
-    result.innerHTML = `✅ <b>Hosted FREE!</b><br>📁 File: ${escapeHtml(fileName)} in YOUR Puter Cloud<br>🔗 Share Link: <a href="${hostLink}" target="_blank" class="text-yellow-400 underline">${hostLink}</a><br><button onclick="copyHostLink()" class="bg-white/10 px-3 py-1 rounded-full text-xs mt-2">Copy Link</button>`;
-    window._lastHostLink = hostLink; window._lastHostFile = fileName;
-    // Save to hosted list
-    let hosted = JSON.parse(localStorage.getItem('hosted_apps')||'[]');
-    hosted.unshift({name:fileName, link:hostLink, time:new Date().toLocaleString()});
-    localStorage.setItem('hosted_apps', JSON.stringify(hosted));
-    try{ await puter.kv.set('hosted_apps', JSON.stringify(hosted)); }catch(e){}
-    renderHosted();
-  }catch(e){
-    // Fallback if not logged in - Save locally + give blob link
-    const blob = new Blob([code], {type:'text/html'});
-    const url = URL.createObjectURL(blob);
-    result.innerHTML = `⚠️ Please Sign In FREE to host on Puter Cloud (1 click). Meanwhile, your app is ready locally: <a href="${url}" target="_blank" class="text-yellow-400 underline">Open Local Preview</a> - Click Sign In in Home, then Host again.`;
-  }
-}
-function renderHosted(){
-  let hosted = JSON.parse(localStorage.getItem('hosted_apps')||'[]');
-  const el = document.getElementById('myHostedList');
-  if(!hosted.length){ el.innerHTML=''; return; }
-  el.innerHTML = '<h3 class="font-bold">Your Hosted Apps:</h3>' + hosted.map(h=>`<div class="bg-black/30 p-3 rounded-xl flex justify-between"><span>🚀 ${escapeHtml(h.name)} - ${h.time}</span><a href="${h.link}" target="_blank" class="text-yellow-400 underline text-xs">Open →</a></div>`).join('');
-}
-renderHosted();
-function copyHostLink(){ if(window._lastHostLink) navigator.clipboard.writeText(window._lastHostLink).then(()=>alert('✅ Host Link Copied!')); else alert('Host an app first!'); }
-function shareHostWhatsApp(){
-  if(!window._lastHostLink) return alert('Host an app first, then share!');
-  const text = encodeURIComponent(`🚀 I built this app FREE on Unbeatable App! Try it: ${window._lastHostLink} - Build yours FREE too: ${getAppLink()}`);
-  window.open(`https://wa.me/?text=${text}`, '_blank');
-}
 </script>
 </body>
-  </html>
+</html>
