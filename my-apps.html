@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Apps - Unbeatable App</title>
+<link rel="stylesheet" href="style.css">
+<script src="config.js"></script>
+<script src="script.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f1115;color:#e6e6e6;padding:0}
+  nav{display:flex;gap:8px;flex-wrap:wrap;background:#1a1d23;padding:12px 16px;border-bottom:1px solid #2a2e37;position:sticky;top:0;z-index:10}
+  nav a{color:#c9cdd6;text-decoration:none;font-size:13px;padding:8px 12px;border-radius:8px;background:#0f1115;border:1px solid #2a2e37}
+  nav a.active{background:#4f7cff;color:#fff;border-color:#4f7cff}
+  .container{max-width:1000px;margin:0 auto;padding:20px}
+  h1{font-size:24px;margin-bottom:6px}
+  p.sub{color:#9aa0a6;font-size:14px;margin-bottom:20px}
+  .topbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .topbar input{flex:1;min-width:200px;background:#1a1d23;border:1px solid #2a2e37;color:#fff;padding:11px 12px;border-radius:10px;outline:none}
+  .topbar select{background:#1a1d23;border:1px solid #2a2e37;color:#fff;padding:11px;border-radius:10px}
+  button{background:#4f7cff;color:#fff;border:none;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px}
+  button.secondary{background:#2a2e37}
+  button.danger{background:#c0392b}
+  button.small{padding:7px 10px;font-size:12px}
+  .stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .stat{background:#1a1d23;border:1px solid #2a2e37;padding:14px 16px;border-radius:12px;flex:1;min-width:140px}
+  .stat b{font-size:22px;display:block}
+  .stat span{font-size:12px;color:#9aa0a6}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .card{background:#1a1d23;border:1px solid #2a2e37;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .card h3{font-size:16px;word-break:break-word}
+  .badge{font-size:11px;padding:4px 8px;border-radius:20px;background:#2a2e37;display:inline-block;width:fit-content}
+  .badge.app{background:#1e3a5f;color:#a8c5ff}
+  .badge.website{background:#1e5a36;color:#7ee2a8}
+  .badge.game{background:#5a3a1e;color:#ffcf8a}
+  .badge.agent{background:#4a1e5a;color:#e2a8ff}
+  .meta{font-size:12px;color:#9aa0a6;line-height:1.5;word-break:break-word}
+  .preview{height:90px;background:#0f1115;border:1px solid #2a2e37;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:32px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+  .empty{background:#1a1d23;border:1px dashed #3a3f4d;border-radius:14px;padding:30px;text-align:center;color:#9aa0a6}
+  .empty a{color:#4f7cff}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e5a36;color:#fff;padding:12px 18px;border-radius:10px;display:none;z-index:99}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:16px;z-index:100}
+  .modal.show{display:flex}
+  .modal-box{background:#1a1d23;border:1px solid #2a2e37;border-radius:14px;padding:20px;max-width:500px;width:100%}
+  .modal-box textarea{width:100%;background:#0f1115;border:1px solid #2a2e37;color:#fff;padding:10px;border-radius:8px;min-height:100px;margin-top:10px;font-family:monospace;font-size:12px}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">🏠 Home</a>
+  <a href="app-builder.html">📱 App Builder</a>
+  <a href="website-builder.html">🌐 Website Builder</a>
+  <a href="ai-agent-builder.html">🤖 AI Agent</a>
+  <a href="game-builder.html">🎮 Game Builder</a>
+  <a href="my-apps.html" class="active">📁 My Apps</a>
+  <a href="keys-host-share.html">🔑 Keys + Host + Share</a>
+  <a href="settings.html">⚙️ Settings</a>
+</nav>
+
+<div class="container">
+  <h1>📁 My Saved Apps</h1>
+  <p class="sub">All your creations - from LocalStorage + Puter KV + Puter FS. Open, Share, Host again, Delete.</p>
+
+  <div class="stats">
+    <div class="stat"><b id="totalCount">0</b><span>Total Apps</span></div>
+    <div class="stat"><b id="appCount">0</b><span>Apps</span></div>
+    <div class="stat"><b id="websiteCount">0</b><span>Websites</span></div>
+    <div class="stat"><b id="gameCount">0</b><span>Games</span></div>
+  </div>
+
+  <div class="topbar">
+    <input type="text" id="searchInput" placeholder="🔍 Search my apps... e.g. Todo, Snake, Portfolio">
+    <select id="filterType">
+      <option value="all">All Types</option>
+      <option value="app">📱 Apps</option>
+      <option value="website">🌐 Websites</option>
+      <option value="game">🎮 Games</option>
+      <option value="agent">🤖 Agents</option>
+    </select>
+    <select id="sortBy">
+      <option value="new">Newest First</option>
+      <option value="old">Oldest First</option>
+      <option value="name">Name A-Z</option>
+    </select>
+    <button id="refreshBtn">🔄 Refresh</button>
+  </div>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+    <button class="secondary" id="exportAllBtn">📤 Export All (JSON)</button>
+    <button class="secondary" id="importBtn">📥 Import</button>
+    <input type="file" id="importFile" accept=".json" hidden>
+    <button class="danger" id="clearAllBtn">🗑️ Delete All</button>
+  </div>
+
+  <div id="appsGrid" class="grid"></div>
+  <div id="emptyState" class="empty" style="display:none">
+    <div style="font-size:40px;margin-bottom:10px">📂</div>
+    <b>No apps saved yet</b><br><br>
+    Go to <a href="app-builder.html">App Builder</a> or <a href="game-builder.html">Game Builder</a> and create your first app.<br>
+    It will appear here automatically.
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal" id="previewModal">
+  <div class="modal-box">
+    <h3 id="previewTitle">Preview</h3>
+    <div id="previewFrame" style="margin-top:12px;background:#fff;border-radius:10px;overflow:hidden;height:300px">
+      <iframe id="previewIframe" style="width:100%;height:100%;border:none"></iframe>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <button id="openFullBtn">Open Full Screen</button>
+      <button class="secondary" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal" id="shareModal">
+  <div class="modal-box">
+    <h3>🔗 Share App</h3>
+    <p class="meta" id="shareAppName" style="margin-top:6px"></p>
+    <textarea id="shareLinkBox" readonly></textarea>
+    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+      <button id="copyShareBtn">Copy Link</button>
+      <button class="secondary" id="waShareBtn">Share on WhatsApp</button>
+      <button class="secondary" onclick="closeShareModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- STORAGE: LocalStorage + Puter ----------
+const LS_KEYS = [
+  'unbeatable_my_apps',      // main list from builders
+  'unbeatable_apps',         // old key
+  'my_apps',                 // fallback
+  'saved_apps'
+];
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display='block';
+  setTimeout(()=> t.style.display='none', 2500);
+}
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function getIcon(type){
+  if(type==='website') return '🌐';
+  if(type==='game') return '🎮';
+  if(type==='agent') return '🤖';
+  return '📱';
+}
+function getBadge(type){
+  return `<span class="badge ${type}">${getIcon(type)} ${type.toUpperCase()}</span>`;
+}
+
+// Load from ALL localStorage keys
+function loadLocalApps(){
+  let all = [];
+  LS_KEYS.forEach(k=>{
+    try{
+      const raw = localStorage.getItem(k);
+      if(!raw) return;
+      const arr = JSON.parse(raw);
+      if(Array.isArray(arr)) all = all.concat(arr);
+    }catch(e){}
+  });
+  // Also check single app saves: unbeatable_app_xxx
+  for(let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if(k && k.startsWith('unbeatable_app_')){
+      try{
+        const obj = JSON.parse(localStorage.getItem(k));
+        if(obj && obj.code) all.push(obj);
+      }catch(e){}
+    }
+  }
+  // Deduplicate by id + name + code length
+  const seen = new Set();
+  return all.filter(a=>{
+    const id = a.id || (a.name + '_' + (a.code||'').length);
+    if(seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  }).map((a, idx)=>({
+    id: a.id || 'local_' + idx + '_' + Date.now(),
+    name: a.name || a.title || 'Untitled App',
+    type: a.type || 'app',
+    code: a.code || a.html || '',
+    prompt: a.prompt || '',
+    created: a.created || a.date || Date.now(),
+    source: a.source || 'LocalStorage'
+  }));
+}
+
+// Load from Puter KV + FS if available
+async function loadPuterApps(){
+  if(typeof puter === 'undefined') return [];
+  try{
+    const apps = [];
+    // Try KV: key = my_apps_list
+    try{
+      const kvData = await puter.kv.get('my_apps_list');
+      if(kvData){
+        const arr = typeof kvData === 'string' ? JSON.parse(kvData) : kvData;
+        if(Array.isArray(arr)) apps.push(...arr.map(a=>({...a, source:'Puter KV'})));
+      }
+    }catch(e){}
+    // Try FS: list /unbeatable-apps folder
+    try{
+      const items = await puter.fs.readdir('unbeatable-apps');
+      for(const item of items){
+        if(item.name && item.name.endsWith('.html')){
+          apps.push({
+            id: 'puter_fs_' + item.name,
+            name: item.name.replace('.html','').replace(/-/g,' '),
+            type: 'app',
+            code: '',
+            puterPath: 'unbeatable-apps/' + item.name,
+            created: Date.now(),
+            source: 'Puter FS'
+          });
+        }
+      }
+    }catch(e){}
+    return apps;
+  }catch(e){ return []; }
+}
+
+let ALL_APPS = [];
+let currentPreviewApp = null;
+let currentShareApp = null;
+
+async function loadAll(){
+  const local = loadLocalApps();
+  const puterApps = await loadPuterApps();
+  ALL_APPS = [...puterApps, ...local];
+
+  // Demo data if empty - so user sees how it looks (only first time)
+  if(ALL_APPS.length === 0 && !localStorage.getItem('unbeatable_demo_shown')){
+    ALL_APPS = [
+      {id:'demo1', name:'My Todo App (Demo)', type:'app', code:'<h1>Todo Demo</h1><p>Delete me and create your own!</p>', prompt:'Make Todo App', created:Date.now(), source:'Demo'},
+      {id:'demo2', name:'Snake Game (Demo)', type:'game', code:'<h1>Snake Game Demo</h1>', prompt:'Make Snake Game', created:Date.now()-100000, source:'Demo'},
+      {id:'demo3', name:'My Portfolio (Demo)', type:'website', code:'<h1>Portfolio Demo</h1>', prompt:'Make portfolio', created:Date.now()-200000, source:'Demo'},
+    ];
+    localStorage.setItem('unbeatable_demo_shown','1');
+  }
+  render();
+}
+
+function render(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filter = document.getElementById('filterType').value;
+  const sort = document.getElementById('sortBy').value;
+
+  let filtered = ALL_APPS.filter(a=>{
+    const matchQ = !q || (a.name||'').toLowerCase().includes(q) || (a.prompt||'').toLowerCase().includes(q);
+    const matchF = filter==='all' || a.type===filter;
+    return matchQ && matchF;
+  });
+
+  if(sort==='new') filtered.sort((a,b)=> b.created - a.created);
+  if(sort==='old') filtered.sort((a,b)=> a.created - b.created);
+  if(sort==='name') filtered.sort((a,b)=> (a.name||'').localeCompare(b.name||''));
+
+  // Stats
+  document.getElementById('totalCount').textContent = ALL_APPS.length;
+  document.getElementById('appCount').textContent = ALL_APPS.filter(a=>a.type==='app').length;
+  document.getElementById('websiteCount').textContent = ALL_APPS.filter(a=>a.type==='website').length;
+  document.getElementById('gameCount').textContent = ALL_APPS.filter(a=>a.type==='game').length;
+
+  const grid = document.getElementById('appsGrid');
+  const empty = document.getElementById('emptyState');
+  grid.innerHTML = '';
+
+  if(filtered.length===0){
+    grid.style.display='none';
+    empty.style.display='block';
+    return;
+  }
+  grid.style.display='grid';
+  empty.style.display='none';
+
+  filtered.forEach(app=>{
+    const div = document.createElement('div');
+    div.className='card';
+    const date = new Date(app.created).toLocaleDateString() + ' ' + new Date(app.created).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    div.innerHTML = `
+      <div class="preview">${getIcon(app.type)}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${getBadge(app.type)} <span class="badge">💾 ${escapeHtml(app.source||'Local')}</span></div>
+      <h3>${escapeHtml(app.name)}</h3>
+      <div class="meta">📝 ${escapeHtml(app.prompt || 'No prompt saved')}<br>📅 ${date}<br>🆔 ${escapeHtml(String(app.id).slice(0,20))}</div>
+      <div class="actions">
+        <button class="small" onclick="openApp('${app.id}')">▶️ Open</button>
+        <button class="small secondary" onclick="previewApp('${app.id}')">👁️ Preview</button>
+        <button class="small secondary" onclick="shareApp('${app.id}')">🔗 Share</button>
+        <button class="small secondary" onclick="downloadApp('${app.id}')">⬇️ Download</button>
+        <button class="small danger" onclick="deleteApp('${app.id}')">🗑️ Delete</button>
+      </div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function findApp(id){ return ALL_APPS.find(a=> String(a.id)===String(id)); }
+
+window.openApp = function(id){
+  const app = findApp(id);
+  if(!app) return;
+  if(app.puterPath && typeof puter !== 'undefined'){
+    puter.fs.read(app.puterPath).then(blob=> blob.text()).then(code=>{
+      const w = window.open('', '_blank');
+      w.document.write(code); w.document.close();
+    });
+    return;
+  }
+  if(!app.code){ toast('No code saved for this app'); return; }
+  const w = window.open('', '_blank');
+  w.document.write(app.code); w.document.close();
+};
+
+window.previewApp = function(id){
+  const app = findApp(id);
+  if(!app) return;
+  currentPreviewApp = app;
+  document.getElementById('previewTitle').textContent = getIcon(app.type) + ' ' + app.name;
+  const iframe = document.getElementById('previewIframe');
+  if(app.code){
+    iframe.srcdoc = app.code;
+  } else if(app.puterPath && typeof puter !== 'undefined'){
+    puter.fs.read(app.puterPath).then(b=>b.text()).then(c=> iframe.srcdoc = c);
+  } else {
+    iframe.srcdoc = '<h2 style="padding:20px">No preview available - Click Open</h2>';
+  }
+  document.getElementById('previewModal').classList.add('show');
+};
+
+window.downloadApp = function(id){
+  const app = findApp(id);
+  if(!app || !app.code){ toast('Nothing to download'); return; }
+  const blob = new Blob([app.code], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = app.name.replace(/[^a-z0-9]/gi,'-').toLowerCase() + '.html';
+  a.click();
+  toast('Downloaded ✓');
+};
+
+window.shareApp = function(id){
+  const app = findApp(id);
+  if(!app) return;
+  currentShareApp = app;
+  const base = (typeof CONFIG !== 'undefined' && CONFIG.baseUrl) ? CONFIG.baseUrl : location.origin + '/';
+  // Share via data: if code exists, make a shareable hosted link pattern
+  // For GitHub Pages, we use my-apps.html?open=id - receiver needs same data, so we also give WhatsApp text
+  const link = location.origin + location.pathname + '?open=' + encodeURIComponent(app.id);
+  document.getElementById('shareAppName').textContent = app.name;
+  document.getElementById('shareLinkBox').value = link + '\n\nTo share actual app: Click Download → Upload to GitHub / Puter Hosting → Send that link.\nOr go to Keys + Host + Share page to host it.';
+  document.getElementById('shareModal').classList.add('show');
+};
+
+window.deleteApp = function(id){
+  const app = findApp(id);
+  if(!app) return;
+  if(!confirm('Delete "' + app.name + '"?')) return;
+  ALL_APPS = ALL_APPS.filter(a=> String(a.id)!==String(id));
+  // Save back to localStorage
+  try{
+    const toSave = ALL_APPS.filter(a=>!String(a.id).startsWith('puter_') && a.source!=='Demo');
+    localStorage.setItem('unbeatable_my_apps', JSON.stringify(toSave));
+  }catch(e){}
+  // Try Puter KV delete
+  if(typeof puter !== 'undefined' && String(id).startsWith('puter_')){
+    // Puter FS delete if needed
+    if(app.puterPath) puter.fs.delete(app.puterPath).catch(()=>{});
+  }
+  render();
+  toast('Deleted ✓');
+};
+
+function closeModal(){ document.getElementById('previewModal').classList.remove('show'); }
+function closeShareModal(){ document.getElementById('shareModal').classList.remove('show'); }
+
+document.getElementById('openFullBtn').addEventListener('click', ()=>{
+  if(currentPreviewApp) openApp(currentPreviewApp.id);
+  closeModal();
+});
+document.getElementById('copyShareBtn').addEventListener('click', async ()=>{
+  try{ await navigator.clipboard.writeText(document.getElementById('shareLinkBox').value); toast('Link copied ✓'); }
+  catch(e){ toast('Select and copy manually'); }
+});
+document.getElementById('waShareBtn').addEventListener('click', ()=>{
+  if(!currentShareApp) return;
+  const text = encodeURIComponent('Check my app: ' + currentShareApp.name + ' - ' + document.getElementById('shareLinkBox').value.split('\n')[0]);
+  window.open('https://wa.me/?text=' + text, '_blank');
+});
+
+document.getElementById('searchInput').addEventListener('input', render);
+document.getElementById('filterType').addEventListener('change', render);
+document.getElementById('sortBy').addEventListener('change', render);
+document.getElementById('refreshBtn').addEventListener('click', ()=>{ loadAll(); toast('Refreshed ✓'); });
+
+document.getElementById('exportAllBtn').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(ALL_APPS, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download='my-apps-backup.json'; a.click();
+  toast('Exported ✓');
+});
+document.getElementById('importBtn').addEventListener('click', ()=> document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change', e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const arr = JSON.parse(r.result);
+      if(!Array.isArray(arr)) throw new Error('bad');
+      ALL_APPS = [...arr, ...ALL_APPS];
+      localStorage.setItem('unbeatable_my_apps', JSON.stringify(ALL_APPS));
+      render(); toast('Imported ' + arr.length + ' apps ✓');
+    }catch(err){ toast('Import failed - invalid file'); }
+  };
+  r.readAsText(f);
+});
+document.getElementById('clearAllBtn').addEventListener('click', ()=>{
+  if(!confirm('Delete ALL apps? This cannot be undone.')) return;
+  ALL_APPS = [];
+  localStorage.removeItem('unbeatable_my_apps');
+  localStorage.removeItem('unbeatable_apps');
+  render(); toast('All cleared');
+});
+
+// Close modals on outside click
+document.getElementById('previewModal').addEventListener('click', e=>{ if(e.target.id==='previewModal') closeModal(); });
+document.getElementById('shareModal').addEventListener('click', e=>{ if(e.target.id==='shareModal') closeShareModal(); });
+
+// Auto-open if ?open=id in URL
+window.addEventListener('load', ()=>{
+  loadAll();
+  const params = new URLSearchParams(location.search);
+  const openId = params.get('open');
+  if(openId){
+    setTimeout(()=> previewApp(openId), 500);
+  }
+});
+</script>
+</body>
+</html>
