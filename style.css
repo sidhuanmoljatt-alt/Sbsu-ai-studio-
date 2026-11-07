@@ -1,0 +1,348 @@
+/* ============================================
+   File 10: style.css
+   Unbeatable App - GLOBAL DESIGN
+   Change once here = Changes everywhere
+   ============================================ */
+
+/* ---------- 1. VARIABLES - Change colors here ---------- */
+:root {
+  --bg: #0f1115;
+  --bg-card: #1a1d23;
+  --bg-input: #0f1115;
+  --bg-hover: #23272f;
+  --border: #2a2e37;
+  --border-light: #3a3f4d;
+  --text: #e6e6e6;
+  --text-muted: #9aa0a6;
+  --text-dark: #0f1115;
+  --primary: #4f7cff;
+  --primary-dark: #3a5fd9;
+  --primary-light: #a8c5ff;
+  --success: #22c55e;
+  --success-bg: #12331f;
+  --danger: #c0392b;
+  --danger-bg: #3a1a1a;
+  --warning: #f59e0b;
+  --warning-bg: #3a2e1a;
+  --radius: 12px;
+  --radius-lg: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Courier New', monospace;
+}
+
+/* ---------- 2. LIGHT THEME ---------- */
+body.light {
+  --bg: #f5f5f7;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --bg-hover: #eeeeee;
+  --border: #e0e0e0;
+  --border-light: #d0d0d0;
+  --text: #1a1a1a;
+  --text-muted: #666666;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* ---------- 3. RESET ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; }
+button { font-family: inherit; }
+
+/* ---------- 4. LAYOUT ---------- */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.container-narrow { max-width: 700px; }
+.page { padding: 20px; }
+.section { margin-bottom: 30px; }
+
+/* ---------- 5. NAVBAR - Used on ALL pages ---------- */
+nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: var(--bg-card);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  align-items: center;
+}
+nav a {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+nav a:hover { color: var(--text); text-decoration: none; background: var(--bg-hover); }
+nav a.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+nav .logo { font-weight: 800; font-size: 16px; color: var(--text); background: none; border: none; padding: 8px 4px; }
+nav .logo:hover { background: none; }
+
+/* ---------- 6. HEADINGS & TEXT ---------- */
+h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; line-height: 1.2; }
+h2 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+p { margin-bottom: 12px; }
+.sub { color: var(--text-muted); font-size: 14px; margin-bottom: 20px; }
+.small { font-size: 12px; color: var(--text-muted); }
+.muted { color: var(--text-muted); }
+.center { text-align: center; }
+.bold { font-weight: 700; }
+
+/* ---------- 7. CARDS ---------- */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.card:hover { border-color: var(--border-light); }
+.card-title { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+/* ---------- 8. BUTTONS ---------- */
+.btn, button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 11px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn:hover, button:hover { background: var(--primary-dark); }
+.btn-secondary, button.secondary {
+  background: var(--bg-hover);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover, button.secondary:hover { background: var(--border); }
+.btn-danger, button.danger { background: var(--danger); }
+.btn-danger:hover, button.danger:hover { background: #a93226; }
+.btn-success { background: var(--success); }
+.btn-success:hover { background: #1aa84a; }
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+.btn-outline:hover { background: var(--primary); color: #fff; }
+.btn-small, button.small { padding: 7px 12px; font-size: 12px; }
+.btn-large { padding: 14px 28px; font-size: 16px; }
+.btn-full { width: 100%; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ---------- 9. INPUTS ---------- */
+input[type="text"], input[type="password"], input[type="email"],
+input[type="number"], input[type="url"], select, textarea {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 11px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+textarea { min-height: 100px; resize: vertical; line-height: 1.5; }
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
+label { display: block; font-size: 13px; color: var(--text-muted); margin: 14px 0 6px; font-weight: 500; }
+label:first-child { margin-top: 0; }
+.checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 14px; margin: 10px 0; cursor: pointer; }
+.checkbox-row input { width: auto; }
+
+/* ---------- 10. BADGES & TAGS ---------- */
+.badge {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--bg-hover);
+  color: var(--text);
+  display: inline-block;
+  font-weight: 600;
+}
+.badge-primary { background: var(--primary); color: #fff; }
+.badge-success { background: var(--success-bg); color: #7ee2a8; }
+.badge-danger { background: var(--danger-bg); color: #ff9a9a; }
+.badge-warning { background: var(--warning-bg); color: #ffcf8a; }
+.badge-app { background: #1e3a5f; color: #a8c5ff; }
+.badge-website { background: #1e5a36; color: #7ee2a8; }
+.badge-game { background: #5a3a1e; color: #ffcf8a; }
+.badge-agent { background: #4a1e5a; color: #e2a8ff; }
+
+/* ---------- 11. STATUS / ALERTS ---------- */
+.status, .alert {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-top: 12px;
+  display: none;
+  line-height: 1.5;
+}
+.status.show, .alert.show { display: block; }
+.status.ok, .alert-success { display: block; background: var(--success-bg); color: #7ee2a8; border: 1px solid #1e5a36; }
+.status.err, .alert-error { display: block; background: var(--danger-bg); color: #ff9a9a; border: 1px solid #6b2a2a; }
+.status.info, .alert-info { display: block; background: #1a2a4a; color: #a8c5ff; border: 1px solid #2a4a8a; }
+.status.warn, .alert-warning { display: block; background: var(--warning-bg); color: #ffcf8a; border: 1px solid #5a3a1e; }
+
+/* ---------- 12. MODAL ---------- */
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 200;
+}
+.modal.show { display: flex; }
+.modal-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* ---------- 13. TOAST ---------- */
+.toast {
+  position: fixed;
+  bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 12px 18px;
+  border-radius: 10px;
+  display: none;
+  z-index: 300;
+  box-shadow: var(--shadow);
+  font-size: 14px;
+  font-weight: 600;
+}
+.toast.show { display: block; }
+
+/* ---------- 14. FLEX HELPERS ---------- */
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.row-center { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.flex-1 { flex: 1; }
+.mt-10 { margin-top: 10px; }
+.mt-20 { margin-top: 20px; }
+.mb-10 { margin-bottom: 10px; }
+.mb-20 { margin-bottom: 20px; }
+.hidden { display: none !important; }
+
+/* ---------- 15. CODE / PREVIEW ---------- */
+code {
+  background: var(--bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 14px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  line-height: 1.5;
+}
+.preview-box {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  min-height: 300px;
+}
+.preview-box iframe { width: 100%; height: 400px; border: none; }
+
+/* ---------- 16. ADS PLACEHOLDER ---------- */
+.ad-box {
+  background: var(--bg-card);
+  border: 1px dashed var(--border-light);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 16px 0;
+}
+
+/* ---------- 17. FOOTER ---------- */
+footer {
+  text-align: center;
+  padding: 24px 16px;
+  color: var(--text-muted);
+  font-size: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+footer a { color: var(--primary); }
+
+/* ---------- 18. LOADING SPINNER ---------- */
+.spinner {
+  width: 20px; height: 20px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading { display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 14px; }
+
+/* ---------- 19. RESPONSIVE - Mobile ---------- */
+@media (max-width: 600px) {
+  .container { padding: 14px; }
+  h1 { font-size: 22px; }
+  nav { padding: 10px; gap: 6px; }
+  nav a { font-size: 12px; padding: 6px 10px; }
+  .card { padding: 14px; }
+  .card-grid { grid-template-columns: 1fr; }
+  .btn, button { padding: 10px 14px; }
+  .modal-box { padding: 16px; }
+}
+
+/* ---------- 20. HINDI FONT SUPPORT ---------- */
+body[lang="hi"] { font-family: 'Noto Sans Devanagari', var(--font); }
