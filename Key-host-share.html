@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keys - Host & Share</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f1115; color: #e6e6e6; padding: 20px; }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 24px; margin-bottom: 8px; }
+  p.sub { color: #9aa0a6; margin-bottom: 24px; font-size: 14px; }
+  .card { background: #1a1d23; border: 1px solid #2a2e37; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .card h2 { font-size: 17px; margin-bottom: 12px; }
+  label { display: block; font-size: 13px; color: #9aa0a6; margin: 12px 0 6px; }
+  input[type="text"], input[type="password"], textarea { width: 100%; background: #0f1115; border: 1px solid #2a2e37; color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 14px; outline: none; }
+  input:focus, textarea:focus { border-color: #4f7cff; }
+  textarea { min-height: 80px; resize: vertical; font-family: monospace; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  button { background: #4f7cff; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600; }
+  button.secondary { background: #2a2e37; }
+  button.danger { background: #c0392b; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .status { margin-top: 12px; font-size: 13px; padding: 10px; border-radius: 8px; display: none; }
+  .status.ok { display: block; background: #12331f; color: #7ee2a8; border: 1px solid #1e5a36; }
+  .status.err { display: block; background: #3a1a1a; color: #ff9a9a; border: 1px solid #6b2a2a; }
+  .status.info { display: block; background: #1a2a4a; color: #a8c5ff; border: 1px solid #2a4a8a; }
+  .key-list { margin-top: 12px; }
+  .key-item { display: flex; justify-content: space-between; align-items: center; background: #0f1115; border: 1px solid #2a2e37; padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; }
+  .key-item code { color: #a8c5ff; }
+  .small { font-size: 12px; color: #9aa0a6; }
+  .toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-top: 10px; }
+  .share-box { background: #0f1115; border: 1px dashed #4f7cff; padding: 12px; border-radius: 8px; word-break: break-all; font-family: monospace; font-size: 12px; margin-top: 10px; display: none; }
+  .share-box.show { display: block; }
+  .qr-placeholder { width: 120px; height: 120px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #000; font-size: 11px; text-align: center; margin-top: 10px; }
+  details { margin-top: 10px; font-size: 13px; }
+  details summary { cursor: pointer; color: #4f7cff; }
+  code.inline { background: #0f1115; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔑 Keys - Host &amp; Share</h1>
+  <p class="sub">Store keys locally in this browser only. Share via expiring link. Nothing is uploaded unless you click Host.</p>
+
+  <div class="card">
+    <h2>1. Add a Key</h2>
+    <label for="keyName">Key Name</label>
+    <input type="text" id="keyName" placeholder="e.g. My API Key, WiFi, Game Code">
+    <label for="keyValue">Key Value</label>
+    <input type="password" id="keyValue" placeholder="Paste your key / password">
+    <label class="toggle"><input type="checkbox" id="showKey"> Show value</label>
+    <label for="keyNote">Note (optional)</label>
+    <textarea id="keyNote" placeholder="Where is this used?"></textarea>
+    <div class="row">
+      <button id="saveBtn">Save Locally</button>
+      <button class="secondary" id="clearFormBtn">Clear</button>
+    </div>
+    <div id="saveStatus" class="status"></div>
+  </div>
+
+  <div class="card">
+    <h2>2. Your Saved Keys <span class="small">(localStorage only)</span></h2>
+    <div id="keyList" class="key-list"></div>
+    <p id="emptyMsg" class="small">No keys saved yet.</p>
+    <div class="row">
+      <button class="secondary" id="exportBtn">Export Backup (JSON)</button>
+      <button class="secondary" id="importBtn">Import Backup</button>
+      <input type="file" id="importFile" accept=".json" hidden>
+      <button class="danger" id="wipeBtn">Wipe All</button>
+    </div>
+    <div id="listStatus" class="status"></div>
+  </div>
+
+  <div class="card">
+    <h2>3. Host &amp; Share</h2>
+    <p class="small">Pick a key above → Share. Creates a local share link with expiry. For real hosting, paste the generated JSON to your host.</p>
+    <label for="expiry">Link Expires In</label>
+    <input type="text" id="expiry" value="24h" placeholder="e.g. 1h, 24h, 7d">
+    <label for="sharePassword">Share Password (optional)</label>
+    <input type="password" id="sharePassword" placeholder="Leave blank for no password">
+    <div class="row">
+      <button id="genLinkBtn">Generate Share Link</button>
+      <button class="secondary" id="copyLinkBtn">Copy Link</button>
+    </div>
+    <div id="shareBox" class="share-box"></div>
+    <div id="shareStatus" class="status"></div>
+    <details>
+      <summary>How hosting works</summary>
+      <p style="margin-top:8px; line-height:1.6;">This page never sends your keys to a server by itself. <code class="inline">Generate Share Link</code> creates a <code class="inline">#share=...</code> hash link you can send. The receiver opens it in their browser and the key is decoded locally. For a permanent hosted link, use the <code class="inline">Export</code> JSON and host it on GitHub Pages / Netlify / Vercel yourself.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>4. Receive a Shared Key</h2>
+    <label for="receiveInput">Paste Share Link or Code</label>
+    <textarea id="receiveInput" placeholder="Paste #share=... link here"></textarea>
+    <div class="row">
+      <button id="decodeBtn">Decode &amp; Save</button>
+    </div>
+    <div id="receiveStatus" class="status"></div>
+  </div>
+
+  <p class="small" style="text-align:center; margin-top:20px;">Security: Keys stay in localStorage. Clear browser data to remove. Don't share sensitive production keys over public links.</p>
+</div>
+
+<script>
+const LS_KEY = 'keys_host_share_v1';
+const $ = id => document.getElementById(id);
+
+function getKeys(){ try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch(e){ return []; } }
+function setKeys(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
+function show(el, msg, type){ el.textContent = msg; el.className = 'status ' + type; setTimeout(()=>{ el.className='status'; }, 4000); }
+
+function render(){
+  const keys = getKeys();
+  const list = $('keyList');
+  list.innerHTML = '';
+  $('emptyMsg').style.display = keys.length ? 'none' : 'block';
+  keys.forEach((k, i) => {
+    const div = document.createElement('div');
+    div.className = 'key-item';
+    const masked = '•'.repeat(8);
+    div.innerHTML = `<span><strong>${escapeHtml(k.name)}</strong> <code>${masked}</code> <span class="small">${k.note ? escapeHtml(k.note) : ''} • ${new Date(k.created).toLocaleDateString()}</span></span><span><button class="secondary" data-act="show" data-i="${i}">Show</button> <button data-act="share" data-i="${i}">Share</button> <button class="danger" data-act="del" data-i="${i}">Delete</button></span>`;
+    list.appendChild(div);
+  });
+}
+
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+$('showKey').addEventListener('change', e => { $('keyValue').type = e.target.checked ? 'text' : 'password'; });
+
+$('saveBtn').addEventListener('click', () => {
+  const name = $('keyName').value.trim();
+  const value = $('keyValue').value.trim();
+  const note = $('keyNote').value.trim();
+  if(!name || !value){ show($('saveStatus'), 'Name and value are required.', 'err'); return; }
+  const keys = getKeys();
+  keys.push({ name, value: btoa(unescape(encodeURIComponent(value))), note, created: Date.now() });
+  setKeys(keys);
+  $('keyName').value=''; $('keyValue').value=''; $('keyNote').value='';
+  show($('saveStatus'), 'Saved locally ✓', 'ok');
+  render();
+});
+
+$('clearFormBtn').addEventListener('click', ()=>{ $('keyName').value=''; $('keyValue').value=''; $('keyNote').value=''; });
+
+$('keyList').addEventListener('click', e => {
+  const btn = e.target.closest('button'); if(!btn) return;
+  const i = Number(btn.dataset.i); const act = btn.dataset.act;
+  const keys = getKeys(); const k = keys[i]; if(!k) return;
+  if(act==='del'){ if(confirm('Delete "'+k.name+'"?')){ keys.splice(i,1); setKeys(keys); render(); } }
+  if(act==='show'){ const v = decodeURIComponent(escape(atob(k.value))); alert(k.name + ':\n' + v); }
+  if(act==='share'){ window._selected = i; show($('listStatus'), 'Selected "'+k.name+'" for sharing. Go to Section 3 and Generate Share Link.', 'info'); }
+});
+
+$('wipeBtn').addEventListener('click', ()=>{ if(confirm('Wipe ALL keys? This cannot be undone.')){ localStorage.removeItem(LS_KEY); render(); show($('listStatus'), 'All keys wiped.', 'ok'); } });
+
+$('exportBtn').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(getKeys(), null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'keys-backup.json'; a.click();
+});
+
+$('importBtn').addEventListener('click', ()=> $('importFile').click());
+$('importFile').addEventListener('change', e => {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{ try{ const arr = JSON.parse(r.result); if(!Array.isArray(arr)) throw new Error('bad'); setKeys(arr); render(); show($('listStatus'), 'Imported '+arr.length+' keys.', 'ok'); } catch(err){ show($('listStatus'), 'Import failed: invalid file.', 'err'); } };
+  r.readAsText(f);
+});
+
+function parseExpiry(str){
+  str = (str||'24h').trim().toLowerCase();
+  const m = str.match(/^(\d+)(h|d|m)?$/); if(!m) return 24*3600*1000;
+  const n = parseInt(m[1],10); const u = m[2]||'h';
+  return n * (u==='d'?86400000: u==='m'?60000:3600000);
+}
+
+$('genLinkBtn').addEventListener('click', ()=>{
+  const keys = getKeys();
+  const idx = window._selected ?? 0;
+  if(!keys.length){ show($('shareStatus'), 'No keys to share. Add one first.', 'err'); return; }
+  const k = keys[idx] || keys[0];
+  const expMs = parseExpiry($('expiry').value);
+  const payload = { n: k.name, v: k.value, note: k.note, exp: Date.now()+expMs, pw: $('sharePassword').value ? btoa($('sharePassword').value) : '' };
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  const link = location.origin + location.pathname + '#share=' + encoded;
+  $('shareBox').textContent = link;
+  $('shareBox').classList.add('show');
+  show($('shareStatus'), 'Share link generated. Expires in ' + $('expiry').value, 'ok');
+});
+
+$('copyLinkBtn').addEventListener('click', async ()=>{
+  const txt = $('shareBox').textContent;
+  if(!txt){ show($('shareStatus'), 'Generate a link first.', 'err'); return; }
+  try{ await navigator.clipboard.writeText(txt); show($('shareStatus'), 'Copied to clipboard ✓', 'ok'); } catch(e){ show($('shareStatus'), 'Copy failed - select and copy manually.', 'err'); }
+});
+
+$('decodeBtn').addEventListener('click', ()=>{
+  let input = $('receiveInput').value.trim();
+  if(!input){ show($('receiveStatus'), 'Paste a share link first.', 'err'); return; }
+  try{
+    const hashPart = input.includes('#share=') ? input.split('#share=')[1] : input;
+    const clean = hashPart.trim().split(/\s/)[0];
+    const obj = JSON.parse(decodeURIComponent(escape(atob(clean))));
+    if(obj.exp && Date.now() > obj.exp){ show($('receiveStatus'), 'This link has expired.', 'err'); return; }
+    if(obj.pw){ const pw = prompt('This share requires a password:'); if(!pw || btoa(pw)!==obj.pw){ show($('receiveStatus'), 'Wrong password.', 'err'); return; } }
+    const keys = getKeys();
+    keys.push({ name: obj.n + ' (shared)', value: obj.v, note: obj.note||'', created: Date.now() });
+    setKeys(keys); render();
+    show($('receiveStatus'), 'Decoded and saved: ' + obj.n, 'ok');
+  } catch(e){ show($('receiveStatus'), 'Invalid share code.', 'err'); }
+});
+
+// Auto-decode if opened with #share=
+window.addEventListener('load', ()=>{
+  render();
+  if(location.hash.startsWith('#share=')){
+    $('receiveInput').value = location.href;
+    show($('receiveStatus'), 'Share link detected - click Decode & Save.', 'info');
+    document.querySelector('.container').scrollIntoView();
+  }
+});
+render();
+</script>
+</body>
+</html>
