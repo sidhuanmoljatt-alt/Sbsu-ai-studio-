@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website Builder - Build Websites FREE - Unbeatable App</title>
+<script src="https://js.puter.com/v2/"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#0f172a] text-white min-h-screen font-[Inter]">
+
+<!-- ===== TOP BAR ===== -->
+<header class="sticky top-0 z-40 bg-[#0f172a]/95 backdrop-blur border-b border-white/10">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <a href="index.html" class="flex items-center gap-2">
+      <span class="w-9 h-9 bg-blue-500 rounded-xl flex items-center justify-center text-xl">🌐</span>
+      <span class="font-bold text-lg leading-none">Unbeatable<br><span class="text-blue-400 text-sm">Website Builder</span></span>
+    </a>
+    <nav class="hidden md:flex gap-1 text-sm">
+      <a href="index.html" class="px-3 py-2 rounded-full hover:bg-white/10">🏠 Home</a>
+      <a href="app-builder.html" class="px-3 py-2 rounded-full hover:bg-white/10">📱 App</a>
+      <a href="website-builder.html" class="bg-white/10 px-3 py-2 rounded-full">🌐 Website</a>
+      <a href="ai-agent-builder.html" class="px-3 py-2 rounded-full hover:bg-white/10">🤖 AI Agent</a>
+      <a href="game-builder.html" class="px-3 py-2 rounded-full hover:bg-white/10">🎮 Game</a>
+      <a href="my-apps.html" class="px-3 py-2 rounded-full hover:bg-white/10">📁 My Apps</a>
+      <a href="keys-host-share.html" class="px-3 py-2 rounded-full hover:bg-white/10">🔑 Keys + Host</a>
+      <a href="settings.html" class="px-3 py-2 rounded-full hover:bg-white/10">⚙️ Settings</a>
+    </nav>
+    <button id="loginBtn" onclick="handleLogin()" class="bg-yellow-400 text-black font-bold px-4 py-2 rounded-full text-sm">Sign In FREE</button>
+  </div>
+  <div class="md:hidden flex gap-2 overflow-x-auto px-4 pb-3 text-xs whitespace-nowrap">
+    <a href="index.html" class="bg-white/10 px-3 py-2 rounded-full">🏠 Home</a>
+    <a href="app-builder.html" class="bg-white/10 px-3 py-2 rounded-full">📱 App</a>
+    <a href="ai-agent-builder.html" class="bg-white/10 px-3 py-2 rounded-full">🤖 AI Agent</a>
+    <a href="game-builder.html" class="bg-white/10 px-3 py-2 rounded-full">🎮 Game</a>
+    <a href="my-apps.html" class="bg-white/10 px-3 py-2 rounded-full">📁 My Apps</a>
+    <a href="keys-host-share.html" class="bg-white/10 px-3 py-2 rounded-full">🔑 Keys</a>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 pb-20">
+
+<!-- ===== HERO ===== -->
+<section class="py-6 text-center">
+  <span class="bg-blue-500/20 text-blue-300 text-xs px-3 py-1 rounded-full">🌐 WEBSITE BUILDER - 100% FREE - YOU $0</span>
+  <h1 class="text-3xl md:text-5xl font-black mt-3">Build Any Website.<br><span class="text-blue-400">Type. Build. Share.</span></h1>
+  <p class="text-white/60 text-sm mt-2">Portfolio, Business, Shop, Blog, School, Restaurant - Anything. No coding.</p>
+</section>
+
+<!-- ===== BUILDER BOX ===== -->
+<div class="bg-white/5 border border-white/10 rounded-3xl p-4 md:p-5">
+  <label class="font-bold text-sm">What website do you want? - Type in simple words:</label>
+  <textarea id="sitePrompt" rows="3" placeholder="Example: Make a Portfolio Website for Photographer with Gallery, About, Contact...&#10;Example: Make a Business Website for Pizza Shop with Menu, Prices, Order Button...&#10;Example: Make a School Website..." class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 mt-2 text-sm outline-none"></textarea>
+
+  <!-- Website Details -->
+  <div class="grid md:grid-cols-2 gap-3 mt-3">
+    <input id="siteName" placeholder="Website / Business Name - e.g. Sharma Pizza, Rahul Photography" class="bg-black/40 border border-white/10 rounded-xl p-3 text-sm">
+    <input id="sitePhone" placeholder="Phone / WhatsApp Number - e.g. 9876543210 (for Order / Contact button)" class="bg-black/40 border border-white/10 rounded-xl p-3 text-sm">
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3 text-sm">
+    <select id="siteType" class="bg-black/40 border border-white/10 rounded-xl p-3">
+      <option value="Business Website">🏢 Business Website</option>
+      <option value="Portfolio Website">📸 Portfolio Website</option>
+      <option value="Shop / E-commerce Website">🛍️ Shop Website</option>
+      <option value="Blog Website">✍️ Blog Website</option>
+      <option value="School / College Website">🏫 School Website</option>
+      <option value="Restaurant Website">🍕 Restaurant Website</option>
+      <option value="Personal Website">👤 Personal Website</option>
+    </select>
+    <select id="siteStyle" class="bg-black/40 border border-white/10 rounded-xl p-3">
+      <option value="Modern Premium - Dark + Yellow">🎨 Modern Premium</option>
+      <option value="Clean White + Blue - Professional">🎨 Clean White + Blue</option>
+      <option value="Colorful Gradient - Fun">🎨 Colorful Fun</option>
+      <option value="Luxury Black + Gold">🎨 Luxury Black + Gold</option>
+    </select>
+    <select id="siteLang" class="bg-black/40 border border-white/10 rounded-xl p-3">
+      <option value="English">🌐 English</option>
+      <option value="Hindi + English">🌐 Hindi + English</option>
+      <option value="Hindi">🌐 Hindi</option>
+    </select>
+    <select id="siteModel" class="bg-black/40 border border-white/10 rounded-xl p-3">
+      <option value="auto">🤖 Auto - Best FREE Model</option>
+      <option value="puter">🤖 Puter FREE First</option>
+      <option value="pollinations">🤖 Pollinations FREE First</option>
+    </select>
+  </div>
+
+  <!-- Quick Templates -->
+  <div class="flex flex-wrap gap-2 mt-3 text-xs">
+    <button onclick="setTemplate('Make a Portfolio Website for Photographer','Rahul Photography','9876543210','Portfolio Website')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">📸 Photographer Portfolio</button>
+    <button onclick="setTemplate('Make a Business Website for Pizza Shop with Menu, Prices, Order on WhatsApp','Sharma Pizza','9876543210','Restaurant Website')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">🍕 Pizza Shop</button>
+    <button onclick="setTemplate('Make a Shop Website for Clothes with Products, Prices, Add to Cart','Fashion Store','9876543210','Shop / E-commerce Website')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">🛍️ Clothes Shop</button>
+    <button onclick="setTemplate('Make a School Website with About, Courses, Admission Form, Gallery','City Public School','9876543210','School / College Website')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">🏫 School</button>
+    <button onclick="setTemplate('Make a Personal Portfolio Website for Student with Skills, Projects, Contact','Aman Kumar','9876543210','Personal Website')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">👤 Student Portfolio</button>
+    <button onclick="setTemplate('Make a Blog Website with Articles, Categories, Search','My Daily Blog','9876543210','Blog Website')" class="bg-black/30 border border-white/10 px-3 py-2 rounded-full">✍️ Blog</button>
+  </div>
+
+  <button onclick="buildWebsite()" id="buildBtn" class="w-full md:w-auto bg-blue-500 text-white font-bold px-8 py-4 rounded-full mt-4 text-sm">🌐 Build My Website FREE →</button>
+  <p class="text-[11px] text-white/40 mt-2">Auto-Shifter: Puter FREE → Pollinations FREE → Your Keys → Popup. Developer $0.</p>
+  <div id="buildStatus" class="text-sm mt-3 text-yellow-300"></div>
+</div>
+
+<!-- ===== ADSENSE AD ===== -->
+<div class="bg-white/5 border border-dashed border-white/10 rounded-2xl p-4 text-center text-xs text-white/40 mt-4">
+  📢 Ad Space - Your AdSense Ad Will Show Here After Approval
+</div>
+
+<!-- ===== PREVIEW + ACTIONS ===== -->
+<div id="resultBox" class="hidden mt-5">
+  <div class="flex flex-wrap gap-2 justify-between items-center">
+    <h2 class="font-bold text-lg">✨ Your Website is Ready!</h2>
+    <div class="flex flex-wrap gap-2">
+      <button onclick="saveSite()" class="bg-white/10 px-4 py-2 rounded-full text-sm">💾 Save</button>
+      <button onclick="hostSite()" class="bg-green-500 text-black font-bold px-4 py-2 rounded-full text-sm">🚀 Host FREE</button>
+      <button onclick="copySiteLink()" class="bg-white/10 px-4 py-2 rounded-full text-sm">🔗 Copy Link</button>
+      <button onclick="shareSiteWhatsApp()" class="bg-[#25D366] text-black font-bold px-4 py-2 rounded-full text-sm">💬 Share WhatsApp</button>
+      <button onclick="downloadSite()" class="bg-white/10 px-4 py-2 rounded-full text-sm">⬇️ Download .html</button>
+      <button onclick="editSitePrompt()" class="bg-blue-500 text-white font-bold px-4 py-2 rounded-full text-sm">✏️ Edit / Rebuild</button>
+    </div>
+  </div>
+  <div id="hostResult" class="text-sm mt-2"></div>
+  <iframe id="sitePreview" sandbox="allow-scripts allow-same-origin" class="w-full h-[520px] bg-white rounded-3xl mt-3 border border-white/10"></iframe>
+  <details class="mt-3"><summary class="text-xs text-white/50 cursor-pointer">Show Code (Copy / Edit)</summary><textarea id="siteCodeView" rows="8" class="w-full bg-black/60 rounded-2xl p-3 mt-2 text-[11px] font-mono"></textarea></details>
+</div>
+
+<!-- ===== RECENT WEBSITES ===== -->
+<div class="mt-6">
+  <div class="flex justify-between"><h2 class="font-bold">Your Recent Websites</h2><a href="my-apps.html" class="text-yellow-400 text-sm">View All →</a></div>
+  <div id="recentSites" class="grid md:grid-cols-3 gap-3 mt-3 text-sm"><p class="text-white/50">No websites yet. Build your first website above!</p></div>
+</div>
+
+</main>
+
+<!-- ===== POPUP ===== -->
+<div id="limitPopup" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
+  <div class="bg-[#1e293b] rounded-3xl p-6 max-w-md w-full text-center">
+    <h2 class="text-xl font-bold">⚠️ All FREE Limits Over</h2>
+    <p class="text-sm text-white/70 mt-2">Puter + Pollinations + All your keys over. Choose:</p>
+    <div class="space-y-2 mt-4">
+      <button onclick="closePopup()" class="w-full bg-white/10 py-3 rounded-full text-sm">🆓 Wait Tomorrow - FREE - $0</button>
+      <a href="https://puter.com" target="_blank" class="block w-full bg-yellow-400 text-black font-bold py-3 rounded-full text-sm">💳 Buy Puter - YOU pay Puter</a>
+      <a href="keys-host-share.html" class="block w-full bg-white/10 py-3 rounded-full text-sm">🔑 Attach Another API Key</a>
+      <button onclick="closePopup(); buildWebsite();" class="w-full bg-green-500 text-black font-bold py-3 rounded-full text-sm">🔄 Try FREE Again</button>
+    </div>
+    <button onclick="closePopup()" class="mt-3 text-xs text-white/50">Close</button>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="script.js"></script>
+<script>
+const lastPrompt = localStorage.getItem('unbeatable_last_prompt');
+if(lastPrompt){ document.getElementById('sitePrompt').value = lastPrompt; localStorage.removeItem('unbeatable_last_prompt'); }
+function setTemplate(prompt, name, phone, type){
+  document.getElementById('sitePrompt').value = prompt;
+  document.getElementById('siteName').value = name;
+  document.getElementById('sitePhone').value = phone;
+  document.getElementById('siteType').value = type;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+async function handleLogin(){ try{ const u = await puter.auth.getUser(); if(u && u.username){ document.getElementById('loginBtn').textContent='👤 '+u.username; return; } }catch(e){} try{ await puter.auth.signIn(); location.reload(); }catch(e){ alert('Sign In FREE with Puter'); } }
+(async()=>{ try{ const u=await puter.auth.getUser(); if(u && u.username) document.getElementById('loginBtn').textContent='👤 '+u.username; }catch(e){} })();
+
+let currentHtml = '';
+let currentTitle = '';
+
+async function buildWebsite(){
+  const prompt = document.getElementById('sitePrompt').value.trim();
+  if(!prompt) return alert('Type what website you want first! Example: Make a Portfolio Website');
+  const siteName = document.getElementById('siteName').value.trim() || 'My Website';
+  const sitePhone = document.getElementById('sitePhone').value.trim() || '';
+  const siteType = document.getElementById('siteType').value;
+  const style = document.getElementById('siteStyle').value;
+  const lang = document.getElementById('siteLang').value;
+  const modelPref = document.getElementById('siteModel').value;
+  const status = document.getElementById('buildStatus');
+  const btn = document.getElementById('buildBtn');
+  btn.disabled = true; btn.textContent = '⏳ Building Website... Please wait 10-20 sec...';
+  const fullPrompt = `Make a complete single-file HTML website: Type: ${siteType}, Name: ${siteName}, Phone/WhatsApp: ${sitePhone}. User wants: ${prompt}. Style: ${style}. Language: ${lang}. Requirements: 1) Single HTML file, 2) Use Tailwind CDN, 3) Hero section with big heading + ${siteName}, 4) About section, 5) Services/Products/Gallery section with cards, 6) Contact section with phone ${sitePhone} + WhatsApp button https://wa.me/${sitePhone}, 7) Footer, 8) Beautiful modern premium design, 9) Mobile responsive, 10) Use emoji, no external images needed. Return ONLY HTML code, no explanation, no markdown.`;
+  currentTitle = siteName + ' - ' + siteType;
+  const order = modelPref==='pollinations' ? ['pollinations','puter'] : ['puter','pollinations'];
+  for(const step of order){
+    try{
+      status.textContent = step==='puter' ? 'Step 1/4: Trying Puter FREE...' : 'Step 2/4: Trying Pollinations FREE...';
+      let html = '';
+      if(step==='puter'){
+        const resp = await puter.ai.chat(fullPrompt, {model:'openai/gpt-6-astra'});
+        html = (resp.message?.content || resp.toString()).replace(/```html|```/g,'').trim();
+      } else {
+        const res = await fetch('https://text.pollinations.ai/'+encodeURIComponent(fullPrompt));
+        html = (await res.text()).replace(/```html|```/g,'').trim();
+      }
+      if(html && html.length>300 && html.includes('<')){ showResult(html, step==='puter' ? '✅ Built via Puter FREE' : '✅ Built via Pollinations FREE'); btn.disabled=false; btn.textContent='🌐 Build My Website FREE →'; return; }
+    }catch(e){ console.log(step+' failed', e); }
+  }
+  const keys = JSON.parse(localStorage.getItem('unbeatable_api_keys')||'[]');
+  for(let i=0;i<keys.length;i++){
+    status.textContent = `Step 3/4: Trying Your Key ${i+1}/${keys.length} - ${keys[i].provider}...`;
+    try{
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+keys[i].value}, body: JSON.stringify({model:'gpt-4o-mini', messages:[{role:'user', content: fullPrompt}]})});
+      if(res.ok){ const data = await res.json(); let html = data.choices[0].message.content.replace(/```html|```/g,'').trim(); showResult(html, `✅ Built via YOUR Key ${i+1} - ${keys[i].provider}`); btn.disabled=false; btn.textContent='🌐 Build My Website FREE →'; return; }
+    }catch(e){ continue; }
+  }
+  status.textContent = '❌ All limits over - Showing options...';
+  btn.disabled=false; btn.textContent='🌐 Build My Website FREE →'; showPopup();
+}
+function showResult(html, msg){
+  currentHtml = html;
+  document.getElementById('buildStatus').textContent = msg;
+  const box = document.getElementById('resultBox'); box.classList.remove('hidden');
+  document.getElementById('sitePreview').srcdoc = html;
+  document.getElementById('siteCodeView').value = html;
+  box.scrollIntoView({behavior:'smooth'});
+}
+function editSitePrompt(){ document.getElementById('sitePrompt').value += ' - Make it even better, add more sections, make design premium'; window.scrollTo({top:0, behavior:'smooth'}); }
+function saveSite(){
+  if(!currentHtml) return alert('Build website first!');
+  let saved = JSON.parse(localStorage.getItem('unbeatable_saved_apps')||'[]');
+  saved.unshift({name: currentTitle, html: currentHtml, time: new Date().toLocaleString(), type:'Website'});
+  localStorage.setItem('unbeatable_saved_apps', JSON.stringify(saved));
+  try{ puter.kv.set('unbeatable_saved_apps', JSON.stringify(saved)); }catch(e){}
+  alert('✅ Website Saved! See in My Apps.'); renderRecent();
+}
+async function hostSite(){
+  if(!currentHtml) return alert('Build website first!');
+  const name = prompt('Enter website name for hosting (no space, e.g. my-portfolio):', currentTitle.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30) || 'my-website');
+  if(!name) return;
+  document.getElementById('hostResult').textContent = '⏳ Hosting FREE on YOUR Puter Cloud...';
+  try{
+    const fileName = name + '.html';
+    await puter.fs.write(fileName, currentHtml);
+    const user = await puter.auth.getUser().catch(()=>null);
+    const link = user ? `https://${user.username}.puter.site/${fileName}` : fileName;
+    window._hostLink = link;
+    document.getElementById('hostResult').innerHTML = `✅ <b>Hosted FREE!</b> 🔗 <a href="${link}" target="_blank" class="text-yellow-400 underline">${link}</a> - Share this link!`;
+    let hosted = JSON.parse(localStorage.getItem('hosted_apps')||'[]');
+    hosted.unshift({name: fileName, link, time: new Date().toLocaleString()});
+    localStorage.setItem('hosted_apps', JSON.stringify(hosted));
+    renderRecent();
+  }catch(e){ document.getElementById('hostResult').innerHTML = '⚠️ Please Sign In FREE first (top right), then Host again.'; }
+}
+function copySiteLink(){ if(window._hostLink) navigator.clipboard.writeText(window._hostLink).then(()=>alert('✅ Host Link Copied!')); else alert('Host website first, then copy link.'); }
+function shareSiteWhatsApp(){
+  const link = window._hostLink || ((typeof CONFIG!=='undefined') ? CONFIG.baseUrl : window.location.href);
+  const text = encodeURIComponent(`🌐 I built this Website FREE on Unbeatable App! Check it: ${link} - Build yours FREE too!`);
+  window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+function downloadSite(){
+  if(!currentHtml) return alert('Build website first!');
+  const blob = new Blob([currentHtml], {type:'text/html'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = (currentTitle||'my-website').replace(/[^a-z0-9]+/gi,'-')+'.html'; a.click();
+}
+function showPopup(){ const p=document.getElementById('limitPopup'); p.classList.remove('hidden'); p.classList.add('flex'); }
+function closePopup(){ const p=document.getElementById('limitPopup'); p.classList.add('hidden'); p.classList.remove('flex'); }
+function renderRecent(){
+  try{
+    const saved = JSON.parse(localStorage.getItem('unbeatable_saved_apps')||'[]').filter(x=>x.type==='Website').slice(0,3);
+    const hosted = JSON.parse(localStorage.getItem('hosted_apps')||'[]').slice(0,3);
+    const all = [...saved, ...hosted];
+    if(all.length) document.getElementById('recentSites').innerHTML = all.map(a=>`<div class="bg-white/5 border border-white/10 p-4 rounded-2xl"><b>🌐 ${a.name}</b><p class="text-white/50 text-xs">${a.time||''}</p><a href="my-apps.html" class="text-yellow-400 text-xs">Open in My Apps →</a></div>`).join('');
+  }catch(e){}
+}
+renderRecent();
+</script>
+</body>
+</html>
