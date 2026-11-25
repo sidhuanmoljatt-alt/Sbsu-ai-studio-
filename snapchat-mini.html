@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snapchat Mini - SBS Ferozepur | Sofia AI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{background:#000;color:#fff;font-family:Inter,system-ui}
+.glass{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:16px}
+.btn{background:#FFFC00;color:#000;padding:10px 16px;border-radius:999px;font-weight:900}
+.btn2{background:#222;padding:9px 13px;border-radius:999px}
+.tab{display:none}.tab.active{display:block}
+input{background:#222;border:1px solid #444;border-radius:10px;padding:10px;width:100%;color:#fff}
+.filterBtn{width:56px;height:56px;border-radius:50%;border:3px solid transparent;flex-shrink:0;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:#222}
+.filterBtn.active{border-color:#FFFC00;transform:scale(1.15)}
+#video{width:100%;height:420px;object-fit:cover;border-radius:16px;background:#222}
+#canvasSnap{width:100%;border-radius:16px;display:none}
+.streak{color:#ff6a00;font-weight:900}
+</style>
+</head>
+<body>
+<header class="p-3 flex justify-between items-center sticky top-0 z-20 bg-black/90">
+<div><h1 class="font-black text-xl">👻 SNAPCHAT <span class="text-yellow-300">MINI</span></h1><p class="text-[11px] text-slate-400">SBS Ferozepur • Sofia AI • Filters + Streaks</p></div>
+<div class="flex gap-2"><button class="btn2" onclick="window.location.href='index.html'">🏠 Studio</button><button class="btn" onclick="shareApp()">↗️ Share</button></div>
+</header>
+
+<nav class="flex gap-2 px-3 overflow-x-auto pb-2">
+<button class="btn2" onclick="showTab('camera')">📷 Camera</button><button class="btn2" onclick="showTab('chat')">💬 Chat</button><button class="btn2" onclick="showTab('stories')">📖 Stories</button><button class="btn2" onclick="showTab('streaks')">🔥 Streaks</button><button class="btn2" onclick="showTab('map')">🗺️ Snap Map</button>
+</nav>
+
+<!-- CAMERA -->
+<section id="camera" class="tab active px-3 pb-4">
+<div class="relative">
+<video id="video" autoplay playsinline></video>
+<canvas id="canvasSnap" width="600" height="420"></canvas>
+<div id="filterOverlay" class="absolute inset-0 flex items-center justify-center pointer-events-none text-7xl"></div>
+<div id="filterLabel" class="absolute top-2 left-2 bg-black/60 px-3 py-1 rounded-full text-xs font-bold">Filter: Original</div>
+<div class="absolute top-2 right-2 bg-black/60 px-3 py-1 rounded-full text-xs">👻 Anmol_SBS</div>
+</div>
+<div class="flex gap-2 overflow-x-auto py-3" id="filterRow"></div>
+<div class="flex gap-2 justify-center items-center mt-1">
+<button class="btn2" onclick="switchCamera()">🔄 Flip</button>
+<button class="w-20 h-20 rounded-full bg-white border-4 border-yellow-300 text-3xl" onclick="takeSnap()">📸</button>
+<button class="btn2" onclick="openGallery()">🖼️ Gallery</button>
+</div>
+<div class="flex gap-2 mt-3">
+<button class="btn flex-1" onclick="sendSnap()">➡️ Send Snap</button>
+<button class="btn2 flex-1" onclick="postStory()">📖 Post to Story</button>
+<button class="btn2 flex-1" onclick="downloadSnap()">⬇️ Save</button>
+</div>
+<input type="file" id="galleryInput" accept="image/*" hidden onchange="uploadPhoto(event)">
+<div class="glass p-3 mt-3"><h3 class="font-bold">✨ AI Caption by Sofia</h3><p class="text-sm text-slate-300" id="aiCaption">Take a snap, Sofia will write a funny caption for you!</p><button class="btn2 mt-2" onclick="genCaption()">✨ Generate Caption</button></div>
+<div id="snapGallery" class="grid grid-cols-3 gap-2 mt-3"></div>
+</section>
+
+<!-- CHAT -->
+<section id="chat" class="tab px-3 pb-4">
+<div id="snapChatList" class="space-y-2"></div>
+<div id="chatBox" class="glass p-3 mt-3 hidden">
+<div class="flex justify-between"><b id="chatName"></b><button class="btn2" onclick="closeChat()">✕</button></div>
+<div id="chatMsgs" class="h-[220px] overflow-y-auto my-2 bg-black/40 rounded-xl p-2"></div>
+<div class="flex gap-2"><input id="chatInput" placeholder="Send a disappearing message..."><button class="btn" onclick="sendMsg()">Send</button></div>
+<p class="text-[11px] text-slate-400 mt-1">⚠️ Messages disappear after viewing like real Snapchat. Screenshot will notify friend.</p>
+</div>
+</section>
+
+<!-- STORIES -->
+<section id="stories" class="tab px-3 pb-4">
+<div class="glass p-4 text-center"><h3 class="font-bold">Your Story</h3><p class="text-sm text-slate-400">Post snap to story, it stays 24h</p><button class="btn w-full mt-2" onclick="showTab('camera')">+ Add to Story</button></div>
+<div id="storyList" class="space-y-2 mt-3"></div>
+</section>
+
+<!-- STREAKS -->
+<section id="streaks" class="tab px-3 pb-4">
+<div class="glass p-4 text-center"><div class="text-5xl">🔥</div><h2 class="font-bold text-xl mt-1">Keep Your Streak Alive!</h2><p class="text-sm text-slate-400">Send 1 snap daily to keep streak. Miss 1 day = Streak lost!</p></div>
+<div id="streakList" class="space-y-2 mt-3"></div>
+<div class="glass p-3 mt-3"><h3 class="font-bold">🏆 Streak Leaderboard - SBS Ferozepur</h3><div id="leaderboard" class="text-sm mt-2"></div></div>
+</section>
+
+<!-- MAP -->
+<section id="map" class="tab px-3 pb-4">
+<div class="glass p-4"><h3 class="font-bold">🗺️ Snap Map - Ferozepur</h3><div class="relative h-[380px] bg-green-800 rounded-xl overflow-hidden mt-2">
+<div class="absolute inset-0 opacity-40" style="background-image:repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(255,255,255,.1) 41px),repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(255,255,255,.1) 41px)"></div>
+<div class="absolute left-4 top-4 bg-blue-500 px-2 py-1 rounded text-xs">SBS University</div>
+<div class="absolute right-6 top-16 bg-red-500 px-2 py-1 rounded text-xs">Ferozepur City</div>
+<div class="absolute left-10 bottom-10 bg-yellow-600 px-2 py-1 rounded text-xs">Hostel</div>
+<div class="absolute text-4xl" style="left:45%;top:40%">📍</div>
+<div class="absolute text-3xl" style="left:20%;top:60%">👻</div>
+<div class="absolute text-3xl" style="left:70%;top:30%">👻</div>
+<div class="absolute text-3xl" style="left:60%;top:70%">👻</div>
+</div><p class="text-xs text-slate-400 mt-2">Your Bitmoji is in Ferozepur. Friends nearby: Gurpreet, Simran, Sofia. Tap map to see friends.</p><button class="btn w-full mt-2" onclick="alert('Snap Map: You are in Ferozepur, Punjab. 3 friends nearby!')">📍 Find Friends Near Me</button></div>
+</section>
+
+<script>
+let currentFilter='Original', facing='user', stream=null, lastSnap=null;
+let friends=JSON.parse(localStorage.getItem('snap_friends')||'[]');
+let stories=JSON.parse(localStorage.getItem('snap_stories')||'[]');
+let snaps=JSON.parse(localStorage.getItem('snap_gallery')||'[]');
+if(friends.length==0){
+friends=[
+{id:1,name:'Gurpreet',avatar:'👦',streak:128,msgs:[{from:'other',text:'Snap bheja 🔥',time:'2m'}]},
+{id:2,name:'Simran',avatar:'👧',streak:96,msgs:[{from:'other',text:'Streak bachana hai! 📸'}]},
+{id:3,name:'Sofia AI',avatar:'👩',streak:210,msgs:[{from:'other',text:'Hi! Send me a snap, I will add filter!'}]},
+{id:4,name:'Anmol - SBS',avatar:'🧑',streak:45,msgs:[{from:'other',text:'Aaj Ferozepur me mela hai'}]},
+{id:5,name:'Harpreet',avatar:'👦',streak:12,msgs:[{from:'other',text:'New filter try kar'}]}
+];
+}
+let filters=[
+{name:'Original',emoji:'',css:'none'},
+{name:'Black & White',emoji:'',css:'grayscale(1)'},
+{name:'Sepia',emoji:'',css:'sepia(1)'},
+{name:'Neon',emoji:'',css:'saturate(3) contrast(1.3) hue-rotate(90deg)'},
+{name:'Vintage',emoji:'',css:'sepia(0.6) contrast(0.9) brightness(1.1)'},
+{name:'Cartoon',emoji:'',css:'saturate(2) contrast(1.5)'},
+{name:'Blur',emoji:'',css:'blur(2px) brightness(1.2)'},
+{name:'Invert',emoji:'',css:'invert(1)'},
+{name:'Rainbow',emoji:'',css:'hue-rotate(180deg) saturate(2)'},
+{name:'Dog',emoji:'🐶',css:'none'},
+{name:'Crown',emoji:'👑',css:'none'},
+{name:'Fire',emoji:'🔥',css:'saturate(2)'}
+];
+function save(){localStorage.setItem('snap_friends',JSON.stringify(friends)); localStorage.setItem('snap_stories',JSON.stringify(stories)); localStorage.setItem('snap_gallery',JSON.stringify(snaps))}
+function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active')}
+function shareApp(){let u=location.href; window.open('https://wa.me/?text='+encodeURIComponent('Check Snapchat Mini - Filters + Streaks: '+u),'_blank')}
+function renderFilters(){
+document.getElementById('filterRow').innerHTML=filters.map((f,i)=>`<button class="filterBtn ${i==0?'active':''}" onclick="applyFilter(${i},this)">${f.emoji||f.name[0]}</button>`).join('');
+}
+function applyFilter(i,el){
+let f=filters[i]; currentFilter=f.name;
+document.querySelectorAll('.filterBtn').forEach(b=>b.classList.remove('active')); if(el)el.classList.add('active');
+document.getElementById('video').style.filter=f.css;
+document.getElementById('filterOverlay').innerText=f.emoji;
+document.getElementById('filterLabel').innerText='Filter: '+f.name;
+document.getElementById('canvasSnap').style.filter=f.css;
+}
+async function startCamera(){
+try{
+if(stream) stream.getTracks().forEach(t=>t.stop());
+stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false});
+document.getElementById('video').srcObject=stream;
+}catch(e){document.getElementById('video').outerHTML='<div class="h-[420px] bg-gradient-to-br from-purple-600 to-pink-500 rounded-2xl flex items-center justify-center text-6xl">👻<br><span class="text-sm">Camera not allowed<br>Use Gallery Upload</span></div>'}
+}
+function switchCamera(){facing=facing=='user'?'environment':'user'; startCamera()}
+function takeSnap(){
+let video=document.getElementById('video'); let canvas=document.getElementById('canvasSnap');
+if(!video.srcObject){alert('Camera not on. Use Gallery Upload below.'); openGallery(); return}
+let ctx=canvas.getContext('2d'); ctx.filter=document.getElementById('video').style.filter; ctx.drawImage(video,0,0,600,420);
+canvas.style.display='block'; video.style.display='none';
+lastSnap=canvas.toDataURL('image/jpeg',0.8);
+document.getElementById('aiCaption').innerText='Snap taken with '+currentFilter+' filter! Click Generate Caption.';
+alert('Snap Taken! Now Send or Post to Story.');
+}
+function openGallery(){document.getElementById('galleryInput').click()}
+function uploadPhoto(e){let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=()=>{lastSnap=r.result; let canvas=document.getElementById('canvasSnap'); canvas.style.display='block'; document.getElementById('video').style.display='none'; let ctx=canvas.getContext('2d'); let img=new Image(); img.onload=()=>ctx.drawImage(img,0,0,600,420); img.src=r.result; alert('Photo uploaded! Now Send Snap.')}; r.readAsDataURL(f)}
+function downloadSnap(){if(!lastSnap) return alert('Take snap first'); let a=document.createElement('a'); a.href=lastSnap; a.download='snapchat-mini.jpg'; a.click()}
+function sendSnap(){
+if(!lastSnap) return alert('Take snap first');
+let f=friends[0]; f.streak++; f.msgs.push({from:'me',text:'📸 Snap sent with '+currentFilter+' filter'});
+snaps.unshift(lastSnap); save(); renderAll();
+alert('Snap sent to '+f.name+'! Streak now 🔥 '+f.streak+' days!');
+}
+function postStory(){
+if(!lastSnap) return alert('Take snap first');
+stories.unshift({img:lastSnap,caption:'My Story - '+currentFilter,time:new Date().toLocaleTimeString()}); save(); renderAll(); alert('Posted to Story! Friends can see for 24h.');
+}
+function genCaption(){
+let caps=['Ferozepur vibes ❤️🔥','SBS Life is best life 🎓','Filter on point 👻','Punjab da swag 😎','Streak day '+friends[0].streak+' 🔥','Made with Sofia AI 💜','No filter needed, but filter is fun 😂','Hostel life 🥳'];
+document.getElementById('aiCaption').innerText=caps[Math.floor(Math.random()*caps.length)];
+}
+let currentChat=null;
+function renderChats(){
+document.getElementById('snapChatList').innerHTML=friends.map(f=>`<div class="glass p-3 flex justify-between items-center cursor-pointer" onclick="openChat(${f.id})"><div class="flex gap-3 items-center"><div class="text-3xl">${f.avatar}</div><div><b>${f.name}</b><div class="text-xs text-slate-400">${f.msgs[f.msgs.length-1]?.text||''}</div></div></div><div class="text-right"><div class="streak">🔥 ${f.streak}</div><div class="text-xs">Streak</div></div></div>`).join('');
+}
+function openChat(id){currentChat=friends.find(f=>f.id==id); document.getElementById('chatBox').classList.remove('hidden'); document.getElementById('chatName').innerText='👻 '+currentChat.name+' • 🔥 '+currentChat.streak; renderMsgs()}
+function closeChat(){document.getElementById('chatBox').classList.add('hidden'); currentChat=null}
+function renderMsgs(){if(!currentChat) return; document.getElementById('chatMsgs').innerHTML=currentChat.msgs.map(m=>`<div class="p-2 rounded-lg my-1 ${m.from=='me'?'bg-yellow-400 text-black ml-10':'bg-white/10 mr-10'}">${m.text}<div class="text-[10px] opacity-60">${m.time||'now'} • Tap to view, disappears</div></div>`).join('')}
+function sendMsg(){let inp=document.getElementById('chatInput'); if(!inp.value||!currentChat) return; currentChat.msgs.push({from:'me',text:inp.value}); let t=inp.value; inp.value=''; renderMsgs(); save(); setTimeout(()=>{currentChat.msgs.push({from:'other',text:currentChat.name.includes('Sofia')?'Nice snap! Send me one more 👻':'Haha 🔥 streak bach gaya!'}); currentChat.streak++; renderMsgs(); renderChats(); renderStreaks(); save()},800)}
+function renderStories(){
+document.getElementById('storyList').innerHTML=stories.map(s=>`<div class="glass p-3 flex gap-3"><img src="${s.img}" class="w-16 h-16 rounded-full object-cover border-2 border-yellow-300"><div><b>Your Story</b><div class="text-sm">${s.caption}</div><div class="text-xs text-slate-400">${s.time} • Expires in 24h • 👁️ ${Math.floor(Math.random()*50)+10} views</div></div></div>`).join('')||'<div class="text-center text-slate-400">No stories yet. Take a snap and post!</div>';
+document.getElementById('snapGallery').innerHTML=snaps.slice(0,6).map(s=>`<img src="${s}" class="w-full h-24 object-cover rounded-lg">`).join('');
+}
+function renderStreaks(){
+document.getElementById('streakList').innerHTML=friends.map(f=>`<div class="glass p-3 flex justify-between items-center"><div class="flex gap-3 items-center"><div class="text-3xl">${f.avatar}</div><div><b>${f.name}</b><div class="text-xs text-slate-400">Last snap: Today</div></div></div><div class="text-right"><div class="streak text-xl">🔥 ${f.streak}</div><button class="bg-yellow-400 text-black px-3 py-1 rounded-full text-xs font-bold mt-1" onclick="sendStreak(${f.id})">Send Snap 📸</button></div></div>`).join('');
+document.getElementById('leaderboard').innerHTML=[...friends].sort((a,b)=>b.streak-a.streak).map((f,i)=>`<div class="flex justify-between py-1"><span>${i+1}. ${f.avatar} ${f.name}</span><b class="streak">🔥 ${f.streak}</b></div>`).join('');
+}
+function sendStreak(id){let f=friends.find(x=>x.id==id); f.streak++; save(); renderAll(); alert('Snap sent to '+f.name+'! Streak: 🔥 '+f.streak)}
+function renderAll(){renderChats(); renderStories(); renderStreaks()}
+renderFilters(); startCamera(); renderAll();
+</script>
+</body>
+</html>
