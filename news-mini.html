@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>News Mini - Live News + Weather + Cricket | SBS Ferozepur</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{background:#f8fafc;color:#111;font-family:Inter,system-ui}
+.glass{background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.btn{background:#111;color:#fff;padding:10px 16px;border-radius:999px;font-weight:800}
+.btn2{background:#f1f5f9;padding:9px 13px;border-radius:999px;border:1px solid #e2e8f0}
+input,select{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px;width:100%;color:#111}
+.tab{display:none}.tab.active{display:block}
+.ticker{animation:scroll 25s linear infinite;white-space:nowrap}
+@keyframes scroll{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+</style>
+</head>
+<body>
+<header class="p-3 flex justify-between items-center sticky top-0 z-20 bg-white shadow">
+<div><h1 class="font-black text-lg">📰 NEWS <span class="text-red-600">MINI</span></h1><p class="text-[11px] text-slate-500">SBS Ferozepur • Sofia AI • Live News</p></div>
+<div class="flex gap-2"><button class="btn2" onclick="window.location.href='index.html'">🏠 Studio</button><button class="btn2" onclick="shareApp()">🔗 Share</button></div>
+</header>
+
+<div class="bg-red-600 text-white overflow-hidden py-1"><div class="ticker text-sm font-bold">🔴 BREAKING: India wins by 6 wickets! • Ferozepur weather: Sunny 28°C • SBS University new AI course started • Punjab Kings wins IPL match • Gold price down • PM announces new scheme for students •</div></div>
+
+<nav class="flex gap-2 px-3 py-2 overflow-x-auto">
+<button class="btn2" onclick="showTab('news')">📰 News</button><button class="btn2" onclick="showTab('weather')">🌤️ Weather</button><button class="btn2" onclick="showTab('cricket')">🏏 Cricket Live</button><button class="btn2" onclick="showTab('saved')">🔖 Saved</button>
+</nav>
+
+<!-- NEWS -->
+<section id="news" class="tab active px-3 pb-4">
+<div class="flex gap-2 flex-wrap"><input id="search" placeholder="Search news..." class="!w-[260px]" oninput="renderNews()"><select id="catFilter" onchange="renderNews()" class="!w-[160px]"><option value="all">All News</option><option>Punjab</option><option>India</option><option>World</option><option>Sports</option><option>Tech</option><option>Entertainment</option></select></div>
+<div id="newsList" class="grid md:grid-cols-2 gap-3 mt-3"></div>
+</section>
+
+<!-- WEATHER -->
+<section id="weather" class="tab px-3 pb-4">
+<div class="glass p-5 text-center bg-gradient-to-br from-blue-500 to-cyan-400 text-white"><div class="text-6xl">☀️</div><h2 class="text-3xl font-black">28°C</h2><p>Ferozepur, Punjab • Sunny • Feels like 30°C</p><div class="flex justify-center gap-4 text-sm mt-2"><span>💧 Humidity: 45%</span><span>💨 Wind: 12 km/h</span><span>👁️ Visibility: 10 km</span></div></div>
+<div class="grid grid-cols-4 md:grid-cols-7 gap-2 mt-3 text-center text-sm">
+<div class="glass p-2"><b>Today</b><div class="text-2xl">☀️</div><div>28° / 16°</div></div>
+<div class="glass p-2"><b>Tomorrow</b><div class="text-2xl">🌤️</div><div>29° / 17°</div></div>
+<div class="glass p-2"><b>Thu</b><div class="text-2xl">🌧️</div><div>24° / 15°</div></div>
+<div class="glass p-2"><b>Fri</b><div class="text-2xl">☀️</div><div>27° / 16°</div></div>
+<div class="glass p-2"><b>Sat</b><div class="text-2xl">☀️</div><div>30° / 18°</div></div>
+<div class="glass p-2"><b>Sun</b><div class="text-2xl">🌤️</div><div>29° / 17°</div></div>
+<div class="glass p-2"><b>Mon</b><div class="text-2xl">☀️</div><div>28° / 16°</div></div>
+</div>
+<div class="glass p-4 mt-3"><h3 class="font-bold">🧥 What to Wear Today?</h3><p class="text-sm mt-1">Sunny + 28°C - Light T-shirt + Jeans. Carry water bottle. Evening will be cool - take light jacket.</p></div>
+</section>
+
+<!-- CRICKET -->
+<section id="cricket" class="tab px-3 pb-4">
+<div class="glass p-4 bg-gradient-to-r from-green-600 to-emerald-500 text-white"><div class="flex justify-between"><span class="bg-red-500 px-2 py-0.5 rounded-full text-xs">🔴 LIVE</span><span class="text-xs">T20 • Ferozepur Stadium</span></div><h2 class="font-black text-xl mt-2">IND 186 / 4 (18.2 Overs)</h2><p class="text-sm">PAK 182 / 7 (20 Overs) • India needs 0 runs to win!</p><div class="mt-2"><div class="flex justify-between text-xs"><span>Virat Kohli: 78* (52)</span><span>Hardik: 32* (18)</span></div><div class="bg-white/30 h-2 rounded-full mt-1"><div class="bg-white h-2 rounded-full" style="width:92%"></div></div></div><div class="flex gap-2 mt-3"><button class="bg-white text-black px-3 py-1 rounded-full text-sm" onclick="ballByBall()">🏏 Ball by Ball</button><button class="bg-white text-black px-3 py-1 rounded-full text-sm" onclick="alert('INDIA WON BY 6 WICKETS! 🎉 Kohli Man of the Match!')">🏆 Result</button></div><p id="ballBox" class="text-sm mt-2"></p></div>
+<div class="glass p-4 mt-3"><h3 class="font-bold">📊 Points Table - IPL Style</h3><div class="text-sm mt-2 space-y-1"><div class="flex justify-between bg-green-50 p-2 rounded-lg"><span>1. Punjab Kings</span><b>18 pts</b></div><div class="flex justify-between p-2"><span>2. Mumbai Indians</span><b>16 pts</b></div><div class="flex justify-between p-2"><span>3. Chennai Super Kings</span><b>14 pts</b></div><div class="flex justify-between p-2"><span>4. Royal Challengers</span><b>14 pts</b></div><div class="flex justify-between p-2"><span>5. Delhi Capitals</span><b>12 pts</b></div></div></div>
+<div class="glass p-4 mt-3"><h3 class="font-bold">📅 Upcoming Matches</h3><div class="text-sm mt-2 space-y-2"><div class="bg-slate-50 p-2 rounded-lg">India vs Australia - Tomorrow, 7:30 PM - Ferozepur Live</div><div class="bg-slate-50 p-2 rounded-lg">Punjab Kings vs KKR - Saturday, 7:30 PM</div></div></div>
+</section>
+
+<!-- SAVED -->
+<section id="saved" class="tab px-3 pb-4">
+<div class="glass p-4"><h3 class="font-bold text-lg">🔖 Saved News</h3><div id="savedList" class="mt-3 space-y-3"></div></div>
+</section>
+
+<script>
+let saved=JSON.parse(localStorage.getItem('news_saved')||'[]');
+let news=[
+{id:1,title:'SBS University Ferozepur Starts New AI Course for Students',cat:'Punjab',img:'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600',desc:'SBS University ne naya AI + Coding course start kiya. 500+ students ne admission liya. Sofia AI teacher padhayegi.',time:'10 min ago'},
+{id:2,title:'India Wins T20 Match by 6 Wickets - Kohli Scores 78*',cat:'Sports',img:'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=600',desc:'Virat Kohli ne 78* run banaye. India ne Pakistan ko 6 wicket se haraya. Stadium me full crowd tha.',time:'25 min ago'},
+{id:3,title:'Ferozepur Weather: Sunny, Temperature 28°C - Good Day for Travel',cat:'Punjab',img:'https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=600',desc:'Aaj Ferozepur me mausam saaf rahega. Kal halki barish ho sakti hai. Kisanon ko salah di gayi.',time:'1 hour ago'},
+{id:4,title:'New AI Phone Launched in India - Price ₹15,999',cat:'Tech',img:'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600',desc:'Naya AI phone launch hua. 50MP camera, 5000mAh battery, AI photo editing free. Students ke liye best.',time:'2 hours ago'},
+{id:5,title:'Punjab Government Announces Free Bus for Students',cat:'India',img:'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600',desc:'Punjab sarkar ne students ke liye free bus service announce ki. SBS students ko bhi fayda milega.',time:'3 hours ago'},
+{id:6,title:'World Cup 2026: India in Final - Fans Celebrate in Ferozepur',cat:'World',img:'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600',desc:'India World Cup final me pahunch gaya. Ferozepur me dhol + bhangra ke saath celebration hua.',time:'5 hours ago'},
+{id:7,title:'New Punjabi Movie Breaks Box Office Record',cat:'Entertainment',img:'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600',desc:'Punjabi movie ne pehle din 10 crore kamaye. Diljit Dosanjh ki acting ko sabne saraha.',time:'6 hours ago'},
+{id:8,title:'Gold Price Down ₹500 - Good Time to Buy?',cat:'India',img:'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=600',desc:'Aaj gold price ₹500 gira. Experts kehte hain shaadi season se pehle khareedna sahi rahega.',time:'8 hours ago'},
+{id:9,title:'ISRO Launches New Satellite - India Proud Moment',cat:'Tech',img:'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=600',desc:'ISRO ne naya satellite launch kiya. Ye satellite weather + internet ke liye kaam karega.',time:'10 hours ago'},
+{id:10,title:'Ferozepur Cantt Railway Station Gets New Look',cat:'Punjab',img:'https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=600',desc:'Ferozepur station par naya waiting hall + WiFi + clean washroom banaya gaya.',time:'12 hours ago'}
+];
+function save(){localStorage.setItem('news_saved',JSON.stringify(saved))}
+function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active')}
+function shareApp(){window.open('https://wa.me/?text='+encodeURIComponent('News Mini - Live News + Weather + Cricket: '+location.href),'_blank')}
+function renderNews(){
+let q=(document.getElementById('search').value||'').toLowerCase(), cat=document.getElementById('catFilter').value;
+let list=news.filter(n=>(cat=='all'||n.cat==cat)&&n.title.toLowerCase().includes(q));
+document.getElementById('newsList').innerHTML=list.map(n=>`<div class="glass p-3"><img src="${n.img}" class="w-full h-[160px] object-cover rounded-xl"><div class="flex justify-between mt-2"><span class="bg-red-100 text-red-600 px-2 py-0.5 rounded-full text-xs">${n.cat}</span><span class="text-xs text-slate-400">${n.time}</span></div><b class="block mt-1">${n.title}</b><p class="text-sm text-slate-600 mt-1">${n.desc}</p><div class="flex gap-2 mt-2"><button class="btn2 text-xs flex-1" onclick="saveNews(${n.id})">🔖 Save</button><button class="btn2 text-xs flex-1" onclick="shareNews('${n.title}')">📲 Share</button><button class="btn2 text-xs flex-1" onclick="alert('Full News: ${n.desc}')">📖 Read</button></div></div>`).join('')||'No news found';
+}
+function saveNews(id){if(saved.find(s=>s==id)) return alert('Already Saved!'); saved.push(id); save(); renderSaved(); alert('News Saved!')}
+function renderSaved(){document.getElementById('savedList').innerHTML=saved.map(id=>{let n=news.find(x=>x.id==id); if(!n) return ''; return `<div class="flex gap-3"><img src="${n.img}" class="w-20 h-20 object-cover rounded-lg"><div><b class="text-sm">${n.title}</b><div class="text-xs">${n.cat} • ${n.time}</div><button class="btn2 text-xs mt-1" onclick="removeSaved(${id})">🗑️ Remove</button></div></div>`}).join('')||'No saved news yet.'}
+function removeSaved(id){saved=saved.filter(s=>s!=id); save(); renderSaved()}
+function shareNews(title){window.open('https://wa.me/?text='+encodeURIComponent('📰 '+title+' - Read on News Mini: '+location.href),'_blank')}
+let balls=['4 - FOUR! Kohli hits beautiful cover drive!','6 - SIX! Hardik hits huge six over long on!','1 - Single, Kohli takes quick run','2 - Two runs, good running!','W - Wicket! But no, its a No Ball!','0 - Dot Ball, good bowling'];
+let ballIdx=0;
+function ballByBall(){document.getElementById('ballBox').innerText='Ball '+(ballIdx+1)+': '+balls[ballIdx%balls.length]; ballIdx++}
+renderNews(); renderSaved();
+</script>
+</body>
+</html>
