@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Mini - WhatsApp + Instagram | SBS Ferozepur</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{background:#0b1026;color:#fff;font-family:Inter,system-ui}
+.glass{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:16px}
+.btn{background:linear-gradient(90deg,#ff6a00,#ff2d55);padding:9px 14px;border-radius:999px;font-weight:700}
+.btn2{background:#1e293b;padding:8px 12px;border-radius:999px}
+input,textarea{background:#111827;border:1px solid #374151;border-radius:10px;padding:10px;width:100%;color:#fff}
+.tab{display:none}.tab.active{display:block}
+.msg{padding:8px 12px;border-radius:14px;margin:6px 0;max-width:80%;white-space:pre-wrap}
+.me{background:#00a884;margin-left:auto;color:#fff}.other{background:#202c33;margin-right:auto}
+.story{width:64px;height:64px;border-radius:50%;border:3px solid #ff2d55;padding:2px;flex-shrink:0;cursor:pointer}
+.story img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.postImg{width:100%;height:340px;object-fit:cover;border-radius:12px}
+.chatItem{cursor:pointer}
+</style>
+</head>
+<body>
+<header class="p-3 flex justify-between items-center sticky top-0 z-20 bg-[#0b1026]/95">
+<div><h1 class="font-black text-lg">📱 SOCIAL MINI</h1><p class="text-[11px] text-slate-400">WhatsApp + Instagram • SBS Ferozepur • Sofia AI</p></div>
+<div class="flex gap-2"><button class="btn2" onclick="window.location.href='index.html'">🏠 Studio</button><button class="btn" onclick="shareApp()">🔗 Share</button></div>
+</header>
+
+<nav class="flex gap-2 px-3 overflow-x-auto pb-2">
+<button class="btn2" onclick="showTab('wa')">💚 WhatsApp</button><button class="btn2" onclick="showTab('insta')">📸 Instagram</button><button class="btn2" onclick="showTab('status')">🟢 Status</button><button class="btn2" onclick="showTab('calls')">📞 Calls</button><button class="btn2" onclick="showTab('reels')">🎬 Reels</button>
+</nav>
+
+<!-- WHATSAPP -->
+<section id="wa" class="tab active px-3 pb-4">
+<div class="flex gap-2 mb-3"><input id="searchChat" placeholder="Search chat..." oninput="renderChats()"><button class="btn" onclick="newChat()">+ New Chat</button></div>
+<div id="chatList" class="space-y-2"></div>
+<div id="chatWindow" class="glass p-3 mt-3 hidden">
+<div class="flex justify-between items-center"><div class="flex gap-2 items-center"><img id="chatAvatar" src="" class="w-10 h-10 rounded-full"><div><b id="chatName"></b><div class="text-xs text-green-400" id="chatOnline">online</div></div></div><button class="btn2" onclick="closeChat()">✕ Close</button></div>
+<div id="chatMsgs" class="h-[280px] overflow-y-auto my-3 bg-black/30 rounded-xl p-2"></div>
+<div class="flex gap-2"><input id="chatInput" placeholder="Type message..."><button class="btn" onclick="sendMsg()">Send ➤</button><button class="btn2" onclick="sendVoice()">🎤</button></div>
+<div class="flex gap-2 mt-2"><label class="btn2 cursor-pointer">📷 Photo<input type="file" accept="image/*" hidden onchange="sendPhoto(event)"></label><button class="btn2" onclick="sendSticker()">😍 Sticker</button></div>
+</div>
+</section>
+
+<!-- INSTAGRAM -->
+<section id="insta" class="tab px-3 pb-4">
+<div class="flex gap-3 overflow-x-auto py-2" id="storyRow"></div>
+<div class="glass p-3 mb-3"><h3 class="font-bold">Create Post</h3><input id="postCaption" placeholder="Write caption... e.g. SBS Ferozepur Life ❤️" class="mt-2"><div class="flex gap-2 mt-2"><label class="btn2 cursor-pointer">📷 Upload Photo<input type="file" accept="image/*" hidden onchange="addPost(event)"></label><button class="btn" onclick="addTextPost()">Post Text 📝</button></div><p class="text-xs text-slate-400 mt-1">Photo post will appear in feed instantly.</p></div>
+<div id="feed" class="space-y-4"></div>
+</section>
+
+<!-- STATUS -->
+<section id="status" class="tab px-3 pb-4">
+<div class="glass p-4 text-center"><div class="text-5xl">🟢</div><h3 class="font-bold mt-2">My Status</h3><p class="text-sm text-slate-400">Share photo / text for 24 hours like WhatsApp Status</p><input id="statusText" placeholder="What's on your mind?" class="mt-3"><button class="btn w-full mt-2" onclick="addStatus()">+ Add Status</button></div>
+<div id="statusList" class="space-y-2 mt-3"></div>
+</section>
+
+<!-- CALLS -->
+<section id="calls" class="tab px-3 pb-4">
+<div class="glass p-4"><h3 class="font-bold">Recent Calls</h3><div id="callList" class="mt-2 space-y-2"></div><button class="btn w-full mt-3" onclick="fakeCall()">📞 Call Sofia AI (Demo)</button><p class="text-xs text-slate-400 mt-2">Real voice call needs server. This demo shows call UI + ring + timer like real WhatsApp.</p><div id="callScreen" class="hidden text-center mt-3"><div class="text-6xl">👩</div><b>Sofia AI</b><div id="callTimer">00:00</div><button class="bg-red-500 px-6 py-2 rounded-full mt-2" onclick="endCall()">End Call</button></div></div>
+</section>
+
+<!-- REELS -->
+<section id="reels" class="tab px-3 pb-4">
+<div class="glass p-4 text-center"><h3 class="font-bold text-xl">🎬 Reels Mini</h3><p class="text-sm text-slate-400">Swipe style reels - Like, Comment, Share</p></div>
+<div id="reelList" class="space-y-4 mt-3"></div>
+</section>
+
+<script>
+let chats=JSON.parse(localStorage.getItem('social_chats')||'[]');
+let posts=JSON.parse(localStorage.getItem('social_posts')||'[]');
+let statuses=JSON.parse(localStorage.getItem('social_status')||'[]');
+let currentChat=null, callInt=null, callSec=0;
+if(chats.length==0){
+chats=[
+{id:1,name:'Sofia AI',avatar:'https://i.pravatar.cc/100?img=47',online:'online',msgs:[{from:'other',text:'Hi! I am Sofia from SBS Ferozepur 💜'},{from:'other',text:'Send me anything, I will reply like a friend!'}]},
+{id:2,name:'Anmol - SBS Ferozepur',avatar:'https://i.pravatar.cc/100?img=12',online:'online',msgs:[{from:'other',text:'Bro, did you see new AI Studio? 🔥'}]},
+{id:3,name:'Gurpreet - Hostel',avatar:'https://i.pravatar.cc/100?img=33',online:'last seen today',msgs:[{from:'other',text:'Mess me aaj free fire khelenge?'}]},
+{id:4,name:'Simran - Class',avatar:'https://i.pravatar.cc/100?img=45',online:'online',msgs:[{from:'other',text:'Notes bhej de please 🙏'}]},
+{id:5,name:'SBS Ferozepur Group',avatar:'https://i.pravatar.cc/100?img=68',online:'12 members',msgs:[{from:'other',text:'Sir: Tomorrow lab at 10 AM'}]}
+];
+}
+if(posts.length==0){
+posts=[
+{id:1,user:'sofia.ai',avatar:'https://i.pravatar.cc/100?img=47',img:'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600',caption:'SBS Ferozepur AI Studio is LIVE! Build anything with Sofia 💜🔥',likes:124,comments:['Amazing!','Best app'],time:'2h'},
+{id:2,user:'anmol_sbs',avatar:'https://i.pravatar.cc/100?img=12',img:'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',caption:'Coding my own GTA Mini City with AI 🚗',likes:89,comments:['Bro OP!'],time:'5h'},
+{id:3,user:'punjab_vibes',avatar:'https://i.pravatar.cc/100?img=32',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600',caption:'Ferozepur vibes ❤️',likes:210,comments:['Beautiful!'],time:'1d'}
+];
+}
+function save(){localStorage.setItem('social_chats',JSON.stringify(chats)); localStorage.setItem('social_posts',JSON.stringify(posts)); localStorage.setItem('social_status',JSON.stringify(statuses))}
+function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active')}
+function shareApp(){let u=location.href; window.open('https://wa.me/?text='+encodeURIComponent('Check Social Mini - WhatsApp + Instagram in 1 App: '+u),'_blank')}
+
+// WHATSAPP
+function renderChats(){
+let q=(document.getElementById('searchChat').value||'').toLowerCase();
+let list=chats.filter(c=>c.name.toLowerCase().includes(q));
+document.getElementById('chatList').innerHTML=list.map(c=>`<div class="glass p-3 flex gap-3 items-center chatItem" onclick="openChat(${c.id})"><img src="${c.avatar}" class="w-12 h-12 rounded-full"><div class="flex-1"><b>${c.name}</b><div class="text-xs text-slate-400">${c.msgs[c.msgs.length-1]?.text||''}</div></div><span class="text-xs text-green-400">${c.online}</span></div>`).join('');
+}
+function openChat(id){
+currentChat=chats.find(c=>c.id==id);
+document.getElementById('chatWindow').classList.remove('hidden');
+document.getElementById('chatName').innerText=currentChat.name;
+document.getElementById('chatAvatar').src=currentChat.avatar;
+document.getElementById('chatOnline').innerText=currentChat.online;
+renderMsgs();
+}
+function closeChat(){document.getElementById('chatWindow').classList.add('hidden'); currentChat=null}
+function renderMsgs(){
+if(!currentChat) return;
+document.getElementById('chatMsgs').innerHTML=currentChat.msgs.map(m=>m.img?`<div class="msg ${m.from=='me'?'me':'other'}"><img src="${m.img}" class="w-40 rounded-lg"><div>${m.text||''}</div></div>`:`<div class="msg ${m.from=='me'?'me':'other'}">${m.text}</div>`).join('');
+let box=document.getElementById('chatMsgs'); box.scrollTop=box.scrollHeight;
+}
+function sendMsg(){
+let inp=document.getElementById('chatInput'); if(!inp.value||!currentChat) return;
+currentChat.msgs.push({from:'me',text:inp.value}); let txt=inp.value; inp.value=''; renderMsgs(); save();
+setTimeout(()=>{
+let replies=['Haha sahi aa 😂','Wow! Nice bro 🔥','SBS me kab aayega?','Maine bhi wahi socha tha','Bhej de photo','Okay done ✅','Sofia AI is best!','Kal milte hai hostel me'];
+let r=replies[Math.floor(Math.random()*replies.length)];
+if(currentChat.name.includes('Sofia')) r='I am Sofia AI! You said: "'+txt+'". I can help you build apps, games, notes. Ask me anything in Punjabi / Hindi / English 💜';
+currentChat.msgs.push({from:'other',text:r}); renderMsgs(); save();
+},800);
+}
+function sendVoice(){if(!currentChat) return alert('Open a chat first'); currentChat.msgs.push({from:'me',text:'🎤 Voice Note (0:12) ▶️'}); renderMsgs(); save()}
+function sendSticker(){if(!currentChat) return; currentChat.msgs.push({from:'me',text:'😍❤️🔥😂🥰'}); renderMsgs(); save()}
+function sendPhoto(e){let f=e.target.files[0]; if(!f||!currentChat) return; let url=URL.createObjectURL(f); currentChat.msgs.push({from:'me',text:'📷 Photo',img:url}); renderMsgs(); save()}
+function newChat(){let n=prompt('Enter name for new chat:'); if(!n) return; let id=Date.now(); chats.unshift({id:id,name:n,avatar:'https://i.pravatar.cc/100?img='+Math.floor(Math.random()*70),online:'online',msgs:[{from:'other',text:'Hi! New chat started 👋'}]}); save(); renderChats(); openChat(id)}
+
+// INSTAGRAM
+function renderStories(){
+let users=[['You','https://i.pravatar.cc/100?img=12'],['sofia.ai','https://i.pravatar.cc/100?img=47'],['anmol_sbs','https://i.pravatar.cc/100?img=12'],['gurpreet','https://i.pravatar.cc/100?img=33'],['simran','https://i.pravatar.cc/100?img=45'],['sbs','https://i.pravatar.cc/100?img=68']];
+document.getElementById('storyRow').innerHTML=users.map(u=>`<div class="text-center"><div class="story" onclick="alert('Story by ${u[0]}: SBS Life ❤️')"><img src="${u[1]}"></div><div class="text-[10px] mt-1">${u[0]}</div></div>`).join('');
+}
+function renderFeed(){
+document.getElementById('feed').innerHTML=posts.map(p=>`
+<div class="glass p-3">
+<div class="flex justify-between items-center"><div class="flex gap-2 items-center"><img src="${p.avatar}" class="w-10 h-10 rounded-full"><div><b>${p.user}</b><div class="text-xs text-slate-400">${p.time}</div></div></div><button class="btn2" onclick="followUser('${p.user}',this)">Follow</button></div>
+${p.img?`<img src="${p.img}" class="postImg mt-3">`:''}
+<div class="flex gap-3 mt-3 text-xl"><span class="cursor-pointer" onclick="likePost(${p.id},this)">❤️</span><span class="cursor-pointer" onclick="commentPost(${p.id})">💬</span><span class="cursor-pointer" onclick="shareApp()">↗️</span></div>
+<div class="text-sm mt-1"><b>${p.likes} likes</b> • <b>${p.user}</b> ${p.caption}</div>
+<div class="text-xs text-slate-400 mt-1">${p.comments.map(c=>'💬 '+c+'<br>').join('')}</div>
+</div>`).join('')||'No posts yet';
+}
+function likePost(id,el){let p=posts.find(x=>x.id==id); p.likes++; el.innerText='❤️'; save(); renderFeed()}
+function commentPost(id){let c=prompt('Write comment:'); if(!c) return; let p=posts.find(x=>x.id==id); p.comments.push(c); save(); renderFeed()}
+function followUser(name,el){el.innerText=el.innerText=='Follow'?'Following ✓':'Follow'; el.classList.toggle('!bg-green-600')}
+function addPost(e){let f=e.target.files[0]; if(!f) return; let url=URL.createObjectURL(f); let cap=document.getElementById('postCaption').value||'My new post from Social Mini ❤️'; posts.unshift({id:Date.now(),user:'you',avatar:'https://i.pravatar.cc/100?img=12',img:url,caption:cap,likes:0,comments:[],time:'Just now'}); save(); renderFeed(); alert('Posted!')}
+function addTextPost(){let cap=document.getElementById('postCaption').value; if(!cap) return alert('Write caption'); posts.unshift({id:Date.now(),user:'you',avatar:'https://i.pravatar.cc/100?img=12',img:'',caption:cap,likes:0,comments:[],time:'Just now'}); document.getElementById('postCaption').value=''; save(); renderFeed()}
+
+// STATUS / CALLS / REELS
+function addStatus(){let t=document.getElementById('statusText').value; if(!t) return alert('Write status'); statuses.unshift({text:t,time:new Date().toLocaleTimeString()}); document.getElementById('statusText').value=''; save(); renderStatus()}
+function renderStatus(){document.getElementById('statusList').innerHTML=statuses.map(s=>`<div class="glass p-3 flex gap-3"><img src="https://i.pravatar.cc/100?img=12" class="w-10 h-10 rounded-full"><div><b>You</b><div class="text-sm">${s.text}</div><div class="text-xs text-slate-400">${s.time} • 24h</div></div></div>`).join('')||'<div class="text-center text-slate-400">No status yet</div>'}
+function renderCalls(){let calls=[{n:'Sofia AI',t:'Today, 10:30 AM - Incoming - 2:15'},{n:'Gurpreet',t:'Yesterday - Outgoing - 5:40'},{n:'Simran',t:'Yesterday - Missed'}]; document.getElementById('callList').innerHTML=calls.map(c=>`<div class="flex justify-between bg-white/5 p-2 rounded-lg"><span>📞 ${c.n}<div class="text-xs text-slate-400">${c.t}</div></span><button class="btn2" onclick="fakeCall()">📞</button></div>`).join('')}
+function fakeCall(){document.getElementById('callScreen').classList.remove('hidden'); callSec=0; callInt=setInterval(()=>{callSec++; let m=String(Math.floor(callSec/60)).padStart(2,'0'), s=String(callSec%60).padStart(2,'0'); document.getElementById('callTimer').innerText=m+':'+s},1000)}
+function endCall(){clearInterval(callInt); document.getElementById('callScreen').classList.add('hidden')}
+function renderReels(){
+let reels=[{user:'sofia.ai',img:'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',cap:'Coding with AI 🔥',likes:1200},{user:'punjab_vibes',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600',cap:'Ferozepur ❤️',likes:3400},{user:'anmol_sbs',img:'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600',cap:'SBS Life',likes:890}];
+document.getElementById('reelList').innerHTML=reels.map(r=>`<div class="glass p-3"><img src="${r.img}" class="w-full h-[380px] object-cover rounded-xl"><div class="flex justify-between mt-2"><b>@${r.user}</b><span>❤️ ${r.likes}</span></div><p class="text-sm">${r.cap}</p><div class="flex gap-2 mt-2"><button class="btn2" onclick="alert('Liked!')">❤️ Like</button><button class="btn2" onclick="alert('Comment added!')">💬 Comment</button><button class="btn2" onclick="shareApp()">↗️ Share</button></div></div>`).join('');
+}
+renderChats(); renderStories(); renderFeed(); renderStatus(); renderCalls(); renderReels();
+</script>
+</body>
+</html>
