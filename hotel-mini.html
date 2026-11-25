@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel Mini - Travel Booking | SBS Ferozepur</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{background:#eff6ff;color:#111;font-family:Inter,system-ui}
+.glass{background:#fff;border:1px solid #bfdbfe;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.btn{background:linear-gradient(90deg,#2563eb,#06b6d4);color:#fff;padding:10px 16px;border-radius:999px;font-weight:800}
+.btn2{background:#eff6ff;padding:9px 13px;border-radius:999px;border:1px solid #bfdbfe}
+input,select{background:#fff;border:1px solid #bfdbfe;border-radius:10px;padding:10px;width:100%;color:#111}
+.tab{display:none}.tab.active{display:block}
+.hotelImg{width:100%;height:180px;object-fit:cover;border-radius:12px}
+</style>
+</head>
+<body>
+<header class="p-3 flex justify-between items-center sticky top-0 z-20 bg-white shadow">
+<div><h1 class="font-black text-lg">🏨 HOTEL <span class="text-blue-600">MINI</span></h1><p class="text-[11px] text-slate-500">SBS Ferozepur • Sofia AI • MakeMyTrip Style</p></div>
+<div class="flex gap-2"><button class="btn2" onclick="showTab('hotels')">🏨 Hotels</button><button class="btn2" onclick="showTab('tours')">✈️ Tours</button><button class="btn2" onclick="showTab('bookings')">🎫 My Bookings</button><button class="btn2" onclick="showTab('admin')">🏠 Host Admin</button><button class="btn2" onclick="window.location.href='index.html'">🏠 Studio</button></div>
+</header>
+
+<!-- HOTELS -->
+<section id="hotels" class="tab active px-3 pb-4">
+<div class="bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-4 rounded-2xl mt-2 flex justify-between"><div><h2 class="font-black text-xl">Flat ₹500 OFF!</h2><p class="text-sm">Coupon: <b class="bg-white text-black px-2 py-0.5 rounded">STAY500</b> • Free Cancellation</p></div><div class="text-5xl">✈️</div></div>
+<div class="flex gap-2 mt-3 flex-wrap"><select id="cityFilter" onchange="renderHotels()" class="!w-[180px]"><option value="all">All Cities</option><option>Amritsar</option><option>Manali</option><option>Goa</option><option>Delhi</option><option>Ferozepur</option><option>Jaipur</option></select><input type="date" id="checkin" class="!w-[160px]" value="2026-12-01"><input type="date" id="checkout" class="!w-[160px]" value="2026-12-03"><select id="guests" class="!w-[120px]"><option>2 Guests</option><option>1 Guest</option><option>4 Guests</option><option>Family</option></select><input id="search" placeholder="Search hotel..." class="!w-[200px]" oninput="renderHotels()"></div>
+<div id="hotelGrid" class="grid md:grid-cols-3 gap-3 mt-3"></div>
+</section>
+
+<!-- HOTEL DETAIL / BOOK -->
+<section id="detail" class="tab px-3 pb-4">
+<button class="btn2 mt-2" onclick="showTab('hotels')">⬅️ Back to Hotels</button>
+<div id="detailBox" class="mt-2"></div>
+<div class="glass p-4 mt-3 max-w-xl mx-auto"><h3 class="font-bold">📝 Book This Hotel</h3><input id="guestName" placeholder="Guest Name" class="mt-2"><input id="guestPhone" placeholder="Phone" class="mt-2"><input id="coupon" placeholder="Coupon: STAY500" class="mt-2"><button class="btn2 w-full mt-2" onclick="applyCoupon()">Apply Coupon</button><select id="payMethod" class="mt-2"><option>UPI</option><option>Card</option><option>Pay at Hotel</option></select><button class="btn w-full mt-3" onclick="confirmBooking()">✅ Confirm Booking - <span id="bookTotal">₹0</span></button></div>
+</section>
+
+<!-- TOURS -->
+<section id="tours" class="tab px-3 pb-4">
+<div class="grid md:grid-cols-3 gap-3 mt-2" id="tourGrid"></div>
+</section>
+
+<!-- BOOKINGS -->
+<section id="bookings" class="tab px-3 pb-4">
+<div class="glass p-4 mt-2"><h3 class="font-bold text-lg">🎫 My Bookings</h3><div id="bookingList" class="mt-3 space-y-3"></div></div>
+</section>
+
+<!-- ADMIN -->
+<section id="admin" class="tab px-3 pb-4">
+<div class="grid md:grid-cols-2 gap-3 mt-2">
+<div class="glass p-4"><h3 class="font-bold">🏠 Host - Add Hotel</h3><input id="adminName" placeholder="Hotel Name" class="mt-2"><input id="adminCity" placeholder="City e.g. Manali" class="mt-2"><input id="adminPrice" type="number" placeholder="Price per night e.g. 2499" class="mt-2"><button class="btn w-full mt-3" onclick="addHotel()">+ Add Hotel</button></div>
+<div class="glass p-4"><h3 class="font-bold">📊 Host Dashboard</h3><div class="grid grid-cols-3 gap-2 text-center text-sm mt-2"><div class="bg-blue-50 p-2 rounded-lg">Hotels<br><b id="hotelCount">0</b></div><div class="bg-green-50 p-2 rounded-lg">Bookings<br><b id="bookingCount">0</b></div><div class="bg-purple-50 p-2 rounded-lg">Earnings<br><b id="earnings">₹0</b></div></div><div id="adminList" class="mt-3 space-y-2"></div></div>
+</div>
+</section>
+
+<script>
+let hotels=JSON.parse(localStorage.getItem('hotel_list')||'[]');
+let bookings=JSON.parse(localStorage.getItem('hotel_bookings')||'[]');
+let selectedHotel=null, couponApplied=false;
+let defaultHotels=[
+{id:1,name:'Hotel Golden Temple View',city:'Amritsar',price:2499,old:4999,rating:4.8,img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600',amen:['Free WiFi','Breakfast','Near Golden Temple']},
+{id:2,name:'Mountain Resort - Manali',city:'Manali',price:3499,old:6999,rating:4.9,img:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600',amen:['Snow View','Heater','Bonfire']},
+{id:3,name:'Beach Resort - Goa',city:'Goa',price:4999,old:9999,rating:4.7,img:'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600',amen:['Beach','Pool','Bar']},
+{id:4,name:'SBS Guest House',city:'Ferozepur',price:999,old:1999,rating:4.5,img:'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600',amen:['WiFi','Near SBS','Parking']},
+{id:5,name:'Delhi Grand Hotel',city:'Delhi',price:2999,old:5999,rating:4.6,img:'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=600',amen:['Metro Near','Breakfast','Gym']},
+{id:6,name:'Royal Palace - Jaipur',city:'Jaipur',price:3999,old:7999,rating:4.8,img:'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=600',amen:['Palace View','Pool','Heritage']},
+{id:7,name:'Snow View Cottage',city:'Manali',price:1999,old:3999,rating:4.7,img:'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=600',amen:['Cottage','Bonfire','Mountain']},
+{id:8,name:'Goa Party Hostel',city:'Goa',price:899,old:1799,rating:4.4,img:'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600',amen:['Hostel','Party','Beach 5 min']}
+];
+let tours=[
+{name:'Manali Tour - 4 Days',price:9999,old:19999,img:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600',desc:'Delhi → Manali → Solang Valley → Rohtang → Return. Hotel + Bus + Breakfast included.',days:'4 Days / 3 Nights'},
+{name:'Goa Tour - 5 Days',price:14999,old:29999,img:'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=600',desc:'Beach Party, Water Sports, North Goa + South Goa. Flight + Hotel included.',days:'5 Days / 4 Nights'},
+{name:'Amritsar Darshan - 2 Days',price:3999,old:7999,img:'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=600',desc:'Golden Temple, Jallianwala Bagh, Wagah Border, Langar. From Ferozepur.',days:'2 Days / 1 Night'},
+{name:'Kashmir Tour - 6 Days',price:19999,old:39999,img:'https://images.unsplash.com/photo-1566837945700-30057527ade0?w=600',desc:'Srinagar, Gulmarg, Pahalgam, Dal Lake Shikara. Heaven on Earth!',days:'6 Days / 5 Nights'}
+];
+if(hotels.length==0) hotels=[...defaultHotels];
+function save(){localStorage.setItem('hotel_list',JSON.stringify(hotels)); localStorage.setItem('hotel_bookings',JSON.stringify(bookings))}
+function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active')}
+function renderHotels(){
+let city=document.getElementById('cityFilter').value, q=(document.getElementById('search').value||'').toLowerCase();
+let list=hotels.filter(h=>(city=='all'||h.city==city) && h.name.toLowerCase().includes(q));
+document.getElementById('hotelGrid').innerHTML=list.map(h=>`<div class="glass p-3"><img src="${h.img}" class="hotelImg"><div class="flex justify-between mt-2"><b class="text-lg">${h.name}</b><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs">⭐ ${h.rating}</span></div><div class="text-sm text-slate-500">📍 ${h.city} • ${h.amen.join(' • ')}</div><div class="flex gap-2 items-center mt-1"><b class="text-xl">₹${h.price}</b><span class="line-through text-slate-400">₹${h.old}</span><span class="text-green-600 text-xs">${Math.round((1-h.price/h.old)*100)}% OFF / night</span></div><button class="btn w-full mt-2" onclick="openHotel(${h.id})">View & Book →</button></div>`).join('')||'No hotels found';
+}
+function openHotel(id){
+selectedHotel=hotels.find(h=>h.id==id); showTab('detail');
+document.getElementById('detailBox').innerHTML=`<div class="glass p-4"><img src="${selectedHotel.img}" class="w-full h-[220px] object-cover rounded-xl"><h2 class="font-black text-2xl mt-2">${selectedHotel.name}</h2><p class="text-sm">📍 ${selectedHotel.city} • ⭐ ${selectedHotel.rating} • Free Cancellation • Free WiFi</p><div class="flex gap-2 mt-2 flex-wrap">${selectedHotel.amen.map(a=>`<span class="bg-blue-50 px-2 py-1 rounded-full text-xs">${a}</span>`).join('')}</div><div class="mt-2"><b>₹${selectedHotel.price}</b> / night • Check-in: ${document.getElementById('checkin').value} • Check-out: ${document.getElementById('checkout').value} • ${document.getElementById('guests').value}</div></div>`;
+updateBookTotal();
+}
+function applyCoupon(){let v=document.getElementById('coupon').value.trim().toUpperCase(); if(v=='STAY500'){couponApplied=true; alert('₹500 OFF Applied!')} else {couponApplied=false; alert('Wrong Coupon. Try STAY500')} updateBookTotal()}
+function updateBookTotal(){if(!selectedHotel) return; let nights=2; let total=selectedHotel.price*nights - (couponApplied?500:0); document.getElementById('bookTotal').innerText='₹'+total.toLocaleString('en-IN')}
+function confirmBooking(){
+let name=document.getElementById('guestName').value, phone=document.getElementById('guestPhone').value;
+if(!name||!phone) return alert('Guest Name + Phone required');
+let nights=2, total=selectedHotel.price*nights - (couponApplied?500:0);
+let b={id:'HTL'+Date.now(),hotel:selectedHotel.name,city:selectedHotel.city,total:total,name:name,phone:phone,checkin:document.getElementById('checkin').value,checkout:document.getElementById('checkout').value,pay:document.getElementById('payMethod').value,status:'Confirmed'};
+bookings.unshift(b); couponApplied=false; save(); renderAll(); showTab('bookings'); alert('Booking Confirmed! ID: '+b.id+' • '+b.hotel+' • Total ₹'+total);
+}
+function renderTours(){document.getElementById('tourGrid').innerHTML=tours.map(t=>`<div class="glass p-3"><img src="${t.img}" class="hotelImg"><b class="text-lg block mt-2">${t.name}</b><div class="text-xs text-slate-500">${t.days}</div><p class="text-sm mt-1">${t.desc}</p><div class="flex gap-2 mt-2"><b class="text-xl">₹${t.price.toLocaleString('en-IN')}</b><span class="line-through">₹${t.old.toLocaleString('en-IN')}</span></div><button class="btn w-full mt-2" onclick="bookTour('${t.name}',${t.price})">Book Tour →</button></div>`).join('')}
+function bookTour(name,price){let n=prompt('Your Name for Tour Booking:'); if(!n) return; bookings.unshift({id:'TOUR'+Date.now(),hotel:name,city:'Tour Package',total:price,name:n,phone:'',checkin:'2026-12-20',checkout:'2026-12-24',pay:'UPI',status:'Confirmed'}); save(); renderAll(); showTab('bookings'); alert('Tour Booked! '+name+' • ₹'+price)}
+function renderBookings(){
+document.getElementById('bookingList').innerHTML=bookings.map(b=>`<div class="border p-3 rounded-xl"><div class="flex justify-between"><b>${b.id}</b><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs">${b.status}</span></div><div class="text-sm mt-1">🏨 ${b.hotel} • 📍 ${b.city}</div><div class="text-sm">Guest: ${b.name} • Check-in: ${b.checkin} → Check-out: ${b.checkout}</div><div class="text-sm">Total: <b>₹${b.total}</b> • ${b.pay}</div><div class="bg-slate-100 p-2 rounded-lg mt-2 text-center text-xs">QR Ticket: <b>📱 ${b.id} - Show at Hotel Reception</b></div><div class="flex gap-2 mt-2"><button class="btn2 text-xs" onclick="cancelBooking('${b.id}')">❌ Cancel (Free)</button><button class="btn2 text-xs" onclick="alert('Booking Details Sent on WhatsApp!')">📲 Send on WhatsApp</button></div></div>`).join('')||'No bookings yet. Book your dream trip!';
+}
+function cancelBooking(id){bookings=bookings.filter(b=>b.id!=id); save(); renderAll(); alert('Booking Cancelled. Full Refund in 3-5 days (Demo).')}
+function addHotel(){let n=document.getElementById('adminName').value, c=document.getElementById('adminCity').value, p=parseInt(document.getElementById('adminPrice').value); if(!n||!c||!p) return alert('Name + City + Price required'); hotels.unshift({id:Date.now(),name:n,city:c,price:p,old:p*2,rating:4.5,img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600',amen:['Free WiFi','Breakfast']}); save(); renderAll(); alert('Hotel Added!')}
+function renderAdmin(){document.getElementById('hotelCount').innerText=hotels.length; document.getElementById('bookingCount').innerText=bookings.length; document.getElementById('earnings').innerText='₹'+bookings.reduce((s,b)=>s+b.total,0).toLocaleString('en-IN'); document.getElementById('adminList').innerHTML=hotels.map(h=>`<div class="flex justify-between bg-slate-50 p-2 rounded-lg"><span>${h.name} - ${h.city} - ₹${h.price}</span><button class="btn2 text-xs" onclick="delHotel(${h.id})">🗑️</button></div>`).join('')}
+function delHotel(id){hotels=hotels.filter(h=>h.id!=id); save(); renderAll()}
+function renderAll(){renderHotels(); renderTours(); renderBookings(); renderAdmin()}
+renderAll();
+</script>
+</body>
+</html>
