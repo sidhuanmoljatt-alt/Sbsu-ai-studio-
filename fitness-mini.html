@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitness Mini - Gym + Diet + Yoga | SBS Ferozepur</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{background:#0f172a;color:#fff;font-family:Inter,system-ui}
+.glass{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:16px}
+.btn{background:linear-gradient(90deg,#f97316,#22c55e);color:#000;padding:10px 16px;border-radius:999px;font-weight:800}
+.btn2{background:#1e293b;padding:9px 13px;border-radius:999px}
+input,select{background:#111827;border:1px solid #374151;border-radius:10px;padding:10px;width:100%;color:#fff}
+.tab{display:none}.tab.active{display:block}
+.workCard{cursor:pointer}
+.workCard.active{border:2px solid #22c55e}
+</style>
+</head>
+<body>
+<header class="p-3 flex justify-between items-center sticky top-0 z-20 bg-[#0f172a]/95">
+<div><h1 class="font-black text-lg">💪 FITNESS <span class="text-green-400">MINI</span></h1><p class="text-[11px] text-slate-400">SBS Ferozepur • Sofia AI • Gym + Diet + Yoga</p></div>
+<div class="flex gap-2"><button class="btn2" onclick="window.location.href='index.html'">🏠 Studio</button><button class="btn2" onclick="shareApp()">🔗 Share</button></div>
+</header>
+
+<nav class="flex gap-2 px-3 overflow-x-auto pb-2">
+<button class="btn2" onclick="showTab('home')">🏠 Home</button><button class="btn2" onclick="showTab('workout')">🏋️ Workout</button><button class="btn2" onclick="showTab('diet')">🥗 Diet</button><button class="btn2" onclick="showTab('steps')">👟 Steps</button><button class="btn2" onclick="showTab('bmi')">📊 BMI</button>
+</nav>
+
+<!-- HOME -->
+<section id="home" class="tab active px-3 pb-4">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+<div class="glass p-3"><div class="text-2xl">👟</div><div class="text-xs">Steps Today</div><b class="text-xl" id="stepsToday">0</b><div class="text-xs">Goal: 10,000</div><div class="bg-white/10 h-2 rounded-full mt-1"><div id="stepsBar" class="bg-green-500 h-2 rounded-full" style="width:0%"></div></div></div>
+<div class="glass p-3"><div class="text-2xl">💧</div><div class="text-xs">Water</div><b class="text-xl" id="waterCount">0 / 8</b><div class="text-xs">Glasses</div><button class="btn2 mt-1 text-xs" onclick="addWater()">+ 1 Glass</button></div>
+<div class="glass p-3"><div class="text-2xl">🔥</div><div class="text-xs">Calories Burned</div><b class="text-xl" id="calBurned">0</b><div class="text-xs">kcal</div></div>
+<div class="glass p-3"><div class="text-2xl">🔥</div><div class="text-xs">Streak</div><b class="text-xl" id="streak">1 Day</b><div class="text-xs">Keep going!</div></div>
+</div>
+<div class="glass p-4 mt-3"><h3 class="font-bold">🎯 Today's Plan - Sofia AI</h3><div class="text-sm mt-2 space-y-1"><p>🌅 Morning: 10 min Yoga + 1 Glass Water</p><p>🏋️ Afternoon: 20 min Workout (Pushups + Squats)</p><p>🥗 Lunch: Dal + Roti + Salad (No Junk)</p><p>👟 Evening: 5,000 Steps Walk</p><p>😴 Night: Sleep before 11 PM, No Phone</p></div><button class="btn w-full mt-3" onclick="showTab('workout')">▶️ Start Workout Now</button></div>
+<div class="glass p-4 mt-3"><h3 class="font-bold">🏆 SBS Fitness Leaderboard</h3><div id="leaderList" class="text-sm mt-2"></div></div>
+</section>
+
+<!-- WORKOUT -->
+<section id="workout" class="tab px-3 pb-4">
+<div class="glass p-4"><h3 class="font-bold">🏋️ Choose Workout</h3><div class="grid grid-cols-3 gap-2 mt-2">
+<div class="glass p-3 text-center workCard" onclick="selectWorkout('Gym',this)"><div class="text-3xl">🏋️</div><b>Gym</b><div class="text-xs">Pushups, Squats</div></div>
+<div class="glass p-3 text-center workCard" onclick="selectWorkout('Yoga',this)"><div class="text-3xl">🧘</div><b>Yoga</b><div class="text-xs">Stretch, Breathe</div></div>
+<div class="glass p-3 text-center workCard" onclick="selectWorkout('Running',this)"><div class="text-3xl">🏃</div><b>Running</b><div class="text-xs">Cardio, Walk</div></div>
+</div>
+<div class="text-center mt-4"><div class="text-5xl font-black" id="workTimer">00:00</div><div class="text-sm" id="workExercise">Select workout to start</div><div class="flex gap-2 justify-center mt-3"><button class="btn" onclick="startWorkout()">▶️ Start</button><button class="btn2" onclick="pauseWorkout()">⏸️ Pause</button><button class="btn2" onclick="finishWorkout()">✅ Finish</button></div></div>
+<div id="workoutList" class="mt-4 space-y-2 text-sm"></div>
+</div>
+</section>
+
+<!-- DIET -->
+<section id="diet" class="tab px-3 pb-4">
+<div class="grid md:grid-cols-2 gap-3">
+<div class="glass p-4"><h3 class="font-bold">🥗 Today's Diet Plan - Punjabi Style</h3><div class="text-sm mt-2 space-y-2"><div class="bg-white/5 p-2 rounded-lg">🌅 <b>Breakfast:</b> 2 Eggs / Poha + Milk - 350 kcal</div><div class="bg-white/5 p-2 rounded-lg">☀️ <b>Lunch:</b> Dal + 2 Roti + Salad + Curd - 550 kcal</div><div class="bg-white/5 p-2 rounded-lg">🍎 <b>Snack:</b> Fruit + Nuts - 200 kcal</div><div class="bg-white/5 p-2 rounded-lg">🌙 <b>Dinner:</b> Paneer + Roti + Salad - 500 kcal</div><div class="bg-green-500/10 p-2 rounded-lg">Total: <b>1600 kcal</b> • Protein: 70g • Water: 8 Glasses</div></div><div class="flex gap-2 mt-2"><button class="btn2 flex-1" onclick="dietPlan('veg')">🥦 Veg Plan</button><button class="btn2 flex-1" onclick="dietPlan('nonveg')">🍗 Non-Veg Plan</button><button class="btn2 flex-1" onclick="dietPlan('muscle')">💪 Muscle Gain</button></div><p id="dietPlanBox" class="text-sm mt-2"></p></div>
+<div class="glass p-4"><h3 class="font-bold">🍔 Calorie Counter</h3><input id="foodName" placeholder="Food e.g. Pizza, Samosa, Roti"><input id="foodCal" type="number" placeholder="Calories e.g. 300" class="mt-2"><button class="btn w-full mt-2" onclick="addFood()">+ Add Food</button><div id="foodList" class="mt-2 space-y-1 text-sm"></div><div class="text-sm mt-2">Total Eaten: <b id="totalCal">0</b> kcal / Goal: 2000 kcal</div></div>
+</div>
+</section>
+
+<!-- STEPS -->
+<section id="steps" class="tab px-3 pb-4">
+<div class="glass p-6 text-center max-w-md mx-auto"><div class="text-6xl">👟</div><div class="text-5xl font-black mt-2" id="stepsBig">0</div><p class="text-sm text-slate-400">Steps Today • Goal 10,000</p><div class="bg-white/10 h-3 rounded-full mt-3"><div id="stepsBar2" class="bg-green-500 h-3 rounded-full" style="width:0%"></div></div><div class="flex gap-2 justify-center mt-4"><button class="btn" onclick="addSteps(500)">+500 Steps</button><button class="btn2" onclick="addSteps(1000)">+1000</button><button class="btn2" onclick="addSteps(2000)">+2000</button></div><p class="text-xs mt-3">Walk 30 min = ~3000 steps. Take stairs, not lift!</p><button class="btn2 w-full mt-2" onclick="resetSteps()">🔄 Reset Today</button></div>
+</section>
+
+<!-- BMI -->
+<section id="bmi" class="tab px-3 pb-4">
+<div class="glass p-4 max-w-md mx-auto"><h3 class="font-bold text-lg">📊 BMI Calculator</h3><label class="text-xs">Weight (kg)</label><input id="bmiWeight" type="number" value="65" class="mt-1"><label class="text-xs mt-2 block">Height (cm)</label><input id="bmiHeight" type="number" value="170" class="mt-1"><button class="btn w-full mt-3" onclick="calcBMI()">Calculate BMI</button><div id="bmiResult" class="text-center mt-3"></div></div>
+</section>
+
+<script>
+let steps=parseInt(localStorage.getItem('fit_steps')||'0');
+let water=parseInt(localStorage.getItem('fit_water')||'0');
+let calories=parseInt(localStorage.getItem('fit_cal')||'0');
+let foods=JSON.parse(localStorage.getItem('fit_foods')||'[]');
+let workoutType='Gym', workoutTimer=null, workoutSec=0, workoutRunning=false;
+let workouts={
+Gym:['Pushups - 10 reps','Squats - 15 reps','Plank - 30 sec','Lunges - 10 reps','Jumping Jacks - 20 reps'],
+Yoga:['Surya Namaskar - 5 times','Tree Pose - 30 sec','Cobra Pose - 30 sec','Deep Breathing - 2 min','Meditation - 2 min'],
+Running:['Warmup Walk - 5 min','Slow Run - 10 min','Fast Walk - 5 min','Cool Down - 5 min']
+};
+function save(){localStorage.setItem('fit_steps',steps); localStorage.setItem('fit_water',water); localStorage.setItem('fit_cal',calories); localStorage.setItem('fit_foods',JSON.stringify(foods))}
+function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active')}
+function shareApp(){window.open('https://wa.me/?text='+encodeURIComponent('Fitness Mini - Gym + Diet: '+location.href),'_blank')}
+function addWater(){water=Math.min(12,water+1); save(); renderAll(); if(water==8) alert('🎉 8 Glasses Done! You are hydrated!')}
+function addSteps(n){steps+=n; calories+=Math.round(n*0.04); save(); renderAll(); if(steps>=10000) alert('🎉 10,000 Steps Done! You are SBS Fitness Star!')}
+function resetSteps(){steps=0; water=0; save(); renderAll()}
+function selectWorkout(t,el){workoutType=t; document.querySelectorAll('.workCard').forEach(c=>c.classList.remove('active')); el.classList.add('active'); document.getElementById('workoutList').innerHTML=workouts[t].map((w,i)=>`<div class="bg-white/5 p-2 rounded-lg">${i+1}. ${w}</div>`).join(''); document.getElementById('workExercise').innerText=t+' Workout - '+workouts[t][0]}
+function startWorkout(){if(workoutRunning) return; workoutRunning=true; workoutTimer=setInterval(()=>{workoutSec++; let m=String(Math.floor(workoutSec/60)).padStart(2,'0'), s=String(workoutSec%60).padStart(2,'0'); document.getElementById('workTimer').innerText=m+':'+s},1000); document.getElementById('workExercise').innerText=workoutType+' Workout - In Progress! Keep going!'}
+function pauseWorkout(){clearInterval(workoutTimer); workoutRunning=false}
+function finishWorkout(){pauseWorkout(); let cal=Math.round(workoutSec/60*8); calories+=cal; save(); renderAll(); alert('🎉 Workout Done! Time: '+document.getElementById('workTimer').innerText+' • Calories Burned: '+cal); workoutSec=0; document.getElementById('workTimer').innerText='00:00'}
+function addFood(){let n=document.getElementById('foodName').value, c=parseInt(document.getElementById('foodCal').value); if(!n||!c) return alert('Food + Calories required'); foods.unshift({name:n,cal:c}); save(); renderAll(); document.getElementById('foodName').value=''; document.getElementById('foodCal').value=''}
+function dietPlan(t){let box=document.getElementById('dietPlanBox'); if(t=='veg') box.innerText='Veg Plan: Breakfast - Poha + Milk, Lunch - Dal + Roti + Salad, Dinner - Paneer + Roti. Protein from Dal, Paneer, Milk.'; if(t=='nonveg') box.innerText='Non-Veg Plan: Breakfast - 2 Eggs + Toast, Lunch - Chicken + Roti, Dinner - Fish + Salad. Extra Protein = Faster Muscle.'; if(t=='muscle') box.innerText='Muscle Gain: Eat 4 times a day. Add 1 extra Roti + 1 Egg + Milk daily. Workout 30 min. Sleep 8 hours. No Junk Food!'}
+function calcBMI(){let w=parseFloat(document.getElementById('bmiWeight').value), h=parseFloat(document.getElementById('bmiHeight').value)/100; let bmi=w/(h*h); let status=bmi<18.5?'Underweight - Eat More Protein':bmi<25?'Healthy - Perfect! Keep it up':bmi<30?'Overweight - Walk + Diet': 'Obese - Start Workout Daily'; document.getElementById('bmiResult').innerHTML=`<div class="text-4xl font-black">${bmi.toFixed(1)}</div><div>${status}</div><div class="text-xs text-slate-400 mt-1">Healthy BMI: 18.5 - 24.9</div>`}
+function renderAll(){
+document.getElementById('stepsToday').innerText=steps.toLocaleString(); document.getElementById('stepsBig').innerText=steps.toLocaleString();
+document.getElementById('stepsBar').style.width=Math.min(100,steps/100)+'%'; document.getElementById('stepsBar2').style.width=Math.min(100,steps/100)+'%';
+document.getElementById('waterCount').innerText=water+' / 8'; document.getElementById('calBurned').innerText=calories;
+document.getElementById('streak').innerText=steps>0?'2 Days':'1 Day';
+document.getElementById('foodList').innerHTML=foods.map(f=>`<div class="flex justify-between bg-white/5 p-2 rounded-lg"><span>${f.name}</span><b>${f.cal} kcal</b></div>`).join('')||'No food added yet.';
+document.getElementById('totalCal').innerText=foods.reduce((s,f)=>s+f.cal,0);
+document.getElementById('leaderList').innerHTML=[{n:'You',s:steps},{n:'Anmol',s:12500},{n:'Gurpreet',s:9800},{n:'Simran',s:8700}].sort((a,b)=>b.s-a.s).map((l,i)=>`<div class="flex justify-between py-1"><span>${i+1}. ${l.n}</span><b>${l.s.toLocaleString()} steps</b></div>`).join('');
+}
+selectWorkout('Gym',document.querySelector('.workCard')); renderAll();
+</script>
+</body>
+</html>
