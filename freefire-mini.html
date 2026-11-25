@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Free Fire Mini - Battle Royale | SBS Ferozepur</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{margin:0;background:#0b1026;color:#fff;font-family:Inter,system-ui;overflow:hidden}
+.glass{background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);border-radius:12px}
+#gameCanvas{width:100%;height:100vh;display:block;background:#2d6a2e}
+.joyBtn{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:24px;user-select:none}
+.fireBtn{width:88px;height:88px;border-radius:50%;background:rgba(255,0,0,.7);border:3px solid #fff;font-size:30px;display:flex;align-items:center;justify-content:center}
+.bar{height:12px;border-radius:999px;background:#333;overflow:hidden}
+.barFill{height:100%;transition:width .2s}
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+
+<!-- TOP HUD -->
+<div class="fixed top-0 left-0 right-0 p-2 flex justify-between items-start z-20 pointer-events-none">
+<div class="glass p-2 pointer-events-auto">
+<h1 class="font-black text-sm">🔥 FREE FIRE MINI</h1>
+<p class="text-[10px] text-slate-300">SBS Ferozepur • Sofia AI</p>
+<div class="text-xs mt-1">Alive: <b id="alive">20</b> • Kills: <b id="kills">0</b> • Zone in: <b id="zoneTimer">30</b>s</div>
+</div>
+<div class="glass p-2 text-center pointer-events-auto">
+<div class="text-[10px]">HEALTH</div><div class="bar w-32"><div id="hpBar" class="barFill bg-green-500" style="width:100%"></div></div>
+<div class="text-[10px] mt-1">SHIELD</div><div class="bar w-32"><div id="shieldBar" class="barFill bg-blue-500" style="width:0%"></div></div>
+<div class="text-xs mt-1">Ammo: <b id="ammo">30</b> • 🪙 <b id="coins">0</b></div>
+</div>
+<div class="glass p-2 text-right pointer-events-auto">
+<button class="bg-orange-500 px-3 py-1 rounded-full text-xs font-bold" onclick="window.location.href='index.html'">🏠 Studio</button>
+<div id="killFeed" class="text-[10px] text-left mt-1 max-w-[150px]"></div>
+</div>
+</div>
+
+<!-- MINIMAP -->
+<div class="fixed top-[110px] right-2 z-20"><canvas id="miniMap" width="100" height="100" class="rounded-lg border-2 border-white/50 bg-green-900"></canvas><div class="text-[10px] text-center bg-black/60 rounded mt-1">MINI MAP</div></div>
+
+<!-- CONTROLS -->
+<div class="fixed bottom-0 left-0 right-0 p-3 flex justify-between items-end z-20">
+<div class="flex gap-2">
+<div class="joyBtn" ontouchstart="keys.left=true" ontouchend="keys.left=false" onmousedown="keys.left=true" onmouseup="keys.left=false">⬅️</div>
+<div class="joyBtn" ontouchstart="keys.right=true" ontouchend="keys.right=false" onmousedown="keys.right=true" onmouseup="keys.right=false">➡️</div>
+</div>
+<div class="flex gap-2 items-end">
+<button class="bg-green-600 px-3 py-2 rounded-full text-xs font-bold" onclick="useMedkit()">💊 Medkit (<span id="medkit">2</span>)</button>
+<button class="bg-blue-600 px-3 py-2 rounded-full text-xs font-bold" onclick="reload()">🔄 Reload</button>
+</div>
+<div class="flex gap-2">
+<div class="joyBtn" ontouchstart="keys.up=true" ontouchend="keys.up=false" onmousedown="keys.up=true" onmouseup="keys.up=false">⬆️</div>
+<div class="joyBtn" ontouchstart="keys.down=true" ontouchend="keys.down=false" onmousedown="keys.down=true" onmouseup="keys.down=false">⬇️</div>
+<div class="fireBtn" ontouchstart="shoot()" onmousedown="shoot()">🔥</div>
+</div>
+</div>
+<div class="fixed bottom-[110px] left-1/2 -translate-x-1/2 z-10 text-[11px] bg-black/60 px-3 py-1 rounded-full">PC: WASD Move • Mouse Aim • Click / Space Shoot • R Reload</div>
+
+<!-- START -->
+<div id="startBox" class="fixed inset-0 z-30 flex items-center justify-center bg-black/80 p-4">
+<div class="glass p-6 max-w-md w-full text-center">
+<h2 class="text-3xl font-black">🔥 FREE FIRE MINI</h2>
+<p class="text-sm text-slate-300 mt-2">20 Players Drop. 1 Winner. Zone Shrinks. Survive & Get <b>BOOYAH!</b></p>
+<div class="grid grid-cols-2 gap-2 mt-4 text-left text-sm">
+<div class="bg-white/10 p-2 rounded-lg">🎯 <b>Kill:</b> +100 Score</div>
+<div class="bg-white/10 p-2 rounded-lg">🪙 <b>Loot:</b> Coins + Medkit</div>
+<div class="bg-white/10 p-2 rounded-lg">🟢 <b>Zone:</b> Stay Inside</div>
+<div class="bg-white/10 p-2 rounded-lg">🏆 <b>Win:</b> BOOYAH!</div>
+</div>
+<input id="playerName" placeholder="Enter Your Name e.g. Anmol" class="mt-4 !bg-white/10 p-3 rounded-xl w-full text-white">
+<button class="w-full mt-3 py-3 rounded-full font-black text-lg bg-gradient-to-r from-orange-500 to-red-600" onclick="startGame()">▶️ DROP NOW - BOOYAH!</button>
+</div>
+</div>
+
+<!-- WIN / LOSE -->
+<div id="endBox" class="fixed inset-0 z-30 hidden items-center justify-center bg-black/85 p-4">
+<div class="glass p-6 max-w-md w-full text-center">
+<h2 id="endTitle" class="text-4xl font-black text-yellow-400">BOOYAH!</h2>
+<p id="endText" class="mt-2"></p>
+<button class="w-full mt-4 py-3 rounded-full font-black bg-gradient-to-r from-green-500 to-blue-600" onclick="location.reload()">🔁 PLAY AGAIN</button>
+<button class="w-full mt-2 py-2 rounded-full bg-white/10" onclick="window.location.href='index.html'">🏠 Back to Studio</button>
+</div>
+</div>
+
+<script>
+let canvas=document.getElementById('gameCanvas'), ctx=canvas.getContext('2d');
+let mini=document.getElementById('miniMap'), mctx=mini.getContext('2d');
+let player, enemies=[], bullets=[], enemyBullets=[], loots=[], trees=[], rocks=[];
+let keys={up:false,down:false,left:false,right:false}, mouse={x:0,y:0}, running=false;
+let kills=0, coins=0, zone={x:1000,y:1000,r:900}, zoneTimer=30, medkits=2, shield=0, hp=100, ammo=30;
+let playerName='Player', cam={x:0,y:0};
+
+canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+document.addEventListener('keydown',e=>{
+if(e.key=='w'||e.key=='W'||e.key=='ArrowUp')keys.up=true;
+if(e.key=='s'||e.key=='S'||e.key=='ArrowDown')keys.down=true;
+if(e.key=='a'||e.key=='A'||e.key=='ArrowLeft')keys.left=true;
+if(e.key=='d'||e.key=='D'||e.key=='ArrowRight')keys.right=true;
+if(e.key==' ')shoot();
+if(e.key=='r'||e.key=='R')reload();
+});
+document.addEventListener('keyup',e=>{
+if(e.key=='w'||e.key=='W'||e.key=='ArrowUp')keys.up=false;
+if(e.key=='s'||e.key=='S'||e.key=='ArrowDown')keys.down=false;
+if(e.key=='a'||e.key=='A'||e.key=='ArrowLeft')keys.left=false;
+if(e.key=='d'||e.key=='D'||e.key=='ArrowRight')keys.right=false;
+});
+canvas.addEventListener('mousemove',e=>{mouse.x=e.clientX; mouse.y=e.clientY});
+canvas.addEventListener('mousedown',()=>shoot());
+
+function startGame(){
+playerName=document.getElementById('playerName').value||'Anmol';
+document.getElementById('startBox').style.display='none';
+running=true;
+// World 2000x2000
+player={x:1000,y:1000,hp:100,angle:0,speed:4};
+for(let i=0;i<80;i++) trees.push({x:Math.random()*2000,y:Math.random()*2000});
+for(let i=0;i<40;i++) rocks.push({x:Math.random()*2000,y:Math.random()*2000});
+for(let i=0;i<19;i++) enemies.push({x:Math.random()*1800+100,y:Math.random()*1800+100,hp:100,angle:Math.random()*6.28,cool:0,name:['Raju','Simran','Gurpreet','Karan','Harpreet','Manpreet','Aman','Jaspreet','Navjot','Dilpreet','Ravinder','Sukh','Prabh','Arjun','Vikram','Rohan','Amit','Sahil','Deep'][i]});
+for(let i=0;i<30;i++){let t=['medkit','ammo','shield','coin'][Math.floor(Math.random()*4)]; loots.push({x:Math.random()*1800+100,y:Math.random()*1800+100,type:t})}
+gameLoop();
+setInterval(()=>{if(!running)return; zoneTimer--; if(zoneTimer<=0){zone.r=Math.max(120,zone.r-120); zone.x+= (Math.random()-0.5)*200; zone.y+=(Math.random()-0.5)*200; zoneTimer=25; addFeed('⚠️ Zone Shrinking!')} document.getElementById('zoneTimer').innerText=zoneTimer},1000);
+}
+function addFeed(t){let f=document.getElementById('killFeed'); f.innerHTML='<div>'+t+'</div>'+f.innerHTML}
+function shoot(){
+if(!running||ammo<=0){if(ammo<=0) reload(); return}
+ammo--; document.getElementById('ammo').innerText=ammo;
+let dx=mouse.x-canvas.width/2, dy=mouse.y-canvas.height/2; if(dx==0&&dy==0) dx=1;
+let len=Math.sqrt(dx*dx+dy*dy); dx/=len; dy/=len;
+bullets.push({x:player.x,y:player.y,dx:dx,dy:dy,life:40,from:'player'});
+try{let a=new (window.AudioContext||window.webkitAudioContext)(); let o=a.createOscillator(); o.frequency.value=800; o.connect(a.destination); o.start(); setTimeout(()=>o.stop(),50)}catch(e){}
+}
+function reload(){ammo=30; document.getElementById('ammo').innerText=ammo; addFeed('🔄 Reloaded')}
+function useMedkit(){if(medkits<=0) return alert('No Medkit! Find loot.'); medkits--; hp=Math.min(100,hp+50); document.getElementById('medkit').innerText=medkits; addFeed('💊 Used Medkit +50 HP')}
+function endGame(win){
+running=false;
+let box=document.getElementById('endBox'); box.style.display='flex';
+document.getElementById('endTitle').innerText=win?'🏆 BOOYAH!':'💀 ELIMINATED';
+document.getElementById('endText').innerHTML=`${playerName} • Kills: ${kills} • Coins: ${coins} • ${win?'You are the Last One Standing! SBS Champion!':'Better luck next drop!'}`;
+}
+
+function gameLoop(){
+if(!running) return;
+requestAnimationFrame(gameLoop);
+// Player move
+let sp=player.speed;
+if(keys.up) player.y-=sp; if(keys.down) player.y+=sp; if(keys.left) player.x-=sp; if(keys.right) player.x+=sp;
+player.x=Math.max(0,Math.min(2000,player.x)); player.y=Math.max(0,Math.min(2000,player.y));
+player.angle=Math.atan2(mouse.y-canvas.height/2, mouse.x-canvas.width/2);
+// Zone damage
+let dist=Math.hypot(player.x-zone.x, player.y-zone.y);
+if(dist>zone.r){ if(shield>0) shield-=0.2; else hp-=0.3; }
+// Enemies AI
+enemies.forEach((e,ei)=>{
+let d=Math.hypot(player.x-e.x, player.y-e.y);
+if(d<350){ // chase / shoot
+let a=Math.atan2(player.y-e.y, player.x-e.x); e.angle=a;
+if(d>150){ e.x+=Math.cos(a)*1.8; e.y+=Math.sin(a)*1.8; }
+e.cool--; if(e.cool<=0 && d<300){ e.cool=60; enemyBullets.push({x:e.x,y:e.y,dx:Math.cos(a),dy:Math.sin(a),life:50}); }
+} else { e.x+=Math.cos(e.angle)*0.8; e.y+=Math.sin(e.angle)*0.8; if(Math.random()<0.02) e.angle=Math.random()*6.28; }
+// Zone damage for enemy
+let ed=Math.hypot(e.x-zone.x, e.y-zone.y); if(ed>zone.r) e.hp-=0.5;
+if(e.hp<=0){ enemies.splice(ei,1); addFeed('☠️ '+e.name+' died in zone'); }
+});
+// Bullets
+bullets.forEach((b,bi)=>{
+b.x+=b.dx*14; b.y+=b.dy*14; b.life--;
+enemies.forEach((e,ei)=>{
+if(Math.hypot(b.x-e.x,b.y-e.y)<22){ e.hp-=34; bullets.splice(bi,1); if(e.hp<=0){ enemies.splice(ei,1); kills++; coins+=50; document.getElementById('kills').innerText=kills; document.getElementById('coins').innerText=coins; addFeed('🔥 You killed '+e.name); } }
+});
+if(b.life<=0) bullets.splice(bi,1);
+});
+enemyBullets.forEach((b,bi)=>{
+b.x+=b.dx*8; b.y+=b.dy*8; b.life--;
+if(Math.hypot(b.x-player.x,b.y-player.y)<20){ enemyBullets.splice(bi,1); if(shield>0) shield-=15; else hp-=12; }
+if(b.life<=0) enemyBullets.splice(bi,1);
+});
+// Loot pickup
+loots.forEach((l,li)=>{
+if(Math.hypot(l.x-player.x,l.y-player.y)<26){
+loots.splice(li,1);
+if(l.type=='medkit'){medkits++; document.getElementById('medkit').innerText=medkits; addFeed('💊 Got Medkit')}
+if(l.type=='ammo'){ammo+=30; document.getElementById('ammo').innerText=ammo; addFeed('🔫 Got Ammo')}
+if(l.type=='shield'){shield=Math.min(100,shield+50); addFeed('🛡️ Got Shield')}
+if(l.type=='coin'){coins+=20; document.getElementById('coins').innerText=coins; addFeed('🪙 Got Coin')}
+}
+});
+// Enemy vs Enemy random kills
+if(Math.random()<0.01 && enemies.length>2){ let v=enemies[Math.floor(Math.random()*enemies.length)]; v.hp-=50; if(v.hp<=0){ let idx=enemies.indexOf(v); addFeed('💀 '+v.name+' was eliminated'); enemies.splice(idx,1);} }
+
+// UI
+hp=Math.max(0,hp);
+document.getElementById('hpBar').style.width=hp+'%';
+document.getElementById('shieldBar').style.width=shield+'%';
+document.getElementById('alive').innerText=enemies.length+1;
+if(hp<=0) endGame(false);
+if(enemies.length==0) endGame(true);
+
+// Camera
+cam.x=player.x-canvas.width/2; cam.y=player.y-canvas.height/2;
+// Draw
+ctx.fillStyle='#2d6a2e'; ctx.fillRect(0,0,canvas.width,canvas.height);
+// Grid
+ctx.strokeStyle='rgba(255,255,255,.08)'; for(let x=-cam.x%80;x<canvas.width;x+=80){ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke()} for(let y=-cam.y%80;y<canvas.height;y+=80){ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke()}
+// Zone
+ctx.beginPath(); ctx.arc(zone.x-cam.x, zone.y-cam.y, zone.r, 0, Math.PI*2); ctx.fillStyle='rgba(0,150,255,.08)'; ctx.fill(); ctx.strokeStyle='#00aaff'; ctx.lineWidth=3; ctx.stroke(); ctx.fillStyle='rgba(255,0,0,.12)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+// Trees
+ctx.fillStyle='#1a4d1a'; trees.forEach(t=>{let sx=t.x-cam.x, sy=t.y-cam.y; if(sx>-50&&sx<canvas.width+50&&sy>-50&&sy<canvas.height+50){ctx.beginPath(); ctx.arc(sx,sy,18,0,Math.PI*2); ctx.fill();}});
+// Rocks
+ctx.fillStyle='#777'; rocks.forEach(r=>{let sx=r.x-cam.x, sy=r.y-cam.y; ctx.fillRect(sx-12,sy-12,24,24)});
+// Loots
+loots.forEach(l=>{let sx=l.x-cam.x, sy=l.y-cam.y; ctx.font='24px Arial'; ctx.fillText(l.type=='medkit'?'💊':l.type=='ammo'?'🔫':l.type=='shield'?'🛡️':'🪙',sx-12,sy+8)});
+// Enemies
+enemies.forEach(e=>{let sx=e.x-cam.x, sy=e.y-cam.y; ctx.save(); ctx.translate(sx,sy); ctx.rotate(e.angle); ctx.fillStyle='#ff3333'; ctx.fillRect(-14,-10,28,20); ctx.fillStyle='#000'; ctx.fillRect(10,-3,14,6); ctx.restore(); ctx.fillStyle='#fff'; ctx.font='11px Arial'; ctx.fillText(e.name,sx-20,sy-22); ctx.fillStyle='#333'; ctx.fillRect(sx-15,sy-18,30,5); ctx.fillStyle='#f00'; ctx.fillRect(sx-15,sy-18,30*e.hp/100,5)});
+// Player
+let px=canvas.width/2, py=canvas.height/2;
+ctx.save(); ctx.translate(px,py); ctx.rotate(player.angle); ctx.fillStyle='#ffcc00'; ctx.fillRect(-16,-12,32,24); ctx.fillStyle='#000'; ctx.fillRect(12,-4,18,8); ctx.restore();
+ctx.fillStyle='#fff'; ctx.font='bold 12px Arial'; ctx.fillText(playerName,px-20,py-28);
+ctx.fillStyle='#fff'; ctx.fillText('YOU',px-12,py+38);
+// Bullets
+ctx.fillStyle='#ffff00'; bullets.forEach(b=>{ctx.beginPath(); ctx.arc(b.x-cam.x,b.y-cam.y,4,0,Math.PI*2); ctx.fill()});
+ctx.fillStyle='#ff0000'; enemyBullets.forEach(b=>{ctx.beginPath(); ctx.arc(b.x-cam.x,b.y-cam.y,4,0,Math.PI*2); ctx.fill()});
+
+// Minimap
+mctx.fillStyle='#1a4d1a'; mctx.fillRect(0,0,100,100);
+mctx.strokeStyle='#00aaff'; mctx.beginPath(); mctx.arc(zone.x/20,zone.y/20,zone.r/20,0,Math.PI*2); mctx.stroke();
+mctx.fillStyle='#ffcc00'; mctx.fillRect(player.x/20-2,player.y/20-2,4,4);
+mctx.fillStyle='#f00'; enemies.forEach(e=>mctx.fillRect(e.x/20-1,e.y/20-1,2,2));
+}
+window.addEventListener('resize',()=>{canvas.width=window.innerWidth; canvas.height=window.innerHeight});
+</script>
+</body>
+</html>
