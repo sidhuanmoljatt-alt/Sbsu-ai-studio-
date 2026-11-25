@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Minecraft Mini - SBS Ferozepur | Sofia AI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+body{margin:0;background:#000;color:#fff;font-family:Inter,system-ui;overflow:hidden}
+.glass{background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);border-radius:12px}
+.hotbarBtn{width:52px;height:52px;border-radius:10px;border:3px solid transparent;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer}
+.hotbarBtn.active{border-color:#fff;transform:scale(1.15)}
+#crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;z-index:10;pointer-events:none;text-shadow:0 0 5px #000}
+#gameCanvas{width:100%;height:100vh;display:block}
+.joyBtn{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:22px;user-select:none}
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+<div id="crosshair">+</div>
+
+<!-- TOP HUD -->
+<div class="fixed top-0 left-0 right-0 p-3 flex justify-between items-start z-20 pointer-events-none">
+<div class="glass p-3 pointer-events-auto">
+<h1 class="font-black">🧱 MINECRAFT MINI</h1>
+<p class="text-[11px] text-slate-300">SBS Ferozepur • Sofia AI • Three.js</p>
+<div class="text-xs mt-1">Blocks: <b id="blockCount">0</b> • Mode: <b id="modeText">Break</b> • <span id="posText">0,0,0</span></div>
+</div>
+<div class="flex gap-2 pointer-events-auto">
+<button class="bg-white/20 px-3 py-2 rounded-full text-sm font-bold" onclick="toggleMode()">🔄 <span id="modeBtn">Break / Build</span></button>
+<button class="bg-white/20 px-3 py-2 rounded-full text-sm font-bold" onclick="toggleFly()">✈️ Fly: <span id="flyText">OFF</span></button>
+<button class="bg-white/20 px-3 py-2 rounded-full text-sm font-bold" onclick="saveWorld()">💾 Save</button>
+<button class="bg-orange-500 px-4 py-2 rounded-full text-sm font-bold" onclick="window.location.href='index.html'">🏠 Studio</button>
+</div>
+</div>
+
+<!-- HOTBAR -->
+<div class="fixed bottom-0 left-0 right-0 p-3 flex flex-col items-center gap-2 z-20">
+<div class="glass px-2 py-2 flex gap-2" id="hotbar">
+<button class="hotbarBtn active" data-block="grass" onclick="selectBlock('grass',this)" style="background:#5aa832">🌱</button>
+<button class="hotbarBtn" data-block="dirt" onclick="selectBlock('dirt',this)" style="background:#8a5a2b">🟫</button>
+<button class="hotbarBtn" data-block="stone" onclick="selectBlock('stone',this)" style="background:#777">⬛</button>
+<button class="hotbarBtn" data-block="wood" onclick="selectBlock('wood',this)" style="background:#6b4423">🪵</button>
+<button class="hotbarBtn" data-block="leaves" onclick="selectBlock('leaves',this)" style="background:#1e7a1e">🍃</button>
+<button class="hotbarBtn" data-block="sand" onclick="selectBlock('sand',this)" style="background:#e8d98a">🏖️</button>
+<button class="hotbarBtn" data-block="glass" onclick="selectBlock('glass',this)" style="background:#bfeaff">🪟</button>
+<button class="hotbarBtn" data-block="brick" onclick="selectBlock('brick',this)" style="background:#a33">🧱</button>
+<button class="hotbarBtn" data-block="gold" onclick="selectBlock('gold',this)" style="background:#ffd700">🟨</button>
+</div>
+<div class="text-[11px] bg-black/60 px-3 py-1 rounded-full">PC: Click = Break/Build • WASD = Move • Space = Jump • E = Fly • 1-9 = Block &nbsp;|&nbsp; Mobile: Joystick + TAP button</div>
+</div>
+
+<!-- MOBILE CONTROLS -->
+<div class="fixed bottom-24 left-3 z-20 flex gap-2">
+<div class="joyBtn" ontouchstart="mkeys.left=true" ontouchend="mkeys.left=false">⬅️</div>
+<div class="joyBtn" ontouchstart="mkeys.right=true" ontouchend="mkeys.right=false">➡️</div>
+</div>
+<div class="fixed bottom-24 right-3 z-20 flex gap-2">
+<div class="joyBtn" ontouchstart="mkeys.up=true" ontouchend="mkeys.up=false">⬆️</div>
+<div class="joyBtn" ontouchstart="mkeys.down=true" ontouchend="mkeys.down=false">⬇️</div>
+<div class="joyBtn !bg-green-500/60" onclick="jump()">🦘</div>
+<div class="joyBtn !bg-red-500/70 !w-[70px] !h-[70px]" onclick="tapAction()">⛏️ TAP</div>
+</div>
+
+<!-- START -->
+<div id="startBox" class="fixed inset-0 z-30 flex items-center justify-center bg-black/80 p-4">
+<div class="glass p-6 max-w-md w-full text-center">
+<h2 class="text-3xl font-black">🧱 MINECRAFT MINI</h2>
+<p class="text-sm text-slate-300 mt-2">Build your own world! Break blocks, place blocks, explore. Your world auto-saves in your device.</p>
+<div class="grid grid-cols-2 gap-2 mt-4 text-left text-sm">
+<div class="bg-white/10 p-2 rounded-lg">⛏️ <b>Break:</b> Click block</div>
+<div class="bg-white/10 p-2 rounded-lg">🧱 <b>Build:</b> Switch mode + Click</div>
+<div class="bg-white/10 p-2 rounded-lg">🚶 <b>Move:</b> WASD / Joystick</div>
+<div class="bg-white/10 p-2 rounded-lg">✈️ <b>Fly:</b> Press E</div>
+</div>
+<button class="w-full mt-4 py-3 rounded-full font-black text-lg bg-gradient-to-r from-orange-500 to-red-500" onclick="startGame()">▶️ PLAY NOW</button>
+<button class="w-full mt-2 py-2 rounded-full bg-white/10 text-sm" onclick="resetWorld()">🔄 New World</button>
+</div>
+</div>
+
+<script>
+let scene, camera, renderer, raycaster, pointer;
+let blocks=new Map(), selected='grass', mode='break', fly=false, velocityY=0, isGrounded=true;
+let mkeys={up:false,down:false,left:false,right:false}, yaw=0, pitch=0, player={x:8,y:12,z:8};
+let keys={};
+const COLORS={grass:0x5aa832,dirt:0x8a5a2b,stone:0x777777,wood:0x6b4423,leaves:0x1e7a1e,sand:0xe8d98a,glass:0xbfeaff,brick:0xaa3333,gold:0xffd700};
+const SIZE=24;
+
+document.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true; if(e.key>='1'&&e.key<='9'){let names=Object.keys(COLORS); selectBlock(names[parseInt(e.key)-1], document.querySelectorAll('.hotbarBtn')[parseInt(e.key)-1])} if(e.key.toLowerCase()=='e')toggleFly(); if(e.key==' ')jump();});
+document.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});
+document.addEventListener('mousemove',e=>{if(document.pointerLockElement){yaw-=e.movementX*0.0025; pitch-=e.movementY*0.0025; pitch=Math.max(-1.4,Math.min(1.4,pitch))}});
+document.addEventListener('click',e=>{if(e.target.closest('button')||e.target.closest('.glass'))return; if(document.getElementById('startBox').style.display=='none' && !document.pointerLockElement && window.innerWidth>768){document.body.requestPointerLock()}});
+
+function selectBlock(name,el){selected=name; document.querySelectorAll('.hotbarBtn').forEach(b=>b.classList.remove('active')); if(el)el.classList.add('active')}
+function toggleMode(){mode=mode=='break'?'build':'break'; document.getElementById('modeText').innerText=mode=='break'?'Break':'Build'; document.getElementById('modeBtn').innerText=mode=='break'?'Break / Build':'Build / Break'}
+function toggleFly(){fly=!fly; document.getElementById('flyText').innerText=fly?'ON':'OFF'}
+function jump(){if(isGrounded||fly){velocityY=fly?0:8; isGrounded=false}}
+function tapAction(){doAction()}
+function saveWorld(){let data=[]; blocks.forEach((mesh,key)=>{data.push({key:key,type:mesh.userData.type})}); localStorage.setItem('minecraft_world',JSON.stringify(data)); alert('World Saved! '+data.length+' blocks saved.')}
+function resetWorld(){localStorage.removeItem('minecraft_world'); location.reload()}
+function startGame(){document.getElementById('startBox').style.display='none'; init(); if(window.innerWidth>768) document.body.requestPointerLock()}
+
+function key(x,y,z){return x+','+y+','+z}
+function addBlock(x,y,z,type){
+let k=key(x,y,z); if(blocks.has(k))return;
+let geo=new THREE.BoxGeometry(1,1,1);
+let mat=new THREE.MeshLambertMaterial({color:COLORS[type], transparent:type=='glass', opacity:type=='glass'?0.6:1});
+let mesh=new THREE.Mesh(geo,mat); mesh.position.set(x+0.5,y+0.5,z+0.5); mesh.userData.type=type;
+scene.add(mesh); blocks.set(k,mesh); updateCount();
+}
+function removeBlock(x,y,z){let k=key(x,y,z); let m=blocks.get(k); if(m){scene.remove(m); blocks.delete(k); updateCount();}}
+function updateCount(){document.getElementById('blockCount').innerText=blocks.size}
+
+function init(){
+scene=new THREE.Scene(); scene.background=new THREE.Color(0x87ceeb); scene.fog=new THREE.Fog(0x87ceeb,30,90);
+camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+renderer=new THREE.WebGLRenderer({canvas:document.getElementById('gameCanvas'),antialias:true}); renderer.setSize(window.innerWidth,window.innerHeight); renderer.shadowMap.enabled=true;
+let sun=new THREE.DirectionalLight(0xffffff,1); sun.position.set(30,50,20); scene.add(sun); scene.add(new THREE.AmbientLight(0xffffff,0.6));
+raycaster=new THREE.Raycaster(); pointer=new THREE.Vector2(0,0);
+
+// Load saved or generate new world
+let saved=localStorage.getItem('minecraft_world');
+if(saved && JSON.parse(saved).length>0){
+JSON.parse(saved).forEach(b=>{let [x,y,z]=b.key.split(',').map(Number); addBlock(x,y,z,b.type)});
+}else{
+// Generate terrain - hills + trees + lake
+for(let x=0;x<SIZE;x++) for(let z=0;z<SIZE;z++){
+let h=Math.floor(2+Math.sin(x*0.4)*1.5+Math.cos(z*0.3)*1.5);
+if(x>10&&x<15&&z>10&&z<15){ addBlock(x,0,z,'sand'); addBlock(x,1,z,'sand'); continue; }
+addBlock(x,0,z,'stone'); addBlock(x,1,z,'dirt'); addBlock(x,2,z,'grass');
+if(h>2) addBlock(x,3,z,'grass');
+if(Math.random()<0.06){ // tree
+for(let t=0;t<3;t++) addBlock(x,3+t,z,'wood');
+addBlock(x,6,z,'leaves'); addBlock(x+1,5,z,'leaves'); addBlock(x-1,5,z,'leaves'); addBlock(x,5,z+1,'leaves'); addBlock(x,5,z-1,'leaves');
+}
+}
+// Small house
+for(let x=2;x<7;x++) for(let z=2;z<5;z++) addBlock(x,3,z,'brick');
+for(let x=2;x<7;x++) addBlock(x,4,z,'wood');
+}
+// Clouds
+for(let i=0;i<8;i++){let c=new THREE.Mesh(new THREE.BoxGeometry(6,0.6,3), new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.8})); c.position.set(Math.random()*60-10,22,Math.random()*60-10); scene.add(c)}
+
+renderer.domElement.addEventListener('click',()=>{doAction()});
+animate();
+}
+
+function doAction(){
+if(!scene) return;
+raycaster.setFromCamera(pointer,camera);
+let intersects=raycaster.intersectObjects([...blocks.values()]);
+if(intersects.length==0) return;
+let hit=intersects[0];
+let pos=hit.object.position; let x=Math.floor(pos.x), y=Math.floor(pos.y), z=Math.floor(pos.z);
+if(mode=='break'){ if(y>0) removeBlock(x,y,z); }
+else{
+let n=hit.face.normal;
+let nx=x+Math.round(n.x), ny=y+Math.round(n.y), nz=z+Math.round(n.z);
+addBlock(nx,ny,nz,selected);
+}
+// Sound - small click
+try{let a=new (window.AudioContext||window.webkitAudioContext)(); let o=a.createOscillator(); o.frequency.value=mode=='break'?200:400; o.connect(a.destination); o.start(); setTimeout(()=>o.stop(),80)}catch(e){}
+}
+
+function animate(){
+requestAnimationFrame(animate);
+let speed=0.12;
+let forward=(keys['w']||mkeys.up?1:0)-(keys['s']||mkeys.down?1:0);
+let strafe=(keys['d']||mkeys.right?1:0)-(keys['a']||mkeys.left?1:0);
+let sin=Math.sin(yaw), cos=Math.cos(yaw);
+player.x+= (forward*-sin + strafe*cos)*speed;
+player.z+= (forward*-cos - strafe*sin)*speed;
+if(fly){
+if(keys[' ']) player.y+=0.15;
+if(keys['shift']) player.y-=0.15;
+velocityY=0;
+}else{
+velocityY-=0.25; player.y+=velocityY*0.12;
+let groundY=4; // simple ground
+if(player.y<=groundY){player.y=groundY; velocityY=0; isGrounded=true}
+}
+player.x=Math.max(0,Math.min(SIZE-1,player.x)); player.z=Math.max(0,Math.min(SIZE-1,player.z)); player.y=Math.max(3,Math.min(30,player.y));
+camera.position.set(player.x,player.y+1.6,player.z);
+camera.rotation.order='YXZ'; camera.rotation.y=yaw; camera.rotation.x=pitch;
+document.getElementById('posText').innerText=Math.floor(player.x)+','+Math.floor(player.y)+','+Math.floor(player.z);
+renderer.render(scene,camera);
+}
+window.addEventListener('resize',()=>{if(renderer){camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth,window.innerHeight)}});
+</script>
+</body>
+</html>
