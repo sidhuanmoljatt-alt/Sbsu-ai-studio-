@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop Mini - E-Commerce | SBS Ferozepur</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{background:#f1f5f9;color:#111;font-family:Inter,system-ui}
+.glass{background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.btn{background:linear-gradient(90deg,#ff6a00,#ff2d55);color:#fff;padding:10px 16px;border-radius:999px;font-weight:800}
+.btn2{background:#f1f5f9;padding:9px 13px;border-radius:999px}
+input,select,textarea{background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:10px;width:100%;color:#111}
+.tab{display:none}.tab.active{display:block}
+.prodImg{width:100%;height:180px;object-fit:cover;border-radius:12px}
+</style>
+</head>
+<body>
+<header class="p-3 flex justify-between items-center sticky top-0 z-20 bg-white shadow">
+<div><h1 class="font-black text-lg">🛒 SHOP <span class="text-orange-600">MINI</span></h1><p class="text-[11px] text-slate-500">SBS Ferozepur • Sofia AI • Amazon Style</p></div>
+<div class="flex gap-2"><button class="btn2" onclick="showTab('home')">🏠 Shop</button><button class="btn2 relative" onclick="showTab('cart')">🛒 Cart <span id="cartBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span></button><button class="btn2" onclick="showTab('orders')">📦 Orders</button><button class="btn2" onclick="showTab('admin')">⚙️ Admin</button><button class="btn2" onclick="window.location.href='index.html'">🏠 Studio</button></div>
+</header>
+
+<!-- HOME -->
+<section id="home" class="tab active px-3 pb-4">
+<div class="bg-gradient-to-r from-orange-500 to-pink-500 text-white p-4 rounded-2xl mt-2 flex justify-between items-center"><div><h2 class="font-black text-xl">Big Sale! Up to 50% OFF</h2><p class="text-sm">Coupon: <b class="bg-white text-black px-2 py-0.5 rounded">SBS10</b> = Extra 10% OFF • Free Delivery in Ferozepur</p></div><div class="text-4xl">🛍️</div></div>
+<div class="flex gap-2 mt-3 flex-wrap"><input id="search" placeholder="Search e.g. Shoes, Watch, Headphone..." class="!w-[300px]" oninput="renderProducts()"><select id="catFilter" class="!w-[160px]" onchange="renderProducts()"><option value="all">All Category</option><option value="Fashion">Fashion</option><option value="Electronics">Electronics</option><option value="Food">Food</option><option value="Sports">Sports</option><option value="Books">Books</option></select><select id="sort" class="!w-[160px]" onchange="renderProducts()"><option value="pop">Popular</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select></div>
+<div id="productGrid" class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3"></div>
+</section>
+
+<!-- CART -->
+<section id="cart" class="tab px-3 pb-4">
+<div class="grid md:grid-cols-3 gap-3 mt-2">
+<div class="md:col-span-2 glass p-4"><h3 class="font-bold text-lg">🛒 My Cart</h3><div id="cartList" class="mt-3 space-y-3"></div></div>
+<div class="glass p-4"><h3 class="font-bold">💰 Bill Details</h3><div class="text-sm mt-2 space-y-1"><div class="flex justify-between"><span>Items Total</span><b id="billTotal">₹0</b></div><div class="flex justify-between"><span>Delivery</span><b class="text-green-600">FREE</b></div><div class="flex justify-between"><span>Discount (SBS10)</span><b id="billDiscount" class="text-green-600">-₹0</b></div><div class="flex justify-between text-lg font-black border-t pt-2"><span>To Pay</span><b id="billPay">₹0</b></div></div><input id="coupon" placeholder="Coupon Code: SBS10" class="mt-3"><button class="btn2 w-full mt-2" onclick="applyCoupon()">Apply Coupon</button><button class="btn w-full mt-2" onclick="showTab('checkout')">➡️ Proceed to Checkout</button></div>
+</div>
+</section>
+
+<!-- CHECKOUT -->
+<section id="checkout" class="tab px-3 pb-4">
+<div class="glass p-4 max-w-xl mx-auto mt-2"><h3 class="font-bold text-lg">📦 Checkout</h3>
+<input id="custName" placeholder="Full Name" class="mt-3"><input id="custPhone" placeholder="Phone e.g. 98765 43210" class="mt-2"><textarea id="custAddr" placeholder="Full Address e.g. SBS University, Ferozepur, Punjab 152001" class="mt-2"></textarea>
+<h4 class="font-bold mt-3">Payment Method</h4><div class="grid grid-cols-3 gap-2 mt-2"><button class="btn2" onclick="setPay('COD',this)">💵 COD</button><button class="btn2" onclick="setPay('UPI',this)">📱 UPI</button><button class="btn2" onclick="setPay('Card',this)">💳 Card</button></div>
+<div id="upiBox" class="hidden mt-2"><div class="bg-purple-50 p-3 rounded-lg text-center"><div class="text-3xl">📱</div><b>Pay to: sofia@sbsferozepur</b><div class="text-xs">Scan QR in real shop. In demo, just click Place Order.</div></div></div>
+<button class="btn w-full mt-4" onclick="placeOrder()">✅ Place Order - <span id="payTotal">₹0</span></button><p class="text-xs text-slate-500 mt-2">Demo shop - No real money is taken. This is for learning E-Commerce.</p></div>
+</section>
+
+<!-- ORDERS -->
+<section id="orders" class="tab px-3 pb-4">
+<div class="glass p-4 mt-2"><h3 class="font-bold text-lg">📦 My Orders</h3><div id="orderList" class="mt-3 space-y-3"></div></div>
+</section>
+
+<!-- ADMIN -->
+<section id="admin" class="tab px-3 pb-4">
+<div class="grid md:grid-cols-2 gap-3 mt-2">
+<div class="glass p-4"><h3 class="font-bold">⚙️ Admin - Add Product</h3><input id="adminName" placeholder="Product Name" class="mt-2"><input id="adminPrice" type="number" placeholder="Price e.g. 999" class="mt-2"><select id="adminCat" class="mt-2"><option>Fashion</option><option>Electronics</option><option>Food</option><option>Sports</option><option>Books</option></select><input id="adminImg" placeholder="Image URL (or leave empty for auto)" class="mt-2"><button class="btn w-full mt-3" onclick="addProduct()">+ Add Product</button><button class="btn2 w-full mt-2" onclick="resetShop()">🔄 Reset Shop to Default</button></div>
+<div class="glass p-4"><h3 class="font-bold">📊 Admin Dashboard</h3><div class="grid grid-cols-3 gap-2 text-center text-sm mt-2"><div class="bg-orange-50 p-2 rounded-lg">Products<br><b id="adminProdCount">0</b></div><div class="bg-green-50 p-2 rounded-lg">Orders<br><b id="adminOrderCount">0</b></div><div class="bg-blue-50 p-2 rounded-lg">Revenue<br><b id="adminRevenue">₹0</b></div></div><div id="adminList" class="mt-3 space-y-2"></div></div>
+</div>
+</section>
+
+<script>
+let products=JSON.parse(localStorage.getItem('shop_products')||'[]');
+let cart=JSON.parse(localStorage.getItem('shop_cart')||'[]');
+let orders=JSON.parse(localStorage.getItem('shop_orders')||'[]');
+let payMethod='COD', couponApplied=false;
+let defaultProducts=[
+{id:1,name:'Sneakers - White',price:1299,old:2499,cat:'Fashion',rating:4.5,img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500'},
+{id:2,name:'Wireless Headphone',price:1499,old:2999,cat:'Electronics',rating:4.8,img:'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500'},
+{id:3,name:'Smart Watch',price:1999,old:3999,cat:'Electronics',rating:4.6,img:'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500'},
+{id:4,name:'Hoodie - Black',price:899,old:1799,cat:'Fashion',rating:4.4,img:'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500'},
+{id:5,name:'Punjabi Jutti',price:799,old:1499,cat:'Fashion',rating:4.7,img:'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=500'},
+{id:6,name:'Cricket Bat',price:2499,old:4999,cat:'Sports',rating:4.9,img:'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=500'},
+{id:7,name:'Protein - 1kg',price:1899,old:2999,cat:'Food',rating:4.5,img:'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=500'},
+{id:8,name:'AI Book - Learn AI',price:499,old:999,cat:'Books',rating:4.8,img:'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500'},
+{id:9,name:'Bluetooth Speaker',price:1199,old:2499,cat:'Electronics',rating:4.6,img:'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=500'},
+{id:10,name:'Sunglasses',price:699,old:1499,cat:'Fashion',rating:4.3,img:'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500'},
+{id:11,name:'Football',price:899,old:1799,cat:'Sports',rating:4.5,img:'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500'},
+{id:12,name:'Dry Fruits - 500g',price:599,old:999,cat:'Food',rating:4.7,img:'https://images.unsplash.com/photo-1596591606975-97ee5cef3a1e?w=500'}
+];
+if(products.length==0) products=[...defaultProducts];
+function save(){localStorage.setItem('shop_products',JSON.stringify(products)); localStorage.setItem('shop_cart',JSON.stringify(cart)); localStorage.setItem('shop_orders',JSON.stringify(orders))}
+function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active')}
+function renderProducts(){
+let q=(document.getElementById('search').value||'').toLowerCase();
+let cat=document.getElementById('catFilter').value;
+let sort=document.getElementById('sort').value;
+let list=products.filter(p=>p.name.toLowerCase().includes(q) && (cat=='all'||p.cat==cat));
+if(sort=='low') list.sort((a,b)=>a.price-b.price);
+if(sort=='high') list.sort((a,b)=>b.price-a.price);
+document.getElementById('productGrid').innerHTML=list.map(p=>`<div class="glass p-3"><img src="${p.img}" class="prodImg"><div class="text-xs text-slate-500 mt-2">${p.cat} • ⭐ ${p.rating}</div><b class="block">${p.name}</b><div class="flex gap-2 items-center"><b class="text-lg">₹${p.price.toLocaleString('en-IN')}</b><span class="line-through text-sm text-slate-400">₹${p.old.toLocaleString('en-IN')}</span><span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">${Math.round((1-p.price/p.old)*100)}% OFF</span></div><div class="flex gap-2 mt-2"><button class="btn flex-1 text-sm" onclick="addToCart(${p.id})">🛒 Add to Cart</button><button class="btn2" onclick="buyNow(${p.id})">Buy Now</button></div></div>`).join('')||'No products found';
+}
+function addToCart(id){let item=cart.find(c=>c.id==id); if(item) item.qty++; else cart.push({id:id,qty:1}); save(); renderAll(); alert('Added to Cart!')}
+function buyNow(id){addToCart(id); showTab('cart')}
+function renderCart(){
+document.getElementById('cartBadge').innerText=cart.reduce((s,c)=>s+c.qty,0);
+document.getElementById('cartList').innerHTML=cart.map(c=>{let p=products.find(x=>x.id==c.id); if(!p) return ''; return `<div class="flex gap-3 items-center"><img src="${p.img}" class="w-16 h-16 object-cover rounded-lg"><div class="flex-1"><b>${p.name}</b><div class="text-sm">₹${p.price} x ${c.qty} = ₹${p.price*c.qty}</div></div><div class="flex gap-1"><button class="btn2" onclick="changeQty(${c.id},-1)">-</button><b class="px-2">${c.qty}</b><button class="btn2" onclick="changeQty(${c.id},1)">+</button></div><button class="btn2" onclick="removeCart(${c.id})">🗑️</button></div>`}).join('')||'Cart is empty. Add some products!';
+let total=cart.reduce((s,c)=>{let p=products.find(x=>x.id==c.id); return s+(p?p.price*c.qty:0)},0);
+let disc=couponApplied?Math.round(total*0.10):0;
+document.getElementById('billTotal').innerText='₹'+total.toLocaleString('en-IN');
+document.getElementById('billDiscount').innerText='-₹'+disc.toLocaleString('en-IN');
+document.getElementById('billPay').innerText='₹'+(total-disc).toLocaleString('en-IN');
+document.getElementById('payTotal').innerText='₹'+(total-disc).toLocaleString('en-IN');
+}
+function changeQty(id,d){let c=cart.find(x=>x.id==id); c.qty+=d; if(c.qty<=0) cart=cart.filter(x=>x.id!=id); save(); renderAll()}
+function removeCart(id){cart=cart.filter(x=>x.id!=id); save(); renderAll()}
+function applyCoupon(){let v=document.getElementById('coupon').value.trim().toUpperCase(); if(v=='SBS10'){couponApplied=true; alert('Coupon Applied! 10% OFF')} else {couponApplied=false; alert('Wrong Coupon. Try SBS10')} renderCart()}
+function setPay(m,el){payMethod=m; document.querySelectorAll('#checkout .btn2').forEach(b=>b.classList.remove('!bg-purple-600','!text-white')); el.classList.add('!bg-purple-600','!text-white'); document.getElementById('upiBox').classList.toggle('hidden',m!='UPI')}
+function placeOrder(){
+let name=document.getElementById('custName').value, phone=document.getElementById('custPhone').value, addr=document.getElementById('custAddr').value;
+if(cart.length==0) return alert('Cart is empty');
+if(!name||!phone||!addr) return alert('Fill Name + Phone + Address');
+let total=cart.reduce((s,c)=>{let p=products.find(x=>x.id==c.id); return s+(p?p.price*c.qty:0)},0);
+if(couponApplied) total=Math.round(total*0.90);
+let order={id:'ORD'+Date.now(),items:[...cart],total:total,name:name,phone:phone,addr:addr,pay:payMethod,status:'Placed',date:new Date().toLocaleString()};
+orders.unshift(order); cart=[]; couponApplied=false; save(); renderAll(); showTab('orders');
+alert('Order Placed! Order ID: '+order.id+' • Total ₹'+total+' • Payment: '+payMethod);
+}
+function renderOrders(){
+document.getElementById('orderList').innerHTML=orders.map(o=>`<div class="border p-3 rounded-xl"><div class="flex justify-between"><b>${o.id}</b><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs">${o.status}</span></div><div class="text-sm mt-1">${o.items.map(i=>{let p=products.find(x=>x.id==i.id); return p?p.name+' x'+i.qty:''}).join(', ')}</div><div class="text-sm">Total: <b>₹${o.total}</b> • ${o.pay} • ${o.name} • ${o.date}</div><div class="flex gap-2 mt-2 text-xs"><span class="bg-green-500 text-white px-2 py-1 rounded-full">✅ Placed</span><span class="bg-yellow-500 text-white px-2 py-1 rounded-full">📦 Packed</span><span class="bg-blue-500 text-white px-2 py-1 rounded-full">🚚 Shipped</span><span class="bg-purple-500 text-white px-2 py-1 rounded-full">🎉 Delivered in 2 Days</span></div><button class="btn2 mt-2 text-xs" onclick="trackOrder('${o.id}')">📍 Track Order</button></div>`).join('')||'No orders yet. Shop something!';
+}
+function trackOrder(id){alert('Order '+id+' is Packed and will be Shipped tomorrow. Delivery in Ferozepur: 2 Days. Courier will call you.')}
+function addProduct(){let n=document.getElementById('adminName').value, pr=parseInt(document.getElementById('adminPrice').value), cat=document.getElementById('adminCat').value, img=document.getElementById('adminImg').value||'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500'; if(!n||!pr) return alert('Name + Price required'); products.unshift({id:Date.now(),name:n,price:pr,old:pr*2,cat:cat,rating:4.5,img:img}); save(); renderAll(); alert('Product Added!')}
+function resetShop(){if(!confirm('Reset shop?')) return; products=[...defaultProducts]; cart=[]; orders=[]; save(); renderAll()}
+function renderAdmin(){
+document.getElementById('adminProdCount').innerText=products.length;
+document.getElementById('adminOrderCount').innerText=orders.length;
+document.getElementById('adminRevenue').innerText='₹'+orders.reduce((s,o)=>s+o.total,0).toLocaleString('en-IN');
+document.getElementById('adminList').innerHTML=products.map(p=>`<div class="flex justify-between bg-slate-50 p-2 rounded-lg"><span>${p.name} - ₹${p.price}</span><button class="btn2 text-xs" onclick="delProduct(${p.id})">🗑️ Delete</button></div>`).join('');
+}
+function delProduct(id){products=products.filter(p=>p.id!=id); save(); renderAll()}
+function renderAll(){renderProducts(); renderCart(); renderOrders(); renderAdmin()}
+renderAll();
+</script>
+</body>
+</html>
