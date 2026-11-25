@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Mini - Paper Trading | SBS Ferozepur</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{background:#0b1026;color:#fff;font-family:Inter,system-ui}
+.glass{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:16px}
+.btn{background:linear-gradient(90deg,#00c853,#00e676);color:#000;padding:10px 16px;border-radius:999px;font-weight:900}
+.btnRed{background:linear-gradient(90deg,#ff1744,#ff5252);padding:10px 16px;border-radius:999px;font-weight:900}
+.btn2{background:#1e293b;padding:9px 13px;border-radius:999px}
+input,select{background:#111827;border:1px solid #374151;border-radius:10px;padding:10px;width:100%;color:#fff}
+.tab{display:none}.tab.active{display:block}
+</style>
+</head>
+<body>
+<header class="p-3 flex justify-between items-center sticky top-0 z-20 bg-[#0b1026]/95">
+<div><h1 class="font-black text-lg">📈 TRADING <span class="text-green-400">MINI</span></h1><p class="text-[11px] text-slate-400">Paper Trading • SBS Ferozepur • Sofia AI • NO REAL MONEY</p></div>
+<div class="flex gap-2"><button class="btn2" onclick="window.location.href='index.html'">🏠 Studio</button><button class="btn2" onclick="shareApp()">🔗 Share</button></div>
+</header>
+
+<div class="px-3 pb-2 flex gap-2 overflow-x-auto">
+<button class="btn2" onclick="showTab('trade')">📈 Trade</button><button class="btn2" onclick="showTab('portfolio')">💼 Portfolio</button><button class="btn2" onclick="showTab('learn')">🎓 Learn</button><button class="btn2" onclick="showTab('leader')">🏆 Leaderboard</button>
+</div>
+
+<!-- TRADE -->
+<section id="trade" class="tab active px-3 pb-4">
+<div class="grid md:grid-cols-3 gap-3">
+<div class="glass p-3 md:col-span-2">
+<div class="flex justify-between items-center flex-wrap gap-2">
+<select id="symbol" class="!w-[180px]" onchange="changeSymbol()"><option value="BTC">₿ Bitcoin - BTC</option><option value="NIFTY">📊 Nifty 50</option><option value="RELIANCE">🏢 Reliance</option><option value="GOLD">🪙 Gold</option><option value="ETH">Ξ Ethereum</option><option value="TATA">🚗 Tata Motors</option></select>
+<div class="text-right"><div class="text-2xl font-black" id="price">₹0</div><div id="change" class="text-sm font-bold text-green-400">+0.00%</div></div>
+</div>
+<canvas id="tradeChart" height="180"></canvas>
+<div class="grid grid-cols-4 gap-2 mt-3 text-center text-xs">
+<div class="bg-white/5 p-2 rounded-lg">Open<br><b id="openP">-</b></div>
+<div class="bg-white/5 p-2 rounded-lg">High<br><b id="highP" class="text-green-400">-</b></div>
+<div class="bg-white/5 p-2 rounded-lg">Low<br><b id="lowP" class="text-red-400">-</b></div>
+<div class="bg-white/5 p-2 rounded-lg">Vol<br><b>1.2M</b></div>
+</div>
+<div class="flex gap-2 mt-3"><button class="btn2 flex-1" onclick="setTime('1H')">1H</button><button class="btn2 flex-1" onclick="setTime('1D')">1D</button><button class="btn2 flex-1" onclick="setTime('1W')">1W</button><button class="btn2 flex-1" onclick="resetChart()">🔄 Reset</button></div>
+</div>
+<div class="glass p-3">
+<h3 class="font-bold">Your Balance (Paper Money)</h3>
+<div class="text-3xl font-black text-green-400" id="balance">₹1,00,000</div>
+<div class="text-sm">Total P/L: <b id="totalPL" class="text-green-400">₹0</b> • Trades: <b id="tradeCount">0</b></div>
+<div class="mt-3 space-y-2">
+<label class="text-xs">Quantity</label><input id="qty" type="number" value="1" min="1">
+<label class="text-xs">Stop Loss (Auto Sell) - REQUIRED</label><input id="stopLoss" type="number" placeholder="e.g. 5% below price">
+<label class="text-xs">Take Profit (Auto Sell)</label><input id="takeProfit" type="number" placeholder="e.g. 10% above price">
+<div class="flex items-center gap-2 text-xs"><input type="checkbox" id="allowReal" class="!w-4 !h-4"><span>I understand - This is PAPER trading. I Allow this trade.</span></div>
+<div id="riskWarn" class="text-xs bg-yellow-500/20 border border-yellow-500 p-2 rounded-lg">Risk Check: Enter quantity to check 1-2% rule.</div>
+</div>
+<div class="flex gap-2 mt-3"><button class="btn flex-1" onclick="buy()">🟢 BUY</button><button class="btnRed flex-1" onclick="sell()">🔴 SELL</button></div>
+<button class="btn2 w-full mt-2" onclick="closeAll()">Close All Positions</button>
+<p class="text-[11px] text-slate-400 mt-2">⚠️ SAFETY: Never trade with full money. Only 1-2% per trade. App will BLOCK trade if risk >2%. Paper trading first. Real trading needs broker + SEBI license. Sofia will NEVER auto-trade real money.</p>
+</div>
+</div>
+<div class="glass p-3 mt-3"><h3 class="font-bold">📜 Trade History</h3><div id="history" class="text-sm mt-2 space-y-1"></div></div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio" class="tab px-3 pb-4">
+<div class="glass p-4"><h3 class="font-bold text-xl">💼 My Portfolio (Paper)</h3><div id="portfolioList" class="mt-3 space-y-2"></div><div class="mt-3 flex gap-2"><button class="btn2" onclick="exportHistory()">⬇️ Export CSV</button><button class="btn2" onclick="resetAccount()">🔄 Reset to ₹1,00,000</button></div></div>
+</section>
+
+<!-- LEARN -->
+<section id="learn" class="tab px-3 pb-4">
+<div class="space-y-3">
+<div class="glass p-4"><h3 class="font-bold text-lg">🎓 Rule 1: Only 1-2% Per Trade</h3><p class="text-sm text-slate-300 mt-1">If you have ₹1,00,000, risk only ₹1,000 - ₹2,000 per trade. If you lose 10 trades, you still have ₹80,000+. If you trade with full money, 1 loss = Game Over.</p><p class="text-sm text-yellow-300">Example: Balance ₹1,00,000 → Max Risk ₹2,000 → If Stop Loss is 5% away, Max Quantity = ₹2,000 / 5% = ₹40,000 worth.</p></div>
+<div class="glass p-4"><h3 class="font-bold text-lg">🛑 Rule 2: Stop Loss is Compulsory</h3><p class="text-sm text-slate-300">Always set Stop Loss BEFORE buying. In this app, if you don't set Stop Loss, Buy button will be BLOCKED. Real traders never trade without Stop Loss.</p></div>
+<div class="glass p-4"><h3 class="font-bold text-lg">🧪 Rule 3: Paper Trading First - 30 Days</h3><p class="text-sm text-slate-300">Practice 30 days with fake money. If you are profitable in paper trading, only then think about real money with small amount. 90% new traders lose money because they skip paper trading.</p></div>
+<div class="glass p-4"><h3 class="font-bold text-lg">🤖 Ask Sofia (Punjabi / Hindi / English)</h3><input id="learnQ" placeholder="Ask e.g. Stop Loss kya hota hai?"><button class="btn mt-2" onclick="askSofia()">Ask Sofia</button><p id="sofiaAns" class="text-sm mt-2 text-green-300"></p></div>
+</div>
+</section>
+
+<!-- LEADERBOARD -->
+<section id="leader" class="tab px-3 pb-4">
+<div class="glass p-4"><h3 class="font-bold text-xl">🏆 SBS Ferozepur Paper Trading Leaderboard</h3><div id="leaderList" class="mt-3 space-y-2"></div><p class="text-xs text-slate-400 mt-2">Your rank updates after every trade. Top trader gets featured in SBS AI Studio.</p></div>
+</section>
+
+<script>
+let balance=parseFloat(localStorage.getItem('trade_balance')||'100000');
+let positions=JSON.parse(localStorage.getItem('trade_positions')||'[]');
+let history=JSON.parse(localStorage.getItem('trade_history')||'[]');
+let prices={BTC:8450000,NIFTY:24500,RELIANCE:2950,GOLD:78500,ETH:325000,TATA:980};
+let basePrices={...prices};
+let chart=null, chartData=[], labels=[];
+let currentSymbol='BTC', currentPrice=prices.BTC;
+let leaders=[{name:'Anmol_SBS',pl:15400},{name:'Gurpreet',pl:12300},{name:'Simran',pl:9800},{name:'Harpreet',pl:5400},{name:'Sofia AI',pl:21000}];
+for(let i=0;i<30;i++){labels.push(''+(i+1)); chartData.push(currentPrice*(0.95+Math.random()*0.1))}
+function save(){localStorage.setItem('trade_balance',balance); localStorage.setItem('trade_positions',JSON.stringify(positions)); localStorage.setItem('trade_history',JSON.stringify(history))}
+function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active')}
+function shareApp(){let u=location.href; window.open('https://wa.me/?text='+encodeURIComponent('Learn Trading Safe - Paper Trading App: '+u),'_blank')}
+function changeSymbol(){currentSymbol=document.getElementById('symbol').value; currentPrice=prices[currentSymbol]; resetChart()}
+function resetChart(){chartData=[]; for(let i=0;i<30;i++) chartData.push(currentPrice*(0.95+Math.random()*0.1)); updateChart()}
+function setTime(t){resetChart()}
+function updateChart(){
+if(chart) chart.destroy();
+chart=new Chart(document.getElementById('tradeChart'),{type:'line',data:{labels:labels,datasets:[{label:currentSymbol+' Price',data:chartData,borderColor:'#00e676',backgroundColor:'rgba(0,230,118,.15)',fill:true,tension:0.4}]},options:{plugins:{legend:{labels:{color:'#fff'}}},scales:{x:{ticks:{color:'#aaa'}},y:{ticks:{color:'#aaa'}}}}});
+document.getElementById('price').innerText='₹'+Math.round(currentPrice).toLocaleString('en-IN');
+let ch=((currentPrice-basePrices[currentSymbol])/basePrices[currentSymbol]*100);
+document.getElementById('change').innerText=(ch>=0?'+':'')+ch.toFixed(2)+'%';
+document.getElementById('change').className='text-sm font-bold '+(ch>=0?'text-green-400':'text-red-400');
+document.getElementById('openP').innerText='₹'+Math.round(basePrices[currentSymbol]).toLocaleString('en-IN');
+document.getElementById('highP').innerText='₹'+Math.round(Math.max(...chartData)).toLocaleString('en-IN');
+document.getElementById('lowP').innerText='₹'+Math.round(Math.min(...chartData)).toLocaleString('en-IN');
+}
+function updateUI(){
+document.getElementById('balance').innerText='₹'+Math.round(balance).toLocaleString('en-IN');
+let pl=positions.reduce((s,p)=>s+(currentPrice-p.buyPrice)*p.qty,0);
+document.getElementById('totalPL').innerText='₹'+Math.round(pl).toLocaleString('en-IN');
+document.getElementById('totalPL').className=pl>=0?'text-green-400':'text-red-400';
+document.getElementById('tradeCount').innerText=history.length;
+document.getElementById('history').innerHTML=history.slice(-10).reverse().map(h=>`<div class="flex justify-between bg-white/5 p-2 rounded-lg"><span>${h.type} ${h.qty} ${h.symbol} @ ₹${Math.round(h.price).toLocaleString('en-IN')}</span><span class="${h.type=='BUY'?'text-green-400':'text-red-400'}">${h.type}</span></div>`).join('')||'No trades yet. Start with small quantity!';
+document.getElementById('portfolioList').innerHTML=positions.map((p,i)=>`<div class="flex justify-between bg-white/5 p-3 rounded-lg"><div><b>${p.qty} ${p.symbol}</b><div class="text-xs">Bought @ ₹${Math.round(p.buyPrice).toLocaleString('en-IN')} • SL: ₹${p.sl} • TP: ₹${p.tp}</div></div><div class="text-right"><div class="${(currentPrice-p.buyPrice)>=0?'text-green-400':'text-red-400'}">P/L: ₹${Math.round((currentPrice-p.buyPrice)*p.qty).toLocaleString('en-IN')}</div><button class="btn2 text-xs mt-1" onclick="closeOne(${i})">Close</button></div></div>`).join('')||'No open positions. Buy something with 1-2% risk!';
+document.getElementById('leaderList').innerHTML=[...leaders,{name:'You',pl:Math.round(balance-100000)}].sort((a,b)=>b.pl-a.pl).map((l,i)=>`<div class="flex justify-between bg-white/5 p-2 rounded-lg"><span>${i+1}. ${l.name}</span><b class="${l.pl>=0?'text-green-400':'text-red-400'}">₹${l.pl.toLocaleString('en-IN')}</b></div>`).join('');
+// Risk check live
+let qty=parseFloat(document.getElementById('qty').value||1);
+let sl=parseFloat(document.getElementById('stopLoss').value||0);
+let risk=0; if(sl && currentPrice>sl) risk=(currentPrice-sl)*qty;
+let riskPct=(risk/balance*100);
+let warn=document.getElementById('riskWarn');
+if(!sl) warn.innerHTML='❌ Stop Loss REQUIRED. Buy is blocked without Stop Loss.';
+else if(riskPct>2) warn.innerHTML=`❌ BLOCKED: Risk ₹${Math.round(risk)} = ${riskPct.toFixed(2)}% > 2% Rule! Reduce quantity or increase Stop Loss closer. Max qty for 2% = ${Math.floor((balance*0.02)/(currentPrice-sl))}`;
+else warn.innerHTML=`✅ SAFE: Risk ₹${Math.round(risk)} = ${riskPct.toFixed(2)}% (Under 2% Rule). You can trade.`;
+}
+document.getElementById('qty').addEventListener('input',updateUI);
+document.getElementById('stopLoss').addEventListener('input',updateUI);
+function buy(){
+let qty=parseFloat(document.getElementById('qty').value||1);
+let sl=parseFloat(document.getElementById('stopLoss').value);
+let tp=parseFloat(document.getElementById('takeProfit').value||0);
+if(!document.getElementById('allowReal').checked) return alert('Please tick Allow checkbox - You understand this is Paper Trading.');
+if(!sl) return alert('Stop Loss is REQUIRED! Set Stop Loss first.');
+let cost=currentPrice*qty;
+if(cost>balance) return alert('Not enough balance! Cost ₹'+Math.round(cost).toLocaleString('en-IN')+' > Balance ₹'+Math.round(balance).toLocaleString('en-IN'));
+let risk=(currentPrice-sl)*qty;
+if(risk/balance*100>2) return alert('BLOCKED by 1-2% Rule! Risk is '+(risk/balance*100).toFixed(2)+'% > 2%. Reduce quantity.');
+balance-=cost; positions.push({symbol:currentSymbol,qty:qty,buyPrice:currentPrice,sl:sl,tp:tp});
+history.push({type:'BUY',symbol:currentSymbol,qty:qty,price:currentPrice});
+save(); updateUI(); alert('✅ BUY Success! '+qty+' '+currentSymbol+' @ ₹'+Math.round(currentPrice).toLocaleString('en-IN')+' | Stop Loss: ₹'+sl+' | Risk: ₹'+Math.round(risk));
+}
+function sell(){
+let qty=parseFloat(document.getElementById('qty').value||1);
+let pos=positions.find(p=>p.symbol==currentSymbol);
+if(!pos) return alert('No position in '+currentSymbol+' to sell. Buy first.');
+let sellQty=Math.min(qty,pos.qty);
+balance+=currentPrice*sellQty; pos.qty-=sellQty;
+if(pos.qty<=0) positions.splice(positions.indexOf(pos),1);
+history.push({type:'SELL',symbol:currentSymbol,qty:sellQty,price:currentPrice});
+save(); updateUI(); alert('✅ SELL Success! '+sellQty+' '+currentSymbol+' @ ₹'+Math.round(currentPrice).toLocaleString('en-IN'));
+}
+function closeOne(i){let p=positions[i]; balance+=currentPrice*p.qty; history.push({type:'SELL',symbol:p.symbol,qty:p.qty,price:currentPrice}); positions.splice(i,1); save(); updateUI()}
+function closeAll(){positions.forEach(p=>{balance+=currentPrice*p.qty}); positions=[]; save(); updateUI(); alert('All positions closed.')}
+function exportHistory(){let csv='Type,Symbol,Qty,Price\n'+history.map(h=>`${h.type},${h.symbol},${h.qty},${h.price}`).join('\n'); let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv])); a.download='trading-history.csv'; a.click()}
+function resetAccount(){if(!confirm('Reset to ₹1,00,000? All history will clear.')) return; balance=100000; positions=[]; history=[]; save(); updateUI()}
+function askSofia(){
+let q=(document.getElementById('learnQ').value||'').toLowerCase();
+let ans='Sofia: Trading me sabse important hai - Risk Manage karo, Stop Loss lagao, aur Paper Trading se seekho. Kabhi full money ek trade me mat lagao.';
+if(q.includes('stop')) ans='Sofia: Stop Loss matlab - Agar price neeche jaye to auto sell ho jaye. Example: Buy @ ₹100, Stop Loss @ ₹95. Agar price ₹95 aaya, app auto sell kar dega. Loss sirf ₹5 per share.';
+if(q.includes('1')||q.includes('2%')||q.includes('percent')) ans='Sofia: 1-2% Rule - ₹1,00,000 balance hai to ek trade me max ₹2,000 ka risk. Isse 50 loss ke baad bhi aapke paas paisa bachega.';
+if(q.includes('profit')||q.includes('paisa')) ans='Sofia: Profit slowly aata hai. Roz 1% profit bhi bahut hai. Lalach mat karo. Paper trading me 30 din practice karo.';
+if(q.includes('punjab')||q.includes('punjabi')) ans='Sofia: Veere, trading vich sab ton vadda rule - full paisa kade na lao. Sirf 1-2% risk lo, Stop Loss lagao, te pehla Paper Trading karo!';
+document.getElementById('sofiaAns').innerText=ans;
+}
+// Live price simulation + Auto SL / TP check
+setInterval(()=>{
+for(let k in prices){prices[k]*= (1+(Math.random()-0.5)*0.004)}
+currentPrice=prices[currentSymbol];
+chartData.push(currentPrice); chartData.shift(); updateChart(); updateUI();
+// Auto SL / TP
+positions.forEach((p,i)=>{
+if(p.symbol==currentSymbol){
+if(currentPrice<=p.sl){balance+=currentPrice*p.qty; history.push({type:'SELL (SL HIT)',symbol:p.symbol,qty:p.qty,price:currentPrice}); alert('🛑 STOP LOSS HIT! Auto Sold '+p.qty+' '+p.symbol+' @ ₹'+Math.round(currentPrice)); positions.splice(i,1); save(); updateUI();}
+else if(p.tp && currentPrice>=p.tp){balance+=currentPrice*p.qty; history.push({type:'SELL (TP HIT)',symbol:p.symbol,qty:p.qty,price:currentPrice}); alert('🎯 TAKE PROFIT HIT! Auto Sold '+p.qty+' '+p.symbol); positions.splice(i,1); save(); updateUI();}
+}
+});
+},2500);
+updateChart(); updateUI();
+</script>
+</body>
+</html>
