@@ -2,105 +2,64 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SBS Ferozepur AI Studio - Sofia AI</title>
-<meta name="theme-color" content="#0b1026">
+<title>SBS AI Studio - 19 Apps - Ferozepur | Sofia AI</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://js.puter.com/v2/"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-body{background:#0b1026;color:#fff;font-family:Inter,system-ui}
-.glass{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:16px;backdrop-filter:blur(10px)}
-.btn{background:linear-gradient(90deg,#ff6a00,#ff2d55);padding:10px 16px;border-radius:999px;font-weight:700}
-.btn2{background:#1e293b;padding:9px 14px;border-radius:999px}
-input,select,textarea{background:#111827;border:1px solid #374151;border-radius:10px;padding:10px;width:100%;color:#fff}
-.tab{display:none}.tab.active{display:block}
-.msg{padding:10px;border-radius:12px;margin:8px 0;white-space:pre-wrap}
-.user{background:#2563eb;margin-left:40px}.ai{background:#1f2937;margin-right:20px}
-iframe{width:100%;height:400px;background:#fff;border-radius:12px;border:none}
+body{background:#020617;color:#fff;font-family:Outfit,sans-serif}
+.glass{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:18px;backdrop-filter:blur(8px);transition:.2s}
+.glass:hover{transform:translateY(-4px);border-color:#fff;background:rgba(255,255,255,.12)}
+.btn{background:linear-gradient(90deg,#7c3aed,#ec4899,#f59e0b);color:#fff;padding:12px 18px;border-radius:999px;font-weight:900}
+.btn2{background:#1e293b;padding:9px 14px;border-radius:999px;border:1px solid #334155}
+.catBtn.active{background:#fff;color:#000}
 </style>
 </head>
 <body>
-<header class="p-4 flex justify-between items-center sticky top-0 z-50 bg-[#0b1026]/95">
-<div><h1 class="text-xl font-black">🎓 SBS Ferozepur <span class="text-orange-400">AI STUDIO</span></h1><p class="text-xs text-slate-400">Sofia AI • Build Anything • Fully Online</p></div>
-<div class="flex gap-2"><button class="btn2" onclick="installApp()">📲 Install</button><button class="btn2" onclick="shareApp()">🔗 Share</button><button class="btn" id="loginBtn" onclick="login()">Login</button></div>
+<header class="p-4 flex justify-between items-center sticky top-0 z-30 bg-[#020617]/90 backdrop-blur">
+<div class="flex gap-3 items-center"><div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-orange-500 rounded-xl flex items-center justify-center font-black">S</div><div><h1 class="font-black text-xl leading-none">SBS AI STUDIO</h1><p class="text-[11px] text-slate-400">SBS University, Ferozepur • 19 Apps • Sofia AI • Made by Students</p></div></div>
+<div class="flex gap-2"><button class="btn2" onclick="shareStudio()">🔗 Share Studio</button><button class="btn2" onclick="alert('To Install: Chrome Menu → Add to Home Screen → Install SBS Studio. Then open like app!')">📲 Install App</button></div>
 </header>
 
-<nav class="flex gap-2 px-4 overflow-x-auto pb-2">
-<button class="btn2" onclick="showTab('chat')">💬 Sofia</button><button class="btn2" onclick="showTab('build')">🛠️ Build</button><button class="btn2" onclick="showTab('agents')">🤖 Agents</button><button class="btn2" onclick="showTab('expense')">💰 Expense</button><button class="btn2" onclick="showTab('publish')">🚀 Publish</button><button class="btn2" onclick="showTab('keys')">🔑 Keys</button><button class="btn2" onclick="showTab('pricing')">💳 Pricing</button><button class="btn2" onclick="showTab('games')">🎮 Games</button>
-</nav>
-
-<!-- CHAT -->
-<section id="chat" class="tab active p-4">
-<div class="grid md:grid-cols-2 gap-4">
-<div class="glass p-4">
-<div class="flex gap-2"><select id="model"><option value="gpt-5">GPT-5</option><option value="claude-sonnet-4.5">Claude Sonnet 4.5</option><option value="google/gemini-3-pro">Gemini 3 Pro</option><option value="deepseek-chat">DeepSeek</option><option value="meta-llama/llama-4-maverick">Llama 4</option></select><select id="lang"><option value="en-US">English</option><option value="pa-IN">Punjabi</option><option value="hi-IN">Hindi</option></select></div>
-<label class="text-sm">Temperature <span id="tempVal">0.7</span></label>
-<input type="range" id="temp" min="0" max="1" step="0.1" value="0.7" oninput="document.getElementById('tempVal').innerText=this.value">
-<div id="chatBox" class="h-[280px] overflow-y-auto my-2"><div class="msg ai">Hi! I am Sofia from SBS Ferozepur. Ask me anything in Punjabi / Hindi / English. Or go to Build tab.</div></div>
-<div class="flex gap-2"><input id="prompt" placeholder="Ask Sofia..."><button class="btn" onclick="sendChat()">Send</button></div>
-<div class="flex gap-2 mt-2 flex-wrap"><button class="btn2" onclick="startVoice()">🎤 Voice</button><button class="btn2" onclick="speakLast()">🔊 Speak</button><button class="btn2" onclick="generateImage()">🖼️ Image</button><button class="btn2" onclick="exportChat()">⬇️ Export</button><label class="btn2 cursor-pointer">📁 Upload<input type="file" hidden onchange="uploadFile(event)"></label></div><div id="imgOut" class="mt-2"></div>
-</div>
-<div class="glass p-4"><h3 class="font-bold">✨ Live Preview + Edit + Download</h3><iframe id="preview"></iframe><textarea id="codeEditor" class="mt-2 h-[130px]" placeholder="Sofia's code will appear here. Edit it!"></textarea><div class="flex gap-2 mt-2 flex-wrap"><button class="btn" onclick="updatePreview()">Update Preview</button><button class="btn2" onclick="downloadCode()">⬇️ Download</button><button class="btn2" onclick="saveToPuter()">☁️ Save to Puter</button></div></div>
-</div>
+<section class="px-4 pb-3">
+<div class="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 p-5 rounded-[22px] flex justify-between items-center"><div><h2 class="font-black text-3xl">19 APPS IN ONE STUDIO! 🚀</h2><p class="text-sm mt-1">GTA + Minecraft + Free Fire + PUBG + WhatsApp + Instagram + Snapchat + Shop + Food + Cab + Hotel + Jobs + Bank + Fitness + News + Music + Photo Editor + Study + Trading = All in your phone. 100% Free. Made at SBS Ferozepur.</p><div class="flex gap-2 mt-3"><input id="search" placeholder="Search app e.g. Food, GTA, Bank..." class="bg-white text-black px-4 py-2 rounded-full w-[220px]" oninput="renderApps()"><button class="bg-black text-white px-4 py-2 rounded-full text-sm" onclick="renderApps()">Search</button></div></div><div class="text-6xl hidden md:block">🎮</div></div>
+<div class="flex gap-2 mt-3 flex-wrap"><button class="btn2 catBtn active" onclick="filterCat('all',this)">All 19</button><button class="btn2 catBtn" onclick="filterCat('Games',this)">🎮 Games</button><button class="btn2 catBtn" onclick="filterCat('Social',this)">💬 Social</button><button class="btn2 catBtn" onclick="filterCat('Business',this)">💼 Business</button><button class="btn2 catBtn" onclick="filterCat('Tools',this)">🛠️ Tools</button><button class="btn2 catBtn" onclick="filterCat('Travel',this)">✈️ Travel</button><button class="btn2 catBtn" onclick="filterCat('Finance',this)">💰 Finance</button></div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-4" id="appGrid"></div>
+<div class="glass p-4 mt-6 text-center"><h3 class="font-black text-xl">🏆 SBS FER OZEPUR - NO. 1 AI UNIVERSITY</h3><p class="text-sm text-slate-300 mt-1">This studio was made by SBS students to learn AI + App Making. No coding needed. All apps save data in your phone. Safe + Free. Share with all friends.</p><div class="grid grid-cols-4 gap-2 text-center text-sm mt-3"><div class="bg-white/5 p-3 rounded-xl"><b class="text-2xl block">19</b>Apps</div><div class="bg-white/5 p-3 rounded-xl"><b class="text-2xl block">100%</b>Free</div><div class="bg-white/5 p-3 rounded-xl"><b class="text-2xl block">SBS</b>Made</div><div class="bg-white/5 p-3 rounded-xl"><b class="text-2xl block">∞</b>Unlimited Use</div></div><button class="btn mt-4" onclick="shareStudio()">📲 Share with Friends on WhatsApp</button></div>
+<footer class="text-center text-xs text-slate-500 p-6">© 2026 SBS University, Ferozepur • Sofia AI • Made with ❤️ by Students • All Apps Demo for Learning • Not Real Money / Real Orders</footer>
 </section>
 
-<!-- BUILD -->
-<section id="build" class="tab p-4"><div class="glass p-5 text-center"><h2 class="text-2xl font-black">Build Anything Command Bar</h2><p class="text-slate-400">Sofia auto-chooses language, framework, engine, graphics.</p><input id="buildPrompt" class="mt-3" placeholder="Build me a... e.g. Build me a portfolio / Build me a Minecraft game"><div class="flex gap-2 justify-center mt-3 flex-wrap"><button class="btn" onclick="buildAnything()">🚀 Build Now</button><button class="btn2" onclick="quickBuild('expense')">Expense Tracker</button><button class="btn2" onclick="quickBuild('minecraft')">Minecraft Mini</button><button class="btn2" onclick="quickBuild('gta')">GTA Mini</button></div><p id="buildStatus" class="text-green-400 mt-3"></p><p class="text-xs text-slate-400 mt-2">Languages: HTML CSS JS TS PHP | Kotlin Swift Dart Java | Python C C++ C# Go Rust | SQL NoSQL | Next.js Nuxt SvelteKit React Vue Angular FastAPI Node Django Flask</p></div></section>
-
-<!-- AGENTS -->
-<section id="agents" class="tab p-4"><div class="grid md:grid-cols-4 gap-3" id="agentGrid"></div><div class="glass p-4 mt-3"><h3 class="font-bold">Project Memory</h3><input id="projectName" placeholder="Project Name"><button class="btn mt-2" onclick="saveProject()">Save Project</button><div id="projectList" class="mt-2 text-sm"></div></div></section>
-
-<!-- EXPENSE -->
-<section id="expense" class="tab p-4"><div class="glass p-4"><h2 class="font-bold text-xl">💰 Expense Tracker - Fully Working</h2><div class="grid grid-cols-2 gap-2 my-3 text-center"><div class="bg-slate-800 p-3 rounded-xl">Total<br><b id="totalExp">₹0</b></div><div class="bg-slate-800 p-3 rounded-xl">Count<br><b id="countExp">0</b></div></div><div class="grid md:grid-cols-4 gap-2"><input id="expTitle" placeholder="Title"><input id="expAmt" type="number" placeholder="Amount ₹"><input id="expDate" type="date"><select id="expCat"><option>Food</option><option>Travel</option><option>Study</option><option>Shopping</option><option>Other</option></select></div><button class="btn mt-3" onclick="addExpense()">+ Add Expense</button><select id="filterMonth" onchange="renderExpenses()" class="mt-3"><option value="">All Months</option></select><canvas id="expChart" height="110" class="mt-3"></canvas><div id="expList" class="mt-3"></div></div></section>
-
-<!-- PUBLISH -->
-<section id="publish" class="tab p-4"><div class="glass p-4"><h2 class="font-bold text-xl">🚀 Publish Live on GitHub</h2><p class="text-sm text-slate-300">1) Create GitHub Token (Settings → Developer Settings → Tokens → repo) 2) Paste below 3) Publish.</p><input id="ghToken" type="password" placeholder="GitHub Token" class="mt-2"><input id="ghUser" placeholder="GitHub Username" class="mt-2"><input id="ghRepo" placeholder="Repo Name e.g. my-app" class="mt-2"><button class="btn mt-3" onclick="publishToGitHub()">Publish Live Now</button><p id="ghStatus" class="text-green-400 text-sm mt-2"></p></div></section>
-
-<!-- KEYS -->
-<section id="keys" class="tab p-4"><div class="glass p-4"><h2 class="font-bold text-xl">🔑 Key Attacher</h2><p class="text-sm text-slate-300">Puter works WITHOUT key. Attach your own key if you want.</p><select id="keyProvider" class="mt-2"><option>OpenAI</option><option>Gemini</option><option>Claude</option><option>OpenRouter</option><option>DeepSeek</option><option>Grok</option></select><input id="customKey" placeholder="Paste API Key" class="mt-2"><input id="customModel" placeholder="Model e.g. gpt-4o" class="mt-2"><div class="flex gap-2 mt-3"><button class="btn" onclick="saveKey()">✅ Attach Key</button><button class="btn2" onclick="removeKey()">🗑️ Remove</button></div><p id="keyStatus" class="text-green-400 text-sm mt-2"></p><div id="attachedKeys" class="text-sm mt-2"></div></div></section>
-
-<!-- PRICING -->
-<section id="pricing" class="tab p-4"><div class="grid md:grid-cols-3 gap-3">
-<div class="glass p-4"><h3 class="font-bold">🆓 FREE - Student</h3><p class="text-3xl font-black">₹0</p><p>• Daily free AI from Puter<br>• Chat, Image, Voice<br>• Build apps<br>• Expense + Games</p><button class="btn mt-3" onclick="alert('Free activated! Login with Puter.')">Start Free</button></div>
-<div class="glass p-4"><h3 class="font-bold">⭐ PRO - Creator</h3><p class="text-3xl font-black">Pay to Puter</p><p>• Higher AI limits<br>• Unlimited builds<br>• Publish to GitHub<br>• High Thinking</p><button class="btn mt-3" onclick="alert('Pro = You pay Puter directly for your usage. Developer pays ₹0.')">Upgrade via Puter</button></div>
-<div class="glass p-4"><h3 class="font-bold">🏫 UNIVERSITY</h3><p class="text-3xl font-black">SBS Ferozepur</p><p>• For full class<br>• Shared projects<br>• Teacher dashboard</p><button class="btn mt-3" onclick="shareApp()">Share / Contact</button></div>
-</div><p class="text-xs text-slate-400 mt-3">Honest: Puter charges USER after free daily limit. Developer always pays ₹0.</p></section>
-
-<!-- GAMES -->
-<section id="games" class="tab p-4"><div class="glass p-4"><h2 class="font-bold">🎮 Three.js + Babylon.js Auto Selector</h2><p class="text-sm">Voxel / Small 3D → Three.js (Fast). Open World / GTA / PUBG → Babylon.js (Physics, Shadows).</p><div class="flex gap-2 mt-3"><button class="btn" onclick="loadGame('three')">Minecraft Mini</button><button class="btn2" onclick="loadGame('babylon')">GTA Mini City</button></div><div id="gameArea" class="mt-3"></div></div></section>
-
 <script>
-let history=[], lastAI="Hello I am Sofia", expenses=JSON.parse(localStorage.getItem('sbs_expenses')||'[]'), chart=null;
-function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active')}
-function installApp(){alert('To Install: Android Chrome → Menu → Add to Home Screen. iPhone Safari → Share → Add to Home Screen. Opens like real app with icon, no Chrome bar.')}
-function shareApp(){let url=location.href;window.open('https://wa.me/?text='+encodeURIComponent('Check SBS Ferozepur AI Studio - Sofia AI! Build apps, websites, games free: '+url),'_blank')}
-async function login(){try{await puter.auth.signIn();let u=await puter.auth.getUser();document.getElementById('loginBtn').innerText='Hi '+u.username}catch(e){alert(e.message)}}
-async function sendChat(){let p=document.getElementById('prompt').value;if(!p)return;let box=document.getElementById('chatBox');box.innerHTML+=`<div class="msg user">${p}</div>`;document.getElementById('prompt').value='';try{let res=await puter.ai.chat(p,{model:document.getElementById('model').value,temperature:parseFloat(document.getElementById('temp').value)});let txt=res.message?.content||res.toString();lastAI=txt;box.innerHTML+=`<div class="msg ai">${txt}</div>`;history.push({q:p,a:txt});localStorage.setItem('sbs_chat',JSON.stringify(history))}catch(e){box.innerHTML+=`<div class="msg ai">Please Login with Puter once. Error: ${e.message}</div>`}box.scrollTop=box.scrollHeight}
-async function generateImage(){let p=prompt('What image?');if(!p)return;try{let img=await puter.ai.txt2img(p);document.getElementById('imgOut').innerHTML=`<img src="${img.src}" class="rounded-xl w-full">`}catch(e){alert('Login first: '+e.message)}}
-function startVoice(){let SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return alert('Voice not supported');let r=new SR();r.lang=document.getElementById('lang').value;r.onresult=e=>{document.getElementById('prompt').value=e.results[0][0].transcript;sendChat()};r.start()}
-function speakLast(){let u=new SpeechSynthesisUtterance(lastAI);u.lang=document.getElementById('lang').value;speechSynthesis.speak(u)}
-function exportChat(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(history,null,2)]));a.download='sofia-chat.json';a.click()}
-async function uploadFile(e){let f=e.target.files[0];if(!f)return;document.getElementById('chatBox').innerHTML+=`<div class="msg user">Uploaded: ${f.name}</div>`;try{let txt=await puter.ai.img2txt(URL.createObjectURL(f));document.getElementById('chatBox').innerHTML+=`<div class="msg ai">Analysis: ${txt}</div>`}catch(err){document.getElementById('chatBox').innerHTML+=`<div class="msg ai">File received: ${f.name}. Ask Sofia about it.</div>`}}
-function updatePreview(){document.getElementById('preview').srcdoc=document.getElementById('codeEditor').value}
-function downloadCode(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([document.getElementById('codeEditor').value||'<h1>App</h1>']));a.download='my-app-from-sofia.html';a.click()}
-async function saveToPuter(){try{await puter.fs.write('sofia-app-'+Date.now()+'.html',document.getElementById('codeEditor').value);alert('Saved to Puter Drive!')}catch(e){alert('Login first: '+e.message)}}
-async function buildAnything(){let p=document.getElementById('buildPrompt').value||'Build me a portfolio';document.getElementById('buildStatus').innerText='Sofia is building...';try{let res=await puter.ai.chat(`You are Sofia, senior Full-Stack Developer + UI/UX Designer. Build complete single HTML file with Tailwind, high-quality graphics, fully working, no TODO. If game is voxel/small 3D use Three.js, if open world/GTA use Babylon.js. User wants: ${p}. Return ONLY full HTML.`,{model:document.getElementById('model').value,temperature:0.7});let code=(res.message?.content||'').replace(/```html|```/g,'');document.getElementById('codeEditor').value=code;updatePreview();showTab('chat');document.getElementById('buildStatus').innerText='Built! Check Live Preview.'}catch(e){document.getElementById('buildStatus').innerText='Login with Puter to build.'}}
-function quickBuild(t){if(t=='expense')showTab('expense');if(t=='minecraft')loadGame('three');if(t=='gta')loadGame('babylon')}
-let agents=[{n:'Study Agent',d:'Notes, quizzes in Punjabi/Hindi/English',p:'You are Study Agent. Explain simply.'},{n:'Coding Agent',d:'Full code + debug',p:'You are Coding Agent. Write complete code, fix bugs.'},{n:'Research Agent',d:'Online research',p:'You are Research Agent. Research deeply.'},{n:'Personal Assistant',d:'Tasks, planning',p:'You are Personal Assistant.'}];
-document.getElementById('agentGrid').innerHTML=agents.map((a,i)=>`<div class="glass p-4"><h3 class="font-bold">${a.n}</h3><p class="text-sm text-slate-400">${a.d}</p><button class="btn mt-2" onclick="useAgent(${i})">Use Agent</button></div>`).join('');
-function useAgent(i){document.getElementById('prompt').value=agents[i].p+' ';showTab('chat')}
-function saveProject(){let n=document.getElementById('projectName').value||'Untitled';let ps=JSON.parse(localStorage.getItem('sbs_projects')||'[]');ps.push({name:n,date:new Date().toLocaleString(),code:document.getElementById('codeEditor').value});localStorage.setItem('sbs_projects',JSON.stringify(ps));renderProjects()}
-function renderProjects(){let p=JSON.parse(localStorage.getItem('sbs_projects')||'[]');document.getElementById('projectList').innerHTML=p.map(x=>`<div>📁 ${x.name} - ${x.date}</div>`).join('')||'No projects'}
-renderProjects();
-function addExpense(){let t=document.getElementById('expTitle').value,a=parseFloat(document.getElementById('expAmt').value),d=document.getElementById('expDate').value||new Date().toISOString().slice(0,10),c=document.getElementById('expCat').value;if(!t||!a)return alert('Enter title + amount');expenses.push({id:Date.now(),title:t,amount:a,date:d,cat:c});localStorage.setItem('sbs_expenses',JSON.stringify(expenses));renderExpenses()}
-function renderExpenses(){let f=document.getElementById('filterMonth').value;let list=f?expenses.filter(e=>e.date.startsWith(f)):expenses;document.getElementById('totalExp').innerText='₹'+list.reduce((s,e)=>s+e.amount,0);document.getElementById('countExp').innerText=list.length;let months=[...new Set(expenses.map(e=>e.date.slice(0,7)))];document.getElementById('filterMonth').innerHTML='<option value="">All Months</option>'+months.map(m=>`<option>${m}</option>`).join('');document.getElementById('expList').innerHTML=list.map(e=>`<div class="flex justify-between bg-slate-800 p-2 rounded-lg my-1"><span>${e.title} • ${e.cat} • ${e.date}</span><span>₹${e.amount}</span></div>`).join('')||'No expenses';if(chart)chart.destroy();chart=new Chart(document.getElementById('expChart'),{type:'doughnut',data:{labels:[...new Set(list.map(e=>e.cat))],datasets:[{data:[...new Set(list.map(e=>e.cat))].map(c=>list.filter(e=>e.cat==c).reduce((s,e)=>s+e.amount,0))]}})}
-renderExpenses();
-async function publishToGitHub(){let token=document.getElementById('ghToken').value,user=document.getElementById('ghUser').value,repo=document.getElementById('ghRepo').value,code=document.getElementById('codeEditor').value||'<h1>Hello from Sofia</h1>';if(!token||!user||!repo)return alert('Fill Token + Username + Repo');document.getElementById('ghStatus').innerText='Publishing...';try{await fetch('https://api.github.com/user/repos',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({name:repo,auto_init:true,private:false})});let content=btoa(unescape(encodeURIComponent(code)));let put=await fetch(`https://api.github.com/repos/${user}/${repo}/contents/index.html`,{method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({message:'Created by Sofia AI Studio',content:content})});if(put.ok){document.getElementById('ghStatus').innerHTML=`✅ LIVE! <a class="underline text-orange-400" target="_blank" href="https://${user}.github.io/${repo}/">https://${user}.github.io/${repo}/</a>`}else{let err=await put.json();document.getElementById('ghStatus').innerText='Error: '+(err.message||'Check token/repo')}}catch(e){document.getElementById('ghStatus').innerText='Error: '+e.message}}
-function saveKey(){let prov=document.getElementById('keyProvider').value,key=document.getElementById('customKey').value;if(!key)return alert('Paste key');let keys=JSON.parse(localStorage.getItem('sbs_keys')||'[]');keys.push({provider:prov,key:key.slice(0,6)+'****'});localStorage.setItem('sbs_keys',JSON.stringify(keys));localStorage.setItem('sbs_active_key',key);document.getElementById('keyStatus').innerText='✅ Key Attached for '+prov;renderKeys()}
-function removeKey(){localStorage.removeItem('sbs_active_key');localStorage.removeItem('sbs_keys');renderKeys();document.getElementById('keyStatus').innerText='Key removed.'}
-function renderKeys(){let k=JSON.parse(localStorage.getItem('sbs_keys')||'[]');document.getElementById('attachedKeys').innerHTML=k.map(x=>`<div>🔑 ${x.provider} - ${x.key}</div>`).join('')||'No keys yet'}
-renderKeys();
-function loadGame(engine){if(engine=='three'){document.getElementById('gameArea').innerHTML=`<div class="bg-green-900 p-4 rounded-xl"><h3>🧱 Minecraft Mini - Three.js</h3><div class="grid grid-cols-10 gap-1 mt-2">${Array(50).fill(0).map((_,i)=>`<div onclick="this.style.opacity=0" class="h-8 ${i%3==0?'bg-green-600':'bg-amber-700'} rounded cursor-pointer"></div>`).join('')}</div><p class="text-xs mt-2">Click block to break.</p></div>`}else{document.getElementById('gameArea').innerHTML=`<div class="bg-slate-900 p-4 rounded-xl"><h3>🚗 GTA Mini City - Babylon.js</h3><div class="h-40 bg-gradient-to-b from-sky-400 to-green-500 rounded-xl relative"><div id="car" class="absolute bottom-2 left-10 text-4xl">🚗</div></div><p class="text-xs">Press ← → to drive</p></div>`;document.onkeydown=e=>{let c=document.getElementById('car');if(!c)return;let l=parseInt(c.style.left||40);if(e.key=='ArrowRight')c.style.left=(l+20)+'px';if(e.key=='ArrowLeft')c.style.left=(l-20)+'px'}}}
+let currentCat='all';
+let apps=[
+{file:'gta-mini-city.html',name:'GTA Mini City',cat:'Games',emoji:'🚗',desc:'GTA 3D Open World - Car + Gun + Mission',color:'from-slate-700 to-slate-900'},
+{file:'minecraft-mini.html',name:'Minecraft Mini',cat:'Games',emoji:'⛏️',desc:'Minecraft 3D - Build + Break + Survival',color:'from-green-600 to-emerald-800'},
+{file:'freefire-mini.html',name:'Free Fire Mini',cat:'Games',emoji:'🔥',desc:'Free Fire - Battle Royale + Gun Fight',color:'from-orange-600 to-red-700'},
+{file:'pubg-mini.html',name:'PUBG / BGMI Mini',cat:'Games',emoji:'🎯',desc:'PUBG 3D - Erangel + Loot + Chicken Dinner',color:'from-yellow-600 to-orange-700'},
+{file:'social-mini.html',name:'Social Mini',cat:'Social',emoji:'💬',desc:'WhatsApp + Instagram in One App',color:'from-green-500 to-blue-500'},
+{file:'snapchat-mini.html',name:'Snapchat Mini',cat:'Social',emoji:'👻',desc:'Snapchat - Filters + Streaks + Stories',color:'from-yellow-400 to-yellow-600'},
+{file:'music-mini.html',name:'Music Mini',cat:'Tools',emoji:'🎵',desc:'DJ + Piano + Drums + Karaoke + Recording',color:'from-purple-600 to-pink-600'},
+{file:'photo-editor-mini.html',name:'Photo Editor Mini',cat:'Tools',emoji:'📸',desc:'AI Photo Editor - Filters + BG Remove',color:'from-pink-500 to-rose-600'},
+{file:'study-mini.html',name:'Study Mini',cat:'Tools',emoji:'📚',desc:'AI Teacher - Notes + Quiz + Doubt Solver',color:'from-indigo-600 to-blue-600'},
+{file:'news-mini.html',name:'News Mini',cat:'Tools',emoji:'📰',desc:'News + Weather + Live Cricket Score',color:'from-red-600 to-orange-600'},
+{file:'fitness-mini.html',name:'Fitness Mini',cat:'Tools',emoji:'💪',desc:'Gym + Diet + Yoga + Steps Tracker',color:'from-green-600 to-teal-600'},
+{file:'shop-mini.html',name:'Shop Mini',cat:'Business',emoji:'🛒',desc:'E-Commerce - Amazon Style + Admin Panel',color:'from-blue-600 to-cyan-600'},
+{file:'food-mini.html',name:'Food Mini',cat:'Business',emoji:'🍔',desc:'Zomato / Swiggy - Order Food + Tracking',color:'from-red-500 to-orange-500'},
+{file:'job-mini.html',name:'Job Mini',cat:'Business',emoji:'💼',desc:'Jobs + Resume Maker + Interview Prep',color:'from-green-500 to-emerald-600'},
+{file:'cab-mini.html',name:'Cab Mini',cat:'Travel',emoji:'🚕',desc:'Ola / Uber - Book Cab + Live Map + Driver',color:'from-yellow-500 to-amber-600'},
+{file:'hotel-mini.html',name:'Hotel Mini',cat:'Travel',emoji:'🏨',desc:'Hotel + Tours - MakeMyTrip Style Booking',color:'from-blue-500 to-indigo-600'},
+{file:'trading-mini.html',name:'Trading Mini',cat:'Finance',emoji:'📈',desc:'Paper Trading - Learn 1-2% Rule + Charts',color:'from-slate-700 to-slate-900'},
+{file:'bank-mini.html',name:'Bank Mini',cat:'Finance',emoji:'🏦',desc:'Digital Bank - UPI + Send Money + FD',color:'from-emerald-600 to-teal-700'},
+{file:'index.html',name:'Main Studio',cat:'all',emoji:'🏠',desc:'This Home Page - All Apps List',color:'from-purple-700 to-pink-700',isHome:true}
+];
+function shareStudio(){let url=location.href; window.open('https://wa.me/?text='+encodeURIComponent('🚀 SBS AI STUDIO - 19 Apps in One! GTA + Minecraft + PUBG + WhatsApp + Instagram + Food + Cab + Bank + More. Made at SBS Ferozepur. Open: '+url),'_blank')}
+function filterCat(cat,btn){currentCat=cat; document.querySelectorAll('.catBtn').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); renderApps()}
+function renderApps(){
+let q=(document.getElementById('search').value||'').toLowerCase();
+let list=apps.filter(a=>!a.isHome).filter(a=>(currentCat=='all'||a.cat==currentCat)&&(a.name.toLowerCase().includes(q)||a.desc.toLowerCase().includes(q)));
+document.getElementById('appGrid').innerHTML=list.map(a=>`<a href="${a.file}" class="glass p-4 block bg-gradient-to-br ${a.color}"><div class="flex justify-between items-start"><span class="text-4xl">${a.emoji}</span><span class="bg-white/20 text-[10px] px-2 py-0.5 rounded-full">${a.cat}</span></div><b class="block mt-2 text-lg leading-tight">${a.name}</b><p class="text-xs text-white/80 mt-1 leading-snug">${a.desc}</p><div class="mt-3 bg-white text-black text-xs font-black px-3 py-1.5 rounded-full inline-block">OPEN APP →</div></a>`).join('')||`<div class="col-span-4 text-center p-8 glass">No apps found for "${q}". Try Games, Food, Bank...</div>`;
+}
+renderApps();
+window.addEventListener('load',()=>{setTimeout(()=>{if(!localStorage.getItem('sbs_welcome')){alert('🎉 Welcome to SBS AI STUDIO!\n\n19 Apps Ready:\n🎮 GTA, Minecraft, Free Fire, PUBG\n💬 WhatsApp, Instagram, Snapchat\n🛒 Shop, Food, Cab, Hotel\n💼 Jobs, Bank, Fitness, News\n\nAll Free + Save in Phone + Made at SBS Ferozepur!\n\nClick any app to open!'); localStorage.setItem('sbs_welcome','1')}},800)})
 </script>
 </body>
-  </html>
+</html>
