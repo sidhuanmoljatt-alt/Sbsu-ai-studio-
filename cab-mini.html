@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cab Mini - Ola / Uber | SBS Ferozepur</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{background:#fefce8;color:#111;font-family:Inter,system-ui}
+.glass{background:#fff;border:1px solid #fde68a;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.btn{background:#111;color:#fff;padding:10px 16px;border-radius:999px;font-weight:800}
+.btn2{background:#fef9c3;padding:9px 13px;border-radius:999px;border:1px solid #fde68a}
+input,select{background:#fff;border:1px solid #fde68a;border-radius:10px;padding:10px;width:100%;color:#111}
+.tab{display:none}.tab.active{display:block}
+.cabOpt{border:2px solid #fde68a;border-radius:14px;padding:10px;cursor:pointer;text-align:center}
+.cabOpt.selected{border-color:#111;background:#fef9c3}
+</style>
+</head>
+<body>
+<header class="p-3 flex justify-between items-center sticky top-0 z-20 bg-white shadow">
+<div><h1 class="font-black text-lg">🚕 CAB <span class="text-yellow-600">MINI</span></h1><p class="text-[11px] text-slate-500">SBS Ferozepur • Sofia AI • Ola Style</p></div>
+<div class="flex gap-2"><button class="btn2" onclick="showTab('book')">🚕 Book</button><button class="btn2" onclick="showTab('rides')">📜 My Rides</button><button class="btn2" onclick="showTab('driver')">🧑‍✈️ Driver App</button><button class="btn2" onclick="window.location.href='index.html'">🏠 Studio</button></div>
+</header>
+
+<!-- BOOK -->
+<section id="book" class="tab active px-3 pb-4">
+<div class="grid md:grid-cols-2 gap-3 mt-2">
+<div class="glass p-4">
+<h3 class="font-bold text-lg">🚕 Book Your Ride</h3>
+<label class="text-xs">Pickup Location</label><select id="pickup" onchange="calcFare()"><option>SBS University, Ferozepur</option><option>Ferozepur Railway Station</option><option>Ferozepur Cantt</option><option>Bus Stand Ferozepur</option><option>Zira Gate</option><option>Mall Road, Ferozepur</option><option>SBS Hostel</option><option>City Center Ferozepur</option></select>
+<label class="text-xs mt-2 block">Drop Location</label><select id="drop" onchange="calcFare()"><option>Ferozepur Railway Station</option><option>SBS University, Ferozepur</option><option>Ferozepur Cantt</option><option>Bus Stand Ferozepur</option><option>Zira Gate</option><option>Mall Road, Ferozepur</option><option>Amritsar Airport (120 km)</option><option>Ludhiana (110 km)</option></select>
+<h4 class="font-bold mt-3">Choose Cab</h4>
+<div class="grid grid-cols-4 gap-2 mt-2">
+<div class="cabOpt selected" onclick="selectCab('Auto',this)"><div class="text-3xl">🛺</div><b>Auto</b><div class="text-xs">₹8/km</div></div>
+<div class="cabOpt" onclick="selectCab('Mini',this)"><div class="text-3xl">🚗</div><b>Mini</b><div class="text-xs">₹12/km</div></div>
+<div class="cabOpt" onclick="selectCab('Sedan',this)"><div class="text-3xl">🚙</div><b>Sedan</b><div class="text-xs">₹15/km</div></div>
+<div class="cabOpt" onclick="selectCab('SUV',this)"><div class="text-3xl">🚐</div><b>SUV</b><div class="text-xs">₹18/km</div></div>
+</div>
+<div class="flex gap-2 mt-3"><input id="coupon" placeholder="Coupon: CAB100 = ₹100 OFF"><button class="btn2" onclick="applyCoupon()">Apply</button></div>
+<div class="bg-yellow-50 p-3 rounded-xl mt-3 text-sm"><div class="flex justify-between"><span>Distance</span><b id="distance">4.2 km</b></div><div class="flex justify-between"><span>Estimated Time</span><b id="eta">12 min</b></div><div class="flex justify-between"><span>Base Fare</span><b id="baseFare">₹50</b></div><div class="flex justify-between"><span>Discount</span><b id="discount" class="text-green-600">-₹0</b></div><div class="flex justify-between text-lg font-black border-t pt-1"><span>Total Fare</span><b id="totalFare">₹84</b></div></div>
+<select id="payMethod" class="mt-3"><option>Cash</option><option>UPI - GPay / PhonePe</option><option>Card</option></select>
+<button class="btn w-full mt-3" onclick="bookCab()">✅ Book Cab Now</button>
+</div>
+<div class="glass p-4">
+<h3 class="font-bold">🗺️ Live Map - Ferozepur</h3>
+<div class="relative h-[300px] bg-green-100 rounded-xl mt-2 overflow-hidden">
+<div class="absolute left-3 top-3 bg-white px-2 py-1 rounded text-xs shadow">📍 <span id="mapPickup">SBS University</span></div>
+<div class="absolute right-3 bottom-3 bg-white px-2 py-1 rounded text-xs shadow">🏁 <span id="mapDrop">Railway Station</span></div>
+<div class="absolute left-[20%] top-[30%] text-xs bg-yellow-200 px-2 py-1 rounded-full">Zira Gate</div>
+<div class="absolute left-[60%] top-[60%] text-xs bg-blue-200 px-2 py-1 rounded-full">Cantt</div>
+<div id="cabIcon" class="absolute text-4xl transition-all duration-1000" style="left:20px;top:20px">🚕</div>
+<div id="routeLine" class="absolute h-1 bg-yellow-500" style="left:20px;top:35px;width:200px;transform:rotate(25deg)"></div>
+</div>
+<div id="driverBox" class="hidden mt-3 bg-black text-white p-3 rounded-xl"><div class="flex gap-3 items-center"><span class="text-4xl">🧑‍✈️</span><div class="flex-1"><b id="driverName">Gurpreet Singh</b><div class="text-xs">⭐ 4.8 • Swift Dzire • PB05 AB 1234</div><div class="text-xs">OTP: <b class="text-yellow-400 text-lg" id="otp">4521</b> • Tell OTP to driver</div></div><button class="bg-yellow-400 text-black px-3 py-1 rounded-full text-sm" onclick="callDriver()">📞 Call</button></div><div class="flex gap-2 mt-2"><button class="btn2 !text-black flex-1" onclick="moveCab()">🚕 Move Cab Closer</button><button class="btn2 !text-black flex-1" onclick="cancelRide()">❌ Cancel</button></div></div>
+<p class="text-xs text-slate-500 mt-2">Demo app - No real cab will come. For learning Ola / Uber system.</p>
+</div>
+</div>
+</section>
+
+<!-- RIDES -->
+<section id="rides" class="tab px-3 pb-4">
+<div class="glass p-4 mt-2"><h3 class="font-bold text-lg">📜 My Rides</h3><div id="rideList" class="mt-3 space-y-3"></div></div>
+</section>
+
+<!-- DRIVER -->
+<section id="driver" class="tab px-3 pb-4">
+<div class="grid md:grid-cols-2 gap-3 mt-2">
+<div class="glass p-4"><h3 class="font-bold">🧑‍✈️ Driver App - Go Online</h3><div class="flex items-center gap-2 mt-3"><span class="text-2xl">🟢</span><b id="onlineStatus">Offline</b><button class="btn ml-auto" onclick="toggleOnline()">Go Online</button></div><div class="grid grid-cols-3 gap-2 text-center text-sm mt-3"><div class="bg-yellow-50 p-2 rounded-lg">Today Earning<br><b id="driverEarning">₹0</b></div><div class="bg-green-50 p-2 rounded-lg">Rides<br><b id="driverRides">0</b></div><div class="bg-blue-50 p-2 rounded-lg">Rating<br><b>4.8 ⭐</b></div></div><div id="driverRequests" class="mt-3 space-y-2"></div></div>
+<div class="glass p-4"><h3 class="font-bold">💰 Driver Earnings History</h3><div id="driverHistory" class="mt-2 space-y-2 text-sm"></div></div>
+</div>
+</section>
+
+<script>
+let rides=JSON.parse(localStorage.getItem('cab_rides')||'[]');
+let driverEarning=parseInt(localStorage.getItem('cab_earning')||'0');
+let selectedCab='Auto', couponApplied=false, cabPos=20, currentRide=null;
+let distances={'SBS University, Ferozepur':0,'Ferozepur Railway Station':4.2,'Ferozepur Cantt':6.5,'Bus Stand Ferozepur':3.1,'Zira Gate':5.8,'Mall Road, Ferozepur':2.5,'SBS Hostel':0.8,'City Center Ferozepur':3.8,'Amritsar Airport (120 km)':120,'Ludhiana (110 km)':110};
+let rates={Auto:8,Mini:12,Sedan:15,SUV:18};
+function save(){localStorage.setItem('cab_rides',JSON.stringify(rides)); localStorage.setItem('cab_earning',driverEarning)}
+function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active')}
+function selectCab(c,el){selectedCab=c; document.querySelectorAll('.cabOpt').forEach(o=>o.classList.remove('selected')); el.classList.add('selected'); calcFare()}
+function calcFare(){
+let p=document.getElementById('pickup').value, d=document.getElementById('drop').value;
+let dist=Math.abs((distances[d]||5)-(distances[p]||0)); if(dist<1) dist=2.5;
+let base=50+dist*rates[selectedCab];
+let disc=couponApplied?100:0;
+document.getElementById('distance').innerText=dist.toFixed(1)+' km';
+document.getElementById('eta').innerText=Math.round(dist*3+5)+' min';
+document.getElementById('baseFare').innerText='₹'+Math.round(base);
+document.getElementById('discount').innerText='-₹'+disc;
+document.getElementById('totalFare').innerText='₹'+Math.max(30,Math.round(base-disc));
+document.getElementById('mapPickup').innerText=p.split(',')[0];
+document.getElementById('mapDrop').innerText=d.split(',')[0];
+return {dist:dist,fare:Math.max(30,Math.round(base-disc))};
+}
+function applyCoupon(){let v=document.getElementById('coupon').value.trim().toUpperCase(); if(v=='CAB100'){couponApplied=true; alert('₹100 OFF Applied!')} else {couponApplied=false; alert('Wrong Coupon. Try CAB100')} calcFare()}
+function bookCab(){
+let f=calcFare(); let p=document.getElementById('pickup').value, d=document.getElementById('drop').value;
+let otp=Math.floor(1000+Math.random()*9000);
+currentRide={id:'CAB'+Date.now(),pickup:p,drop:d,cab:selectedCab,fare:f.fare,dist:f.dist,pay:document.getElementById('payMethod').value,otp:otp,status:'Driver Arriving',date:new Date().toLocaleString()};
+rides.unshift(currentRide); save(); renderRides();
+document.getElementById('driverBox').classList.remove('hidden');
+document.getElementById('driverName').innerText=['Gurpreet Singh','Harpreet Kaur','Manpreet Singh','Simran Kaur'][Math.floor(Math.random()*4)];
+document.getElementById('otp').innerText=otp;
+alert('Cab Booked! '+selectedCab+' • Fare ₹'+f.fare+' • OTP: '+otp+' • Driver arriving in 5 min');
+}
+function moveCab(){cabPos=Math.min(80,cabPos+18); document.getElementById('cabIcon').style.left=cabPos+'%'; document.getElementById('cabIcon').style.top=(20+cabPos/2)+'%'; if(cabPos>=80) alert('Cab Arrived! Tell OTP '+ (currentRide?currentRide.otp:'') +' to driver. Have a safe ride!')}
+function cancelRide(){if(!currentRide) return alert('No active ride'); currentRide.status='Cancelled'; save(); renderRides(); document.getElementById('driverBox').classList.add('hidden'); alert('Ride Cancelled. No charge.')}
+function callDriver(){alert('Calling Driver... (Demo) Driver: Sat Sri Akal! Main 5 min me pahunch raha haan.')}
+function renderRides(){
+document.getElementById('rideList').innerHTML=rides.map(r=>`<div class="border p-3 rounded-xl"><div class="flex justify-between"><b>${r.id}</b><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs">${r.status}</span></div><div class="text-sm mt-1">📍 ${r.pickup} → 🏁 ${r.drop}</div><div class="text-sm">${r.cab} • ${r.dist.toFixed(1)} km • <b>₹${r.fare}</b> • ${r.pay} • OTP: ${r.otp}</div><div class="flex gap-2 mt-2"><button class="btn2 text-xs" onclick="rebook('${r.id}')">🔁 Rebook</button><button class="btn2 text-xs" onclick="rateRide('${r.id}')">⭐ Rate Driver</button></div></div>`).join('')||'No rides yet. Book your first cab!';
+document.getElementById('driverHistory').innerHTML=rides.slice(0,5).map(r=>`<div class="bg-slate-50 p-2 rounded-lg">Ride ${r.id} - ₹${r.fare} - ${r.cab}</div>`).join('')||'No rides yet.';
+document.getElementById('driverEarning').innerText='₹'+driverEarning;
+document.getElementById('driverRides').innerText=rides.length;
+}
+function rebook(id){let r=rides.find(x=>x.id==id); document.getElementById('pickup').value=r.pickup; document.getElementById('drop').value=r.drop; showTab('book'); calcFare(); alert('Pickup / Drop filled. Click Book Cab Now.')}
+function rateRide(id){let s=prompt('Rate driver 1-5 stars:'); if(s) alert('Thanks! You rated '+s+' stars. Driver is happy!')}
+let isOnline=false;
+function toggleOnline(){
+isOnline=!isOnline; document.getElementById('onlineStatus').innerText=isOnline?'Online - Waiting for Rides':'Offline';
+if(isOnline){
+document.getElementById('driverRequests').innerHTML=`<div class="bg-green-50 p-3 rounded-xl"><b>🔔 New Ride Request!</b><div class="text-sm">SBS University → Railway Station • 4.2 km • ₹84 • Mini</div><div class="flex gap-2 mt-2"><button class="btn text-sm" onclick="acceptRide()">✅ Accept</button><button class="btn2 text-sm" onclick="document.getElementById('driverRequests').innerHTML=''">❌ Reject</button></div></div>`;
+} else document.getElementById('driverRequests').innerHTML='';
+}
+function acceptRide(){
+let earn=84; driverEarning+=earn; save(); renderRides();
+document.getElementById('driverRequests').innerHTML=`<div class="bg-blue-50 p-3 rounded-xl"><b>🚕 Ride Accepted! Go to Pickup: SBS University</b><div class="text-sm">Passenger: Anmol • OTP: 4521 • Fare: ₹84</div><button class="btn2 mt-2" onclick="completeRide()">✅ Complete Ride - Collect ₹84</button></div>`;
+}
+function completeRide(){alert('Ride Completed! ₹84 added to your earnings.'); document.getElementById('driverRequests').innerHTML=''; renderRides()}
+calcFare(); renderRides();
+</script>
+</body>
+</html>
